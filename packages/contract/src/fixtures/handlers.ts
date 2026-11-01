@@ -1,4 +1,4 @@
-// Обработчики MSW витрины на данных демо-магазина. Пагинацию и поиск упрощаем:
+// Обработчики MSW витрины на данных демо-магазина. Фильтры, пагинацию и поиск упрощаем:
 // задача моков — дать фронту реалистичные ответы, а не повторить логику API.
 import { HttpResponse, type HttpHandler } from 'msw';
 
@@ -15,8 +15,33 @@ import {
 import type { Problem } from '../gen/types.gen.js';
 import { createDemoShopData, demoShop } from './demo-shop.js';
 
-// Картинки отдаёт само приложение (папка /demo), поэтому база — адрес страницы, а не API.
-const dataFor = (request: Request) => createDemoShopData(globalThis.location?.origin ?? new URL(request.url).origin);
+export type DemoHandlersOptions = RequestHandlerOptions & {
+  /** Откуда приложение отдаёт фото (`<assetBase>/demo/<имя>.jpg`). Пустая строка — адреса от корня страницы. */
+  assetBase?: string;
+};
+
+const DEFAULT_PAGE_SIZE = 30;
+
+// Картинки отдаёт само приложение (папка /demo), поэтому по умолчанию база — адрес страницы, а не API.
+const dataFor = (request: Request, assetBase?: string) =>
+  createDemoShopData(assetBase ?? globalThis.location?.origin ?? new URL(request.url).origin);
+
+/** Карточки по фильтрам запроса: категория, поиск, сортировка (демо-магазин плоский, без подкатегорий). */
+const filterCards = (request: Request, assetBase?: string) => {
+  const { cards, products } = dataFor(request, assetBase);
+  const params = new URL(request.url).searchParams;
+  const categoryId = params.get('categoryId');
+  const query = params.get('q')?.toLowerCase();
+  const sort = params.get('sort');
+  const items = cards.filter((card) => {
+    const product = products.find((entry) => entry.id === card.id);
+    if (categoryId && product?.category?.id !== categoryId) return false;
+    return !query || card.name.toLowerCase().includes(query);
+  });
+  if (sort === 'price_asc') items.sort((a, b) => a.price - b.price);
+  if (sort === 'price_desc') items.sort((a, b) => b.price - a.price);
+  return items;
+};
 
 const notFound = (): Response =>
   HttpResponse.json<Problem>(
@@ -26,39 +51,43 @@ const notFound = (): Response =>
 
 const isDemo = (subdomain: string | readonly string[] | undefined): boolean => subdomain === demoShop.subdomain;
 
-export const demoStorefrontHandlers = (options?: RequestHandlerOptions): HttpHandler[] => [
+export const demoStorefrontHandlers = ({ assetBase, ...options }: DemoHandlersOptions = {}): HttpHandler[] => [
   handleGetStorefrontShop(
     ({ params }) => (isDemo(params.subdomain) ? HttpResponse.json(demoShop) : notFound()),
     options,
   ),
   handleListStorefrontCategories(
-    ({ params, request }) => (isDemo(params.subdomain) ? HttpResponse.json(dataFor(request).categories) : notFound()),
+    ({ params, request }) =>
+      isDemo(params.subdomain) ? HttpResponse.json(dataFor(request, assetBase).categories) : notFound(),
     options,
   ),
   handleListStorefrontProducts(({ params, request }) => {
     if (!isDemo(params.subdomain)) return notFound();
-    const { cards, products } = dataFor(request);
-    const url = new URL(request.url);
-    const categoryId = url.searchParams.get('categoryId');
-    const query = url.searchParams.get('q')?.toLowerCase();
-    const items = cards.filter((card) => {
-      const product = products.find((entry) => entry.id === card.id);
-      if (categoryId && product?.category?.id !== categoryId) return false;
-      return !query || card.name.toLowerCase().includes(query);
+    const query = new URL(request.url).searchParams;
+    const items = filterCards(request, assetBase);
+    // курсор в моках — просто смещение от начала выборки
+    const offset = Number(query.get('cursor') ?? 0) || 0;
+    const limit = Number(query.get('limit') ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE;
+    const next = offset + limit;
+    return HttpResponse.json({
+      items: items.slice(offset, next),
+      nextCursor: next < items.length ? String(next) : null,
     });
-    return HttpResponse.json({ items, nextCursor: null });
   }, options),
   handleGetStorefrontFacets(
-    ({ params, request }) => (isDemo(params.subdomain) ? HttpResponse.json(dataFor(request).facets) : notFound()),
+    ({ params, request }) =>
+      isDemo(params.subdomain)
+        ? HttpResponse.json({ ...dataFor(request, assetBase).facets, total: filterCards(request, assetBase).length })
+        : notFound(),
     options,
   ),
   handleGetStorefrontProduct(({ params, request }) => {
-    const product = dataFor(request).products.find((entry) => entry.shortId === params.shortId);
+    const product = dataFor(request, assetBase).products.find((entry) => entry.shortId === params.shortId);
     return isDemo(params.subdomain) && product ? HttpResponse.json(product) : notFound();
   }, options),
   handleCheckStorefrontCart(async ({ request }) => {
     const { items } = await request.json();
-    const { products } = dataFor(request);
+    const { products } = dataFor(request, assetBase);
     let total = 0;
     const checked = items.map((item) => {
       const product = products.find((entry) => entry.variants.some((variant) => variant.id === item.variantId));

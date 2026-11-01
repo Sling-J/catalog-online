@@ -1,11 +1,21 @@
 import type { StorefrontShop } from '@catalog/contract';
 import { useLingui } from '@lingui/react/macro';
+import type { ReactNode } from 'react';
 
 import { OpenStatus, ShopAvatar, whatsappLink } from '@/entities/shop';
 import { Icon } from '@/shared/ui';
 
 /** Шапка магазина, закреплена при прокрутке. Нажатие на название открывает «О магазине». */
-export function ShopHeader({ shop, onOpenAbout }: { shop: StorefrontShop; onOpenAbout: () => void }) {
+export function ShopHeader({
+  shop,
+  onOpenAbout,
+  children,
+}: {
+  shop: StorefrontShop;
+  onOpenAbout: () => void;
+  /** Что закреплено под строкой магазина: категории (позже поиск и фильтры). */
+  children?: ReactNode;
+}) {
   const { t } = useLingui();
 
   return (
@@ -39,6 +49,7 @@ export function ShopHeader({ shop, onOpenAbout }: { shop: StorefrontShop; onOpen
           <Icon name="whatsapp" size={22} />
         </a>
       </div>
+      {children && <div className="mx-auto max-w-[1240px]">{children}</div>}
     </header>
   );
 }

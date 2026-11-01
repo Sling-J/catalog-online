@@ -1,20 +1,14 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 
-import { shopQueryOptions } from '@/entities/shop';
-import { CatalogPage } from '@/pages/catalog';
+import { CatalogPage, loadCatalog, validateCatalogSearch } from '@/pages/catalog';
 import { LandingPage } from '@/pages/landing';
-import { isNotFoundError } from '@/shared/api';
 
 export const Route = createFileRoute('/')({
-  loader: async ({ context }) => {
+  validateSearch: validateCatalogSearch,
+  loaderDeps: ({ search }) => search,
+  loader: async ({ context, deps }) => {
     const { tenant, queryClient } = context;
-    if (tenant.kind !== 'shop') return;
-    try {
-      await queryClient.ensureQueryData(shopQueryOptions(tenant.subdomain));
-    } catch (error) {
-      if (isNotFoundError(error)) throw notFound();
-      throw error;
-    }
+    if (tenant.kind === 'shop') await loadCatalog(queryClient, tenant.subdomain, deps);
   },
   component: Home,
 });

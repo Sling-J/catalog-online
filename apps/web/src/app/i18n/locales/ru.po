@@ -7,6 +7,10 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: ru\n"
 
+#. placeholder {0}: facets.total
+msgid "{0, plural, one {# товар} few {# товара} many {# товаров} other {# товара}}"
+msgstr "{0, plural, one {# товар} few {# товара} many {# товаров} other {# товара}}"
+
 msgid "в воскресенье"
 msgstr "в воскресенье"
 
@@ -34,6 +38,9 @@ msgstr "Воскресенье"
 msgid "Вс"
 msgstr "Вс"
 
+msgid "Все"
+msgstr "Все"
+
 msgid "Вт"
 msgstr "Вт"
 
@@ -46,8 +53,17 @@ msgstr "Выходной"
 msgid "График работы"
 msgstr "График работы"
 
+msgid "Дешевле"
+msgstr "Дешевле"
+
+msgid "Дороже"
+msgstr "Дороже"
+
 msgid "Закрыто"
 msgstr "Закрыто"
+
+msgid "Здесь пока нет товаров"
+msgstr "Здесь пока нет товаров"
 
 msgid "Магазин в кармане"
 msgstr "Магазин в кармане"
@@ -55,11 +71,24 @@ msgstr "Магазин в кармане"
 msgid "Магазин не найден"
 msgstr "Магазин не найден"
 
+msgid "мало"
+msgstr "мало"
+
 msgid "Написать в WhatsApp"
 msgstr "Написать в WhatsApp"
 
+msgid "нет в наличии"
+msgstr "нет в наличии"
+
+msgid "Новые"
+msgstr "Новые"
+
 msgid "О магазине: адрес, график, контакты"
 msgstr "О магазине: адрес, график, контакты"
+
+#. placeholder {0}: formatPrice(card.price)
+msgid "от {0}"
+msgstr "от {0}"
 
 #. placeholder {0}: weekdays.on[status.next.day]
 #. placeholder {1}: status.next.time
@@ -111,6 +140,9 @@ msgstr "Скопировано"
 
 msgid "Скопировать адрес"
 msgstr "Скопировать адрес"
+
+msgid "Сортировка"
+msgstr "Сортировка"
 
 msgid "Ср"
 msgstr "Ср"
