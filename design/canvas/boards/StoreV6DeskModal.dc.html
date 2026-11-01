@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Витрина V6 — компьютер</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FBFAFF}
+.d6-btn{cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1),background-color .2s}
+.d6-btn:active{transform:translateY(2px)}
+.d6-btn:focus-visible{outline:3px solid #3B2FD9;outline-offset:2px}
+.d6-scroll{overflow-y:auto;scrollbar-width:thin}
+.d6-tile img{transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.d6-tile:hover img{transform:scale(1.04)}
+.d6-tile .d6-name{opacity:0;transition:opacity .2s}
+.d6-tile:hover .d6-name,.d6-tile:focus-visible .d6-name{opacity:1}
+.d6-pop{animation:d6pop .28s cubic-bezier(.16,1,.3,1)}
+.d6-side{animation:d6side .32s cubic-bezier(.16,1,.3,1)}
+.d6-fade{animation:d6fade .2s ease}
+@keyframes d6pop{from{transform:translateY(12px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+@keyframes d6side{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes d6fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.d6-pop,.d6-side,.d6-fade{animation:none}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 960px; position: relative; overflow: hidden; font-family: 'Geologica', system-ui, sans-serif; color: #17133D; background: #FBFAFF">
+
+<header style="position: relative; z-index: 4; height: 84px; background: #ffffff; border-bottom: 1px solid #ECEAF5">
+<div style="max-width: 1240px; height: 100%; margin: 0 auto; padding: 0 20px; box-sizing: border-box; display: flex; align-items: center; gap: 24px">
+<button class="d6-btn" type="button" onClick="{{toggleInfo}}" aria-expanded="{{infoExpanded}}" style="display: flex; align-items: center; gap: 12px; border: 0; background: transparent; padding: 6px 10px 6px 0; text-align: left; font-family: Geologica, sans-serif; color: #17133D">
+<span style="width: 48px; height: 48px; flex: none; border-radius: 50%; background: linear-gradient(140deg, #FF9CC8, #7C6CFF); color: #ffffff; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center">АK</span>
+<span><span style="display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 18px">Айгерим Kids <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B6694" stroke-width="2.4" stroke-linecap="round"><path d="M7 10l5 5 5-5"></path></svg></span>
+<span style="display: block; font-size: 13px; color: #4A4580">ТЦ «Мега», 2 этаж · <span style="color: #157A52; font-weight: 600">Открыто до 20:00</span></span></span>
+</button>
+<div style="flex: 1; display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 16px; border-radius: 16px; background: #EEECF8; color: #6B6694; font-size: 15px; max-width: 480px; margin: 0 auto"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6694" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Поиск по магазину</div>
+<button class="d6-btn" type="button" style="height: 48px; padding: 0 18px; border: 0; border-radius: 999px; background: #5EE6B0; color: #0B3A28; font: 700 15px Geologica, sans-serif; box-shadow: 0 3px 0 #26B985">Написать в WhatsApp</button>
+<button class="d6-btn" type="button" onClick="{{toggleCart}}" aria-expanded="{{cartExpanded}}" style="height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 18px 0 14px; border: 0; border-radius: 999px; background: #17133D; color: #ffffff; font: 700 15px Geologica, sans-serif; font-variant-numeric: tabular-nums">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11H6.2z"></path><path d="M9 8a3 3 0 0 1 6 0"></path></svg>{{cartBtn}}</button>
+</div>
+<sc-if value="{{showInfo}}" hint-placeholder-val="{{ false }}">
+<div class="d6-pop" style="position: absolute; left: max(20px, calc(50% - 600px)); top: 88px; width: 400px; padding: 20px; box-sizing: border-box; border-radius: 26px; background: #ffffff; box-shadow: 0 24px 60px rgba(23,19,61,.18)">
+<div style="display: flex; gap: 12px"><span style="width: 40px; height: 40px; flex: none; border-radius: 14px; background: #F1EFFA; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B2FD9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg></span>
+<div><div style="font-weight: 700; font-size: 15px">Шымкент, ТЦ «Мега»</div><div style="font-size: 14px; line-height: 1.5; color: #3A3672; margin-top: 2px">2 этаж, бутик 214. Вход со стороны парковки, от эскалатора направо, рядом с фуд-кортом.</div></div></div>
+<div style="display: flex; gap: 8px; margin-top: 14px"><button class="d6-btn" type="button" style="flex: 1; height: 42px; border: 0; border-radius: 14px; background: #17133D; color: #ffffff; font: 700 14px Geologica, sans-serif">Открыть в 2ГИС</button><button class="d6-btn" type="button" style="flex: 1; height: 42px; border: 0; border-radius: 14px; background: #F1EFFA; color: #17133D; font: 600 14px Geologica, sans-serif">Скопировать адрес</button></div>
+<div style="margin-top: 16px; font-size: 14px">
+<div style="display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #F0EEF7"><span>Пн–Пт</span><span style="font-variant-numeric: tabular-nums">10:00–20:00</span></div>
+<div style="display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #F0EEF7; font-weight: 700"><span>Сегодня, суббота</span><span style="color: #157A52; font-variant-numeric: tabular-nums">11:00–20:00</span></div>
+<div style="display: flex; justify-content: space-between; padding: 7px 0"><span>Воскресенье</span><span style="font-variant-numeric: tabular-nums">11:00–18:00</span></div>
+</div>
+<div style="display: flex; gap: 8px; margin-top: 12px; font-size: 14px"><span style="flex: 1; padding: 10px 12px; border-radius: 14px; background: #E6FBF2; color: #0B3A28; font-variant-numeric: tabular-nums">WhatsApp +7 700 000 00 00</span><span style="padding: 10px 12px; border-radius: 14px; background: #F6F5FB">@aigerim.kids</span></div>
+</div>
+</sc-if>
+<sc-if value="{{showCart}}" hint-placeholder-val="{{ false }}">
+<div class="d6-pop" style="position: absolute; right: max(20px, calc(50% - 600px)); top: 88px; width: 400px; padding: 20px; box-sizing: border-box; border-radius: 26px; background: #ffffff; box-shadow: 0 24px 60px rgba(23,19,61,.18)">
+<div style="font-weight: 800; font-size: 19px">Корзина</div>
+<sc-if value="{{cartEmpty}}" hint-placeholder-val="{{ false }}"><div style="margin-top: 10px; font-size: 14px; color: #4A4580">Пока пусто. Откройте товар и выберите размер.</div></sc-if>
+<div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px">
+<sc-for list="{{cartItems}}" as="it" hint-placeholder-count="2">
+<div style="display: flex; gap: 12px; align-items: center"><img src="{{it.img}}" alt="" style="width: 56px; height: 56px; border-radius: 14px; object-fit: cover; background: #EEECF8"><div style="flex: 1; min-width: 0"><div style="font-weight: 600; font-size: 14px">{{it.name}}</div><div style="font-size: 13px; color: #4A4580">{{it.size}} · {{it.qty}} шт.</div></div><div style="font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums">{{it.price}}</div></div>
+</sc-for>
+</div>
+<sc-if value="{{cartFull}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px"><span style="font-size: 14px; color: #3A3672">Итого</span><span style="font-weight: 800; font-size: 20px; font-variant-numeric: tabular-nums">{{total}}</span></div>
+<button class="d6-btn" type="button" style="margin-top: 12px; width: 100%; height: 52px; border: 0; border-radius: 999px; background: #5EE6B0; color: #0B3A28; font: 700 15px Geologica, sans-serif; box-shadow: 0 4px 0 #26B985">Заказать через WhatsApp</button>
+</sc-if>
+</div>
+</sc-if>
+</header>
+
+<div style="{{mainStyle}}">
+<div style="display: flex; align-items: center; gap: 8px; padding: 20px 0 14px">
+<sc-for list="{{cats}}" as="c" hint-placeholder-count="6"><button class="d6-btn" type="button" onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">{{c.label}}</button></sc-for>
+<span style="flex: 1"></span>
+<span style="font-size: 14px; color: #4A4580; margin-right: 8px">{{countText}}</span>
+<button class="d6-btn" type="button" onClick="{{toggleFilters}}" aria-expanded="{{filtersExpanded}}" style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border: 1.5px solid #DAD6EC; border-radius: 999px; background: #ffffff; font: 600 14px Geologica, sans-serif; color: #17133D"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>{{filterBtn}}</button>
+<button class="d6-btn" type="button" onClick="{{cycleSort}}" style="height: 40px; display: flex; align-items: center; gap: 6px; padding: 0 16px; border: 1.5px solid #DAD6EC; border-radius: 999px; background: #ffffff; font: 600 14px Geologica, sans-serif; color: #17133D">{{sortLabel}} <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2.4" stroke-linecap="round"><path d="M7 10l5 5 5-5"></path></svg></button>
+</div>
+<sc-if value="{{showFilters}}" hint-placeholder-val="{{ false }}">
+<div class="d6-fade" style="display: flex; flex-wrap: wrap; align-items: center; gap: 22px; padding: 16px 18px; margin-bottom: 14px; border-radius: 22px; background: #ffffff; border: 1px solid #ECEAF5">
+<div style="display: flex; align-items: center; gap: 6px"><span style="font-weight: 700; font-size: 14px; margin-right: 6px">Рост</span><sc-for list="{{fHeights}}" as="f" hint-placeholder-count="7"><button class="d6-btn" type="button" onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="{{f.style}}">{{f.v}}</button></sc-for></div>
+<div style="display: flex; align-items: center; gap: 6px"><span style="font-weight: 700; font-size: 14px; margin-right: 6px">Обувь</span><sc-for list="{{fShoes}}" as="f" hint-placeholder-count="8"><button class="d6-btn" type="button" onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="{{f.style}}">{{f.v}}</button></sc-for></div>
+<button class="d6-btn" type="button" onClick="{{resetFilters}}" style="border: 0; background: transparent; font: 600 14px Geologica, sans-serif; color: #3B2FD9">Сбросить</button>
+</div>
+</sc-if>
+<div style="{{gridStyle}}">
+<sc-for list="{{grid}}" as="p" hint-placeholder-count="14">
+<button class="d6-btn d6-tile" type="button" onClick="{{p.open}}" aria-label="{{p.label}}" style="{{p.style}}">
+<img src="{{p.img}}" alt="" style="display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover">
+<span class="d6-name" style="position: absolute; left: 0; right: 0; top: 0; padding: 14px 12px 28px; background: linear-gradient(rgba(23,19,61,.55), rgba(23,19,61,0)); color: #ffffff; font: 600 14px Geologica, sans-serif; text-align: left">{{p.name}}</span>
+<span style="position: absolute; left: 8px; bottom: 8px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.92); font: 700 14px Geologica, sans-serif; color: #17133D; font-variant-numeric: tabular-nums">{{p.price}}</span>
+<sc-if value="{{p.few}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 8px; bottom: 8px; padding: 4px 9px; border-radius: 999px; background: #FFF1D6; color: #7A4300; font: 700 12px Geologica, sans-serif">мало</span></sc-if>
+</button>
+</sc-for>
+</div>
+</div>
+
+<sc-if value="{{modalOpen}}" hint-placeholder-val="{{ false }}">
+<div class="d6-fade" onClick="{{closeProduct}}" style="position: absolute; inset: 0; z-index: 8; background: rgba(23,19,61,.55)"></div>
+<button class="d6-btn" type="button" onClick="{{prevProduct}}" aria-label="Предыдущий товар" style="position: absolute; z-index: 9; left: 76px; top: 450px; width: 52px; height: 52px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+<button class="d6-btn" type="button" onClick="{{nextProduct}}" aria-label="Следующий товар" style="position: absolute; z-index: 9; right: 76px; top: 450px; width: 52px; height: 52px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></button>
+<div class="d6-pop" role="dialog" aria-label="{{pName}}" style="position: absolute; z-index: 9; left: 200px; top: 128px; width: 1040px; height: 720px; display: flex; border-radius: 30px; overflow: hidden; background: #ffffff; box-shadow: 0 40px 100px rgba(11,10,38,.35)">
+<div style="position: relative; width: 576px; flex: none; background: #EEECF8">
+<button type="button" onClick="{{nextPhoto}}" aria-label="Следующее фото" style="display: block; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; cursor: pointer"><img src="{{pImg}}" alt="{{pName}}" style="display: block; width: 100%; height: 100%; object-fit: cover"></button>
+<sc-if value="{{pMulti}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; left: 0; right: 0; bottom: 16px; display: flex; justify-content: center; gap: 6px"><sc-for list="{{pDots}}" as="d" hint-placeholder-count="2"><span style="{{d.style}}"></span></sc-for></div></sc-if>
+</div>
+<div style="flex: 1; position: relative; display: flex; flex-direction: column">
+<div class="d6-scroll" style="flex: 1; padding: 30px 32px 0">
+<div style="font-size: 14px; color: #4A4580">{{pCat}}</div>
+<h2 style="margin: 6px 56px 0 0; font-weight: 800; font-size: 30px; letter-spacing: -0.03em; line-height: 1.1">{{pName}}</h2>
+<div style="margin-top: 10px; font-weight: 800; font-size: 28px; font-variant-numeric: tabular-nums">{{pPrice}}</div>
+<div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 24px"><div style="font-weight: 700; font-size: 15px">{{pSizeTitle}}</div><div style="font-size: 13px; color: #4A4580">зачёркнутых нет в наличии</div></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px"><sc-for list="{{pSizes}}" as="z" hint-placeholder-count="7"><button class="d6-btn" type="button" onClick="{{z.pick}}" aria-pressed="{{z.pressed}}" aria-disabled="{{z.out}}" style="{{z.style}}">{{z.v}}</button></sc-for></div>
+<div style="margin-top: 12px; font-size: 14px; font-weight: 600; color: {{pStockColor}}">{{pStock}}</div>
+<p style="margin: 16px 0 0; font-size: 15px; line-height: 1.55; color: #3A3672">{{pDesc}}</p>
+<div style="margin-top: 16px; padding: 14px 16px; border-radius: 18px; background: #F1EFFA; font-size: 14px; line-height: 1.5; color: #3A3672">Можно примерить в магазине: ТЦ «Мега», 2 этаж, бутик 214.</div>
+</div>
+<div style="padding: 18px 32px 28px"><button class="d6-btn" type="button" onClick="{{addToCart}}" style="{{ctaStyle}}">{{ctaText}}</button></div>
+<button class="d6-btn" type="button" onClick="{{closeProduct}}" aria-label="Закрыть" style="position: absolute; right: 20px; top: 20px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #F1EFFA; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{sideOpen}}" hint-placeholder-val="{{ false }}">
+<aside class="d6-side" aria-label="{{pName}}" style="position: absolute; z-index: 3; right: 0; top: 84px; bottom: 0; width: 520px; display: flex; flex-direction: column; background: #ffffff; border-left: 1px solid #ECEAF5; box-shadow: -20px 0 50px rgba(23,19,61,.08)">
+<div class="d6-scroll" style="flex: 1; padding: 20px 24px 0">
+<div style="position: relative">
+<button type="button" onClick="{{nextPhoto}}" aria-label="Следующее фото" style="display: block; width: 100%; padding: 0; border: 0; border-radius: 24px; overflow: hidden; background: #EEECF8; cursor: pointer"><img src="{{pImg}}" alt="{{pName}}" style="display: block; width: 100%; height: 520px; object-fit: cover"></button>
+<sc-if value="{{pMulti}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 6px"><sc-for list="{{pDots}}" as="d" hint-placeholder-count="2"><span style="{{d.style}}"></span></sc-for></div></sc-if>
+<button class="d6-btn" type="button" onClick="{{closeProduct}}" aria-label="Закрыть" style="position: absolute; right: 12px; top: 12px; width: 42px; height: 42px; border-radius: 50%; border: 0; background: rgba(255,255,255,.9); display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div style="margin-top: 18px; font-size: 14px; color: #4A4580">{{pCat}}</div>
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 4px"><h2 style="margin: 0; font-weight: 800; font-size: 26px; letter-spacing: -0.03em; line-height: 1.1">{{pName}}</h2><div style="flex: none; font-weight: 800; font-size: 24px; font-variant-numeric: tabular-nums">{{pPrice}}</div></div>
+<div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 20px"><div style="font-weight: 700; font-size: 15px">{{pSizeTitle}}</div><div style="font-size: 13px; color: #4A4580">зачёркнутых нет в наличии</div></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px"><sc-for list="{{pSizes}}" as="z" hint-placeholder-count="7"><button class="d6-btn" type="button" onClick="{{z.pick}}" aria-pressed="{{z.pressed}}" aria-disabled="{{z.out}}" style="{{z.style}}">{{z.v}}</button></sc-for></div>
+<div style="margin-top: 12px; font-size: 14px; font-weight: 600; color: {{pStockColor}}">{{pStock}}</div>
+<p style="margin: 14px 0 24px; font-size: 15px; line-height: 1.55; color: #3A3672">{{pDesc}}</p>
+</div>
+<div style="padding: 14px 24px 22px; border-top: 1px solid #F0EEF7"><button class="d6-btn" type="button" onClick="{{addToCart}}" style="{{ctaStyle}}">{{ctaText}}</button></div>
+</aside>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { mode: 'modal', cat: 'all', sort: 0, open: 0, photo: 0, size: '110', pop: null, filters: false, cart: [], fs: [] };
+  }
+  renderVals() {
+    var s = this.state, self = this, B = '/_blob/', side = s.mode === 'side';
+    var CL = ['92', '98', '104', '110', '116', '122', '128'], SH = ['24', '25', '26', '27', '28', '29', '30', '31'];
+    var P = [
+      ['Куртка демисезонная', 'outer', 18900, ['1260977f2c0c34a5b933572bb6e99e94', '4469123d08e33e3b8a0e21393b6e426b'], 8, 'Лёгкая куртка на весну и осень, утеплитель 100 г. Капюшон отстёгивается, манжеты на резинке.'],
+      ['Платье трикотажное', 'dress', 9500, ['7d0f77b8370d9af612d61812d7452e5f'], 9, 'Мягкий хлопковый трикотаж, не мнётся. Подходит для садика и праздников.'],
+      ['Кроссовки на липучках', 'shoes', 14200, ['04a201bc58d35022516d4467e49b7f41'], 6, 'Лёгкая подошва, дышащий верх. Липучки — ребёнок обувается сам.'],
+      ['Шапка вязаная', 'acc', 4200, ['b7e066c9d74196dbd3a06f17035798be'], 14, 'Шерсть с акрилом, не колется. Тянется, подходит на обхват 48–54 см.'],
+      ['Дождевик жёлтый', 'outer', 7900, ['a3bc2f157acffb785bd68c64b69fa957'], 9, 'Непромокаемый, со светоотражающими полосками. Складывается в карман.'],
+      ['Джинсовая куртка', 'outer', 12500, ['8a58a9934844266efb16a8c4761e7f7b'], 6, 'Плотный деним, хлопок 100%. Кнопки вместо пуговиц.'],
+      ['Худи с капюшоном', 'tops', 8900, ['b10ce1436e13380c548fa804ef4347fd'], 9, 'Футер с начёсом, карман-кенгуру. Не садится после стирки.'],
+      ['Футболка хлопок', 'tops', 3500, ['167257d6a7f8ad684c2d856ae3a11150'], 22, 'Базовая белая футболка, хлопок 100%.'],
+      ['Платье летнее', 'dress', 8200, ['7cb5296df170d7a0aca0d4bd8ec7cb9e'], 4, 'Лёгкий хлопок, свободный крой. На жару и для прогулок.'],
+      ['Кеды', 'shoes', 11800, ['2ec542edaef6635ace484ac3c7ad1f4a'], 3, 'Текстильный верх, резиновая подошва. Шнурки на резинке.'],
+      ['Пальто шерстяное', 'outer', 24900, ['4425d713fea616a795f8125f90d8aed0'], 3, 'Шерсть 70%, подкладка из вискозы. Нарядное, на прохладную погоду.'],
+      ['Шапка с помпоном', 'acc', 4900, ['ca2b511d14dcdf080d3e936049667bed'], 5, 'Двойная вязка, помпон из искусственного меха.'],
+      ['Кардиган серый', 'tops', 10400, ['93fc374092f690eb46aa0b0cf74bcce4'], 6, 'Мягкая вязка на пуговицах. Носится поверх футболки и платья.'],
+      ['Платье в цветочек', 'dress', 9900, ['ed10ba6d31f748a438a21db8a7387c8a'], 6, 'Хлопок с вискозой, пояс завязывается сзади.']
+    ];
+    var CATN = { outer: 'Куртки и верхняя одежда', dress: 'Платья', tops: 'Кофты и футболки', shoes: 'Обувь', acc: 'Шапки' };
+    function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸'; }
+    function plural(n, f) { var a = n % 10, b = n % 100; return n + ' ' + (a === 1 && b !== 11 ? f[0] : a >= 2 && a <= 4 && (b < 10 || b >= 20) ? f[1] : f[2]); }
+    function sizes(p, i) {
+      var list = p[1] === 'shoes' ? SH : p[1] === 'acc' ? ['Один размер'] : CL;
+      return list.map(function (v, j) { return { v: v, out: list.length > 1 && (j + i) % 4 === 0, left: list.length > 1 && (j + i) % 5 === 1 ? 1 : p[4] }; });
+    }
+    function chip(on) { return 'height: 40px; padding: 0 18px; border-radius: 999px; border: 0; font: 600 14px Geologica, sans-serif; background: ' + (on ? '#17133D' : '#EEECF8') + '; color: ' + (on ? '#ffffff' : '#17133D'); }
+    function sizeChip(on, out, small) {
+      var base = (small ? 'min-width: 44px; height: 36px; padding: 0 10px; border-radius: 12px; font: 600 13px ' : 'min-width: 58px; height: 48px; padding: 0 14px; border-radius: 16px; font: 600 15px ') + 'Geologica, sans-serif; font-variant-numeric: tabular-nums; ';
+      if (out) return base + 'cursor: default; border: 1.5px dashed #D6D2E8; background: transparent; color: #7A7598; text-decoration: line-through';
+      return base + (on ? 'border: 1.5px solid #17133D; background: #17133D; color: #ffffff' : 'border: 1.5px solid #DAD6EC; background: #ffffff; color: #17133D');
+    }
+    function set(o) { self.setState(o); }
+    var opened = s.open >= 0;
+
+    var list = P.map(function (p, i) { return { p: p, i: i, z: sizes(p, i) }; }).filter(function (x) {
+      if (s.cat !== 'all' && x.p[1] !== s.cat) return false;
+      if (s.fs.length && !x.z.some(function (z) { return !z.out && s.fs.indexOf(z.v) >= 0; })) return false;
+      return true;
+    });
+    if (s.sort === 1) list.sort(function (a, b) { return a.p[2] - b.p[2]; });
+    if (s.sort === 2) list.sort(function (a, b) { return b.p[2] - a.p[2]; });
+    function openAt(i) { var z = sizes(P[i], i); set({ open: i, photo: 0, size: z.length === 1 ? z[0].v : null, pop: null }); }
+
+    var v = {};
+    v.cats = [['all', 'Все'], ['outer', 'Куртки'], ['dress', 'Платья'], ['tops', 'Кофты'], ['shoes', 'Обувь'], ['acc', 'Шапки']].map(function (c) {
+      var on = s.cat === c[0];
+      return { label: c[1], pressed: on ? 'true' : 'false', style: chip(on), pick: function () { set({ cat: c[0] }); } };
+    });
+    v.grid = list.map(function (x) {
+      var on = side && opened && x.i === s.open;
+      return { img: B + x.p[3][0], name: x.p[0], price: fmt(x.p[2]), few: x.p[4] <= 4, label: x.p[0] + ', ' + fmt(x.p[2]), open: function () { openAt(x.i); },
+        style: 'position: relative; display: block; padding: 0; border: 0; border-radius: 14px; overflow: hidden; background: #EEECF8; ' + (on ? 'box-shadow: 0 0 0 3px #FBFAFF, 0 0 0 6px #3B2FD9' : '') };
+    });
+    var cols = side && opened ? 4 : 5;
+    v.mainStyle = 'position: relative; box-sizing: border-box; padding: 0 20px; ' + (side && opened ? 'margin-right: 520px; max-width: 920px' : 'max-width: 1240px; margin: 0 auto') + '; transition: margin .3s';
+    v.gridStyle = 'display: grid; grid-template-columns: repeat(' + cols + ', minmax(0, 1fr)); gap: 8px';
+    v.countText = plural(list.length, ['товар', 'товара', 'товаров']);
+    v.sortLabel = ['Сначала новые', 'Сначала дешевле', 'Сначала дороже'][s.sort];
+    v.cycleSort = function () { set({ sort: (s.sort + 1) % 3 }); };
+    v.filterBtn = s.fs.length ? 'Фильтры · ' + s.fs.length : 'Фильтры';
+    v.showFilters = s.filters; v.filtersExpanded = s.filters ? 'true' : 'false';
+    v.toggleFilters = function () { set({ filters: !s.filters }); };
+    v.resetFilters = function () { set({ fs: [] }); };
+    function fchips(arr) {
+      return arr.map(function (val) {
+        var on = s.fs.indexOf(val) >= 0;
+        return { v: val, pressed: on ? 'true' : 'false', style: sizeChip(on, false, true), pick: function () { set({ fs: on ? s.fs.filter(function (q) { return q !== val; }) : s.fs.concat([val]) }); } };
+      });
+    }
+    v.fHeights = fchips(CL); v.fShoes = fchips(SH);
+
+    v.showInfo = s.pop === 'info'; v.infoExpanded = v.showInfo ? 'true' : 'false';
+    v.showCart = s.pop === 'cart'; v.cartExpanded = v.showCart ? 'true' : 'false';
+    v.toggleInfo = function () { set({ pop: s.pop === 'info' ? null : 'info', open: side ? s.open : -1 }); };
+    v.toggleCart = function () { set({ pop: s.pop === 'cart' ? null : 'cart', open: side ? s.open : -1 }); };
+
+    var count = 0, sum = 0;
+    s.cart.forEach(function (c) { count += c.qty; sum += c.qty * P[c.i][2]; });
+    v.cartBtn = count ? count + ' · ' + fmt(sum) : 'Корзина';
+    v.total = fmt(sum); v.cartEmpty = count === 0; v.cartFull = count > 0;
+    v.cartItems = s.cart.map(function (c) { var p = P[c.i]; return { img: B + p[3][0], name: p[0], size: c.size === 'Один размер' ? c.size : (p[1] === 'shoes' ? 'Размер ' : 'Рост ') + c.size, qty: c.qty, price: fmt(p[2] * c.qty) }; });
+
+    v.modalOpen = opened && !side; v.sideOpen = opened && side;
+    var oi = Math.max(s.open, 0), op = P[oi], oz = sizes(op, oi);
+    v.pName = op[0]; v.pPrice = fmt(op[2]); v.pCat = CATN[op[1]]; v.pDesc = op[5];
+    v.pImg = B + op[3][s.photo % op[3].length];
+    v.pMulti = op[3].length > 1;
+    v.pDots = op[3].map(function (_, k) { var on = k === s.photo % op[3].length; return { style: 'width: ' + (on ? '18px' : '7px') + '; height: 7px; border-radius: 999px; background: ' + (on ? '#ffffff' : 'rgba(255,255,255,.6)') + '; box-shadow: 0 1px 3px rgba(0,0,0,.2)' }; });
+    v.nextPhoto = function () { set({ photo: s.photo + 1 }); };
+    var pos = list.map(function (x) { return x.i; }).indexOf(s.open);
+    v.nextProduct = function () { if (list.length) openAt(list[(pos + 1) % list.length].i); };
+    v.prevProduct = function () { if (list.length) openAt(list[(pos - 1 + list.length) % list.length].i); };
+    v.pSizeTitle = op[1] === 'shoes' ? 'Размер обуви' : op[1] === 'acc' ? 'Размер' : 'Рост, см';
+    v.pSizes = oz.map(function (z) {
+      var on = s.size === z.v;
+      return { v: z.v, out: z.out ? 'true' : 'false', pressed: on ? 'true' : 'false', style: sizeChip(on, z.out, false), pick: function () { if (!z.out) set({ size: z.v }); } };
+    });
+    var sel = oz.filter(function (z) { return z.v === s.size && !z.out; })[0];
+    v.pStock = sel ? (sel.left <= 2 ? 'Осталось ' + sel.left + ' шт.' : 'В наличии') : 'Выберите размер, чтобы увидеть наличие';
+    v.pStockColor = sel ? (sel.left <= 2 ? '#A35A00' : '#157A52') : '#4A4580';
+    var inCart = s.cart.some(function (c) { return c.i === s.open && c.size === s.size; });
+    var ctaBase = 'width: 100%; height: 58px; border: 0; border-radius: 999px; font: 700 17px Geologica, sans-serif; font-variant-numeric: tabular-nums; ';
+    if (!sel) { v.ctaText = 'Выберите размер'; v.ctaStyle = ctaBase + 'background: #EEECF8; color: #4A4580; cursor: default'; }
+    else if (inCart) { v.ctaText = 'В корзине · открыть'; v.ctaStyle = ctaBase + 'background: #5EE6B0; color: #0B3A28; box-shadow: 0 5px 0 #26B985'; }
+    else { v.ctaText = 'В корзину · ' + fmt(op[2]); v.ctaStyle = ctaBase + 'background: #FFD23F; color: #17133D; box-shadow: 0 5px 0 #C79A00'; }
+    v.addToCart = function () {
+      if (!sel) return;
+      if (inCart) { set({ open: side ? s.open : -1, pop: 'cart' }); return; }
+      set({ cart: s.cart.concat([{ i: s.open, size: s.size, qty: 1 }]) });
+    };
+    v.closeProduct = function () { set({ open: -1 }); };
+    return v;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Лендинг — Сырмак</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&amp;family=Manrope:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#A3201B}
+a{color:#F2EEE6}a:hover{color:#ffffff}
+::selection{background:#1B2150;color:#F2EEE6}
+.sy-btn{transition:transform .25s cubic-bezier(.16,1,.3,1),background-color .2s}
+.sy-btn:hover{transform:translateY(-2px)}
+.sy-btn:focus-visible,.sy-pill:focus-visible{outline:3px solid #F2EEE6;outline-offset:3px}
+.sy-pill{cursor:pointer;transition:background-color .2s,color .2s}
+.sy-card{transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.sy-card:hover{transform:translateY(-4px)}
+</style>
+</helmet>
+<div style="font-family: 'Manrope', system-ui, sans-serif; color: #F2EEE6; background: #A3201B; width: 100%; min-height: 100vh">
+
+<header style="max-width: 1280px; margin: 0 auto; padding: 28px 32px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px">
+<a href="#top" style="font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; color: #F2EEE6">catalog·online</a>
+<nav aria-label="Основное" style="display: flex; flex-wrap: wrap; align-items: center; gap: 28px; font-weight: 600; font-size: 16px">
+<a href="#how" style="text-decoration: none">Как это работает</a>
+<a href="#demo" style="text-decoration: none">Пример</a>
+<a href="#faq" style="text-decoration: none">Вопросы</a>
+<a class="sy-btn" href="#start" style="text-decoration: none; background: #1B2150; color: #F2EEE6; padding: 14px 22px; border-radius: 14px; outline: 2px dashed rgba(242,238,230,.55); outline-offset: -7px">Создать каталог</a>
+</nav>
+</header>
+
+<section id="top" style="max-width: 1280px; margin: 0 auto; padding: 56px 32px 0">
+<h1 style="font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: clamp(44px, 7.4vw, 104px); line-height: 0.98; letter-spacing: -0.035em; margin: 0; max-width: 13ch; text-wrap: balance">Хватит отвечать «есть ли&nbsp;размер?»</h1>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 32px; margin-top: 36px">
+<p style="font-size: clamp(18px, 1.6vw, 22px); line-height: 1.5; margin: 0; max-width: 46ch; color: #F7DCD6">Загрузите таблицу товаров из своей кассовой программы, и у магазина появится каталог с наличием, размерами и ценами. Покупатель смотрит сам и присылает готовый заказ вам в WhatsApp.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 14px">
+<a class="sy-btn" href="#start" style="text-decoration: none; background: #F2EEE6; color: #1B2150; font-weight: 700; font-size: 18px; padding: 20px 30px; border-radius: 18px; outline: 2px dashed rgba(27,33,80,.45); outline-offset: -8px">Создать каталог бесплатно</a>
+<a class="sy-btn" href="#demo" style="text-decoration: none; color: #F2EEE6; font-weight: 700; font-size: 18px; padding: 20px 26px; border-radius: 18px; border: 2px solid rgba(242,238,230,.6)">Посмотреть пример</a>
+</div>
+</div>
+</section>
+
+<div aria-hidden="true" style="margin-top: 64px; line-height: 0">
+<svg viewBox="0 0 1440 48" preserveAspectRatio="none" style="display: block; width: 100%; height: 48px"><rect x="0" y="0" width="1440" height="48" fill="#A3201B"></rect><polygon points="{{teeth}}" fill="#1B2150"></polygon></svg>
+</div>
+
+<section id="demo" style="background: #1B2150; padding: 40px 0 96px">
+<div style="max-width: 1280px; margin: 0 auto; padding: 0 32px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 16px">
+<h2 style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: clamp(28px, 3.4vw, 44px); letter-spacing: -0.03em; margin: 0; max-width: 20ch">Так выглядит ваш каталог для покупателя</h2>
+<p style="margin: 0; font-size: 14px; color: #B9BEE0">Пример магазина. Товары и цены вымышлены</p>
+</div>
+
+<div style="margin-top: 32px; background: #F2EEE6; color: #1B2150; border-radius: 28px; padding: 28px; outline: 2px dashed rgba(27,33,80,.35); outline-offset: -12px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 4px 8px 20px">
+<div>
+<div style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 22px">Айгерим Kids</div>
+<div style="font-size: 14px; color: #4A4F78; margin-top: 4px">Детская одежда · Шымкент, ТЦ «Мега», 2 этаж</div>
+</div>
+<div role="group" aria-label="Фильтр по размеру" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<span style="font-size: 14px; font-weight: 600; margin-right: 4px">Рост:</span>
+<sc-for list="{{sizes}}" as="s" hint-placeholder-count="4">
+<button class="sy-pill" type="button" onClick="{{s.pick}}" aria-pressed="{{s.pressed}}" style="{{s.style}}">{{s.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px">
+<sc-for list="{{visible}}" as="p" hint-placeholder-count="4">
+<article class="sy-card" style="background: #ffffff; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column">
+<div style="{{p.swatch}}" role="img" aria-label="{{p.alt}}"></div>
+<div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-weight: 700; font-size: 16px; line-height: 1.3">{{p.name}}</div>
+<div style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums">{{p.price}}</div>
+<div style="{{p.badgeStyle}}">{{p.badge}}</div>
+</div>
+</article>
+</sc-for>
+</div>
+<sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+<p style="margin: 24px 8px 4px; font-size: 16px">На этот рост сейчас ничего нет. Покупатель сразу это видит и не пишет вам зря.</p>
+</sc-if>
+</div>
+</div>
+</section>
+
+<div aria-hidden="true" style="line-height: 0">
+<svg viewBox="0 0 1440 48" preserveAspectRatio="none" style="display: block; width: 100%; height: 48px"><rect x="0" y="0" width="1440" height="48" fill="#1B2150"></rect><polygon points="{{teeth}}" fill="#F2EEE6"></polygon></svg>
+</div>
+
+<section style="background: #F2EEE6; color: #1B2150; padding: 72px 0 104px">
+<div style="max-width: 1280px; margin: 0 auto; padding: 0 32px">
+<h2 style="font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: clamp(32px, 4.4vw, 60px); line-height: 1.02; letter-spacing: -0.035em; margin: 0; max-width: 18ch">Было: переписка до ночи. Стало: готовый заказ.</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 0; margin-top: 48px; align-items: stretch">
+
+<div style="flex: 1 1 420px; background: #ffffff; border-radius: 28px 0 0 28px; padding: 36px; outline: 2px dashed rgba(27,33,80,.25); outline-offset: -12px">
+<div style="font-weight: 700; font-size: 14px; color: #6A6F95">Директ, 23:41</div>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 18px; font-size: 16px; line-height: 1.4">
+<div style="align-self: flex-start; background: #ECE8F4; padding: 12px 16px; border-radius: 18px 18px 18px 4px; max-width: 80%">Здравствуйте! Куртка синяя есть на 110?</div>
+<div style="align-self: flex-start; background: #ECE8F4; padding: 12px 16px; border-radius: 18px 18px 18px 4px; max-width: 80%">А сколько стоит? И шапка такая же есть?</div>
+<div style="align-self: flex-end; background: #DCDFF2; padding: 12px 16px; border-radius: 18px 18px 4px 18px; max-width: 80%">Сейчас уточню на складе…</div>
+<div style="align-self: flex-start; background: #ECE8F4; padding: 12px 16px; border-radius: 18px 18px 18px 4px; max-width: 80%">Ну что, есть?</div>
+<div style="align-self: flex-start; color: #6A6F95; font-size: 14px; margin-top: 6px">Покупатель ушёл к соседям</div>
+</div>
+</div>
+
+<div style="flex: 1 1 420px; background: #A3201B; color: #F2EEE6; border-radius: 0 28px 28px 0; padding: 36px; outline: 2px dashed rgba(242,238,230,.45); outline-offset: -12px">
+<div style="font-weight: 700; font-size: 14px; color: #F7DCD6">WhatsApp, 10:05</div>
+<div style="margin-top: 18px; background: #F2EEE6; color: #1B2150; border-radius: 18px 18px 4px 18px; padding: 20px 22px; font-size: 16px; line-height: 1.55; font-variant-numeric: tabular-nums">
+<div style="font-weight: 700">Заказ №128 с сайта «Айгерим Kids»</div>
+<div style="margin-top: 8px">1. Куртка демисезонная (рост 110, синяя) × 1 — 18 900 ₸</div>
+<div>2. Шапка вязаная (52) × 1 — 4 200 ₸</div>
+<div style="margin-top: 8px; font-weight: 700">Итого: 23 100 ₸</div>
+</div>
+<p style="margin: 20px 0 0; font-size: 16px; line-height: 1.5; color: #F7DCD6">Размер и наличие покупатель увидел сам. Вам остаётся подтвердить заказ.</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<div aria-hidden="true" style="line-height: 0">
+<svg viewBox="0 0 1440 48" preserveAspectRatio="none" style="display: block; width: 100%; height: 48px"><rect x="0" y="0" width="1440" height="48" fill="#F2EEE6"></rect><polygon points="{{teeth}}" fill="#A3201B"></polygon></svg>
+</div>
+
+<section id="how" style="background: #A3201B; padding: 64px 0 104px">
+<div style="max-width: 1280px; margin: 0 auto; padding: 0 32px">
+<h2 style="font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: clamp(32px, 4.4vw, 60px); line-height: 1.02; letter-spacing: -0.035em; margin: 0">Три шага, и каталог работает</h2>
+<ol style="list-style: none; padding: 0; margin: 48px 0 0; display: flex; flex-wrap: wrap; border-top: 2px dashed rgba(242,238,230,.5)">
+<li style="flex: 1 1 300px; padding: 32px 32px 0 0">
+<div style="font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 72px; line-height: 1; color: #1B2150">1</div>
+<h3 style="font-size: 24px; margin: 18px 0 10px; font-weight: 700">Загрузите Excel</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.55; color: #F7DCD6; max-width: 34ch">Выгрузка из кассовой программы или 1С. Повторная загрузка обновит остатки и цены.</p>
+</li>
+<li style="flex: 1 1 300px; padding: 32px 32px 0 0">
+<div style="font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 72px; line-height: 1; color: #1B2150">2</div>
+<h3 style="font-size: 24px; margin: 18px 0 10px; font-weight: 700">Добавьте фото</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.55; color: #F7DCD6; max-width: 34ch">Прямо с телефона, несколько снимков на товар. Каталог видно и без фото.</p>
+</li>
+<li style="flex: 1 1 300px; padding: 32px 32px 0 0">
+<div style="font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 72px; line-height: 1; color: #1B2150">3</div>
+<h3 style="font-size: 24px; margin: 18px 0 10px; font-weight: 700">Поделитесь ссылкой</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.55; color: #F7DCD6; max-width: 34ch">В шапке Instagram, в WhatsApp, на кассе. Заказы приходят вам в WhatsApp.</p>
+</li>
+</ol>
+</div>
+</section>
+
+<div aria-hidden="true" style="line-height: 0">
+<svg viewBox="0 0 1440 48" preserveAspectRatio="none" style="display: block; width: 100%; height: 48px"><rect x="0" y="0" width="1440" height="48" fill="#A3201B"></rect><polygon points="{{teeth}}" fill="#1B2150"></polygon></svg>
+</div>
+
+<section id="faq" style="background: #1B2150; padding: 64px 0 96px">
+<div style="max-width: 1280px; margin: 0 auto; padding: 0 32px; display: flex; flex-wrap: wrap; gap: 48px">
+<h2 style="flex: 1 1 320px; font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: clamp(32px, 4vw, 56px); line-height: 1.02; letter-spacing: -0.035em; margin: 0">Частые вопросы</h2>
+<dl style="flex: 2 1 560px; margin: 0; display: flex; flex-direction: column">
+<div style="padding: 22px 0; border-bottom: 2px dashed rgba(242,238,230,.3)"><dt style="font-weight: 700; font-size: 19px">Нужен сайт или программист?</dt><dd style="margin: 8px 0 0; font-size: 17px; line-height: 1.55; color: #C9CDEA">Нет. Каталог появляется на адресе вида vash-magazin.[сервис].kz сразу после загрузки таблицы.</dd></div>
+<div style="padding: 22px 0; border-bottom: 2px dashed rgba(242,238,230,.3)"><dt style="font-weight: 700; font-size: 19px">Сколько стоит?</dt><dd style="margin: 8px 0 0; font-size: 17px; line-height: 1.55; color: #C9CDEA">Бесплатно на время пилота.</dd></div>
+<div style="padding: 22px 0; border-bottom: 2px dashed rgba(242,238,230,.3)"><dt style="font-weight: 700; font-size: 19px">А если товар продали в магазине?</dt><dd style="margin: 8px 0 0; font-size: 17px; line-height: 1.55; color: #C9CDEA">Загрузите свежую выгрузку, и остатки обновятся. Каждый заказ вы подтверждаете сами, поэтому лишнего не продадите.</dd></div>
+<div style="padding: 22px 0"><dt style="font-weight: 700; font-size: 19px">Работает с моей программой учёта?</dt><dd style="margin: 8px 0 0; font-size: 17px; line-height: 1.55; color: #C9CDEA">Подойдёт любая, которая умеет сохранять товары в Excel. Прямые подключения появятся позже.</dd></div>
+</dl>
+</div>
+</section>
+
+<div aria-hidden="true" style="line-height: 0">
+<svg viewBox="0 0 1440 48" preserveAspectRatio="none" style="display: block; width: 100%; height: 48px"><rect x="0" y="0" width="1440" height="48" fill="#1B2150"></rect><polygon points="{{teeth}}" fill="#A3201B"></polygon></svg>
+</div>
+
+<section id="start" style="background: #A3201B; padding: 72px 0 56px">
+<div style="max-width: 1280px; margin: 0 auto; padding: 0 32px">
+<h2 style="font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: clamp(36px, 6vw, 88px); line-height: 0.98; letter-spacing: -0.035em; margin: 0; max-width: 14ch">Пусть покупатели смотрят сами</h2>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; margin-top: 36px">
+<a class="sy-btn" href="#start" style="text-decoration: none; background: #F2EEE6; color: #1B2150; font-weight: 700; font-size: 20px; padding: 22px 34px; border-radius: 18px; outline: 2px dashed rgba(27,33,80,.45); outline-offset: -8px">Создать каталог бесплатно</a>
+<span style="font-size: 16px; color: #F7DCD6">Понадобится только email и таблица товаров</span>
+</div>
+<footer style="margin-top: 96px; padding-top: 24px; border-top: 2px dashed rgba(242,238,230,.4); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 14px; color: #F7DCD6">
+<span>catalog·online — рабочее название</span>
+<span>Казахстан · [контакты]</span>
+</footer>
+</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { size: 'all' };
+  }
+  renderVals() {
+    var size = this.state.size;
+    var self = this;
+    var teeth = '0,48';
+    for (var x = 0; x <= 1440; x += 48) {
+      teeth += ' ' + x + ',48 ' + x + ',24 ' + (x + 24) + ',24 ' + (x + 24) + ',48';
+    }
+    teeth += ' 1440,48';
+    var sizeList = [
+      { id: 'all', label: 'Все' },
+      { id: '104', label: '104' },
+      { id: '110', label: '110' },
+      { id: '116', label: '116' },
+      { id: '122', label: '122' }
+    ];
+    var sizes = sizeList.map(function (s) {
+      var on = s.id === size;
+      return {
+        label: s.label,
+        pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ size: s.id }); },
+        style: 'border: 2px solid #1B2150; border-radius: 12px; padding: 10px 16px; min-height: 44px; font: 700 15px Manrope, sans-serif; ' + (on ? 'background: #1B2150; color: #F2EEE6;' : 'background: transparent; color: #1B2150;')
+      };
+    });
+    var products = [
+      { name: 'Куртка демисезонная, синяя', price: '18 900 ₸', color: '#2E3A8C', stock: { '104': 3, '110': 1, '116': 4, '122': 0 } },
+      { name: 'Платье трикотажное', price: '9 500 ₸', color: '#C9473D', stock: { '104': 2, '110': 5, '116': 0, '122': 2 } },
+      { name: 'Кроссовки на липучках', price: '14 200 ₸', color: '#D9A13B', stock: { '104': 0, '110': 2, '116': 1, '122': 3 } },
+      { name: 'Шапка вязаная', price: '4 200 ₸', color: '#6E7BB8', stock: { '104': 6, '110': 6, '116': 2, '122': 0 } },
+      { name: 'Комбинезон зимний', price: '27 400 ₸', color: '#3B2A55', stock: { '104': 1, '110': 0, '116': 0, '122': 1 } },
+      { name: 'Футболка хлопок, 2 шт.', price: '6 800 ₸', color: '#E3B7AE', stock: { '104': 8, '110': 4, '116': 6, '122': 5 } }
+    ];
+    var visible = products.filter(function (p) {
+      if (size === 'all') return true;
+      return (p.stock[size] || 0) > 0;
+    }).map(function (p) {
+      var total = 0;
+      for (var k in p.stock) total += p.stock[k];
+      var n = size === 'all' ? total : p.stock[size];
+      var few = n <= 2;
+      return {
+        name: p.name,
+        price: p.price,
+        alt: 'Фото товара: ' + p.name,
+        swatch: 'height: 170px; background: ' + p.color + '; background-image: radial-gradient(rgba(255,255,255,.10) 1px, transparent 1.2px); background-size: 6px 6px; outline: 2px dashed rgba(255,255,255,.45); outline-offset: -10px',
+        badge: few ? 'Осталось мало' : 'В наличии',
+        badgeStyle: 'align-self: flex-start; margin-top: 4px; font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 8px; ' + (few ? 'background: #FBE3DF; color: #8A1A15;' : 'background: #E4E7F5; color: #1B2150;')
+      };
+    });
+    return { teeth: teeth, sizes: sizes, visible: visible, empty: visible.length === 0 };
+  }
+}
+</script>
+</body>
+</html>

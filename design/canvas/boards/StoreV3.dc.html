@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Витрина V3 — как Instagram</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F6F5FB}
+.v3-btn{cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.v3-btn:active{transform:translateY(3px)}
+.v3-btn:focus-visible{outline:3px solid #3B2FD9;outline-offset:2px}
+.v3-row{overflow-x:auto;scrollbar-width:none}
+.v3-row::-webkit-scrollbar{display:none}
+.v3-tile img{transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.v3-tile:hover img{transform:scale(1.05)}
+</style>
+</helmet>
+<div style="width: 390px; height: 1700px; position: relative; overflow: hidden; font-family: 'Geologica', system-ui, sans-serif; color: #17133D; background: #F6F5FB">
+<div aria-hidden="true" style="position: absolute; left: -140px; top: -160px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(255,122,182,.35), rgba(255,122,182,0) 68%)"></div>
+<div aria-hidden="true" style="position: absolute; right: -160px; top: -80px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(124,108,255,.35), rgba(124,108,255,0) 68%)"></div>
+
+<div style="position: relative; padding: 20px 16px 0">
+<div style="display: flex; align-items: center; gap: 18px">
+<div style="width: 88px; height: 88px; border-radius: 50%; padding: 3px; background: linear-gradient(140deg, #FFD23F, #FF7AB6 50%, #7C6CFF); flex: none">
+<div style="width: 100%; height: 100%; border-radius: 50%; border: 3px solid #F6F5FB; box-sizing: border-box; background: linear-gradient(140deg, #FF9CC8, #7C6CFF); color: #ffffff; font-weight: 800; font-size: 26px; display: flex; align-items: center; justify-content: center">АK</div>
+</div>
+<div style="flex: 1; display: flex; justify-content: space-around; text-align: center">
+<div><div style="font-weight: 800; font-size: 18px">14</div><div style="font-size: 12px; color: #4A4570">товаров</div></div>
+<div><div style="font-weight: 800; font-size: 18px">12</div><div style="font-size: 12px; color: #4A4570">в наличии</div></div>
+<div><div style="font-weight: 800; font-size: 18px">4</div><div style="font-size: 12px; color: #4A4570">новинки</div></div>
+</div>
+</div>
+<div style="margin-top: 12px">
+<div style="font-weight: 800; font-size: 17px">Айгерим Kids</div>
+<div style="font-size: 14px; line-height: 1.5; color: #3A3672; margin-top: 2px">Детская одежда от 1 до 10 лет. Шымкент, ТЦ «Мега», 2 этаж. <span style="color: #157A52; font-weight: 600">Открыто до 20:00</span></div>
+</div>
+<div style="display: flex; gap: 8px; margin-top: 14px">
+<button class="v3-btn" type="button" style="flex: 1; height: 44px; border: 0; border-radius: 14px; background: #5EE6B0; color: #0B3A28; font: 700 14px Geologica, sans-serif; box-shadow: 0 4px 0 #26B985">Написать в WhatsApp</button>
+<button class="v3-btn" type="button" style="flex: 1; height: 44px; border: 1px solid rgba(255,255,255,.95); border-radius: 14px; background: rgba(255,255,255,.75); color: #17133D; font: 600 14px Geologica, sans-serif; box-shadow: 0 4px 0 rgba(150,130,220,.35)">Как добраться</button>
+</div>
+</div>
+
+<div class="v3-row" style="position: relative; display: flex; gap: 14px; padding: 20px 16px 6px">
+<sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+<button class="v3-btn" type="button" onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="flex: none; width: 68px; border: 0; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; font: 500 12px Geologica, sans-serif; color: #17133D">
+<span style="{{c.ring}}"><img src="{{c.img}}" alt="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #F6F5FB; box-sizing: border-box; display: block"></span>
+<span style="font-weight: {{c.weight}}">{{c.label}}</span>
+</button>
+</sc-for>
+</div>
+
+<div style="position: relative; display: flex; border-top: 1px solid #E6E3F2; margin-top: 12px">
+<div style="flex: 1; text-align: center; padding: 12px 0; font-weight: 700; font-size: 14px; box-shadow: inset 0 -2px 0 #17133D">Все товары</div>
+<div style="flex: 1; text-align: center; padding: 12px 0; font-weight: 500; font-size: 14px; color: #6B6694">Новинки</div>
+<div style="flex: 1; text-align: center; padding: 12px 0; font-weight: 500; font-size: 14px; color: #6B6694">Осталось мало</div>
+</div>
+
+<div style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px">
+<sc-for list="{{grid}}" as="p" hint-placeholder-count="12">
+<button class="v3-btn v3-tile" type="button" onClick="{{p.add}}" aria-label="{{p.label}}" style="position: relative; display: block; padding: 0; border: 0; background: #EEECF8; overflow: hidden">
+<img src="{{p.img}}" alt="{{p.name}}" style="display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover">
+<span style="position: absolute; left: 6px; bottom: 6px; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font: 700 12px Geologica, sans-serif; color: #17133D; font-variant-numeric: tabular-nums">{{p.price}}</span>
+<sc-if value="{{p.few}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 6px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #FFB238; border: 2px solid #ffffff"></span></sc-if>
+</button>
+</sc-for>
+</div>
+<p style="position: relative; text-align: center; margin: 16px 16px 0; font-size: 11px; color: #6E6993">Как профиль Instagram: покупатели приходят оттуда и узнают формат. Оранжевая точка — осталось мало. Фото — Unsplash</p>
+
+<sc-if value="{{hasCart}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 12px; right: 12px; top: 760px; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 18px; border-radius: 999px; background: rgba(23,19,61,.9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #ffffff">
+<div style="flex: 1; font-size: 13px"><div style="opacity: .75">{{cart}} в корзине</div><div style="font-weight: 800; font-size: 15px">{{total}}</div></div>
+<div style="padding: 12px 18px; border-radius: 999px; background: #FFD23F; color: #17133D; font-weight: 700; font-size: 14px; box-shadow: 0 4px 0 #C79A00">Оформить</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { cat: 'all', cart: 0, sum: 0 }; }
+  renderVals() {
+    var s = this.state, self = this, B = '/_blob/';
+    var P = [
+      ['Куртка демисезонная', 'outer', 18900, '1260977f2c0c34a5b933572bb6e99e94', 8], ['Платье трикотажное', 'dress', 9500, '7d0f77b8370d9af612d61812d7452e5f', 9],
+      ['Кроссовки на липучках', 'shoes', 14200, '04a201bc58d35022516d4467e49b7f41', 6], ['Шапка вязаная', 'acc', 4200, 'b7e066c9d74196dbd3a06f17035798be', 14],
+      ['Дождевик жёлтый', 'outer', 7900, 'a3bc2f157acffb785bd68c64b69fa957', 9], ['Джинсовая куртка', 'outer', 12500, '8a58a9934844266efb16a8c4761e7f7b', 6],
+      ['Худи с капюшоном', 'tops', 8900, 'b10ce1436e13380c548fa804ef4347fd', 9], ['Футболка хлопок', 'tops', 3500, '167257d6a7f8ad684c2d856ae3a11150', 22],
+      ['Платье летнее', 'dress', 8200, '7cb5296df170d7a0aca0d4bd8ec7cb9e', 4], ['Кеды', 'shoes', 11800, '2ec542edaef6635ace484ac3c7ad1f4a', 3],
+      ['Пальто шерстяное', 'outer', 24900, '4425d713fea616a795f8125f90d8aed0', 3], ['Шапка с помпоном', 'acc', 4900, 'ca2b511d14dcdf080d3e936049667bed', 5],
+      ['Кардиган серый', 'tops', 10400, '93fc374092f690eb46aa0b0cf74bcce4', 6], ['Платье в цветочек', 'dress', 9900, 'ed10ba6d31f748a438a21db8a7387c8a', 6]
+    ];
+    function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸'; }
+    var CATS = [['all', 'Все', '4425d713fea616a795f8125f90d8aed0'], ['outer', 'Куртки', '1260977f2c0c34a5b933572bb6e99e94'], ['dress', 'Платья', 'ed10ba6d31f748a438a21db8a7387c8a'], ['tops', 'Кофты', 'b10ce1436e13380c548fa804ef4347fd'], ['shoes', 'Обувь', '04a201bc58d35022516d4467e49b7f41'], ['acc', 'Шапки', 'ca2b511d14dcdf080d3e936049667bed']];
+    var cats = CATS.map(function (c) { var on = c[0] === s.cat; return { label: c[1], img: B + c[2], pressed: on ? 'true' : 'false', weight: on ? '700' : '500', pick: function () { self.setState({ cat: c[0] }); }, ring: 'width: 66px; height: 66px; border-radius: 50%; padding: 2px; box-sizing: border-box; display: block; background: ' + (on ? 'linear-gradient(140deg, #FFD23F, #FF7AB6 50%, #7C6CFF)' : '#DCD8EE') }; });
+    var grid = P.filter(function (p) { return s.cat === 'all' || p[1] === s.cat; }).map(function (p) {
+      return { name: p[0], price: fmt(p[2]), img: B + p[3], few: p[4] <= 4, label: p[0] + ', ' + fmt(p[2]), add: function () { self.setState({ cart: self.state.cart + 1, sum: self.state.sum + p[2] }); } };
+    });
+    return { cats: cats, grid: grid, hasCart: s.cart > 0, cart: s.cart, total: fmt(s.sum) };
+  }
+}
+</script>
+</body>
+</html>

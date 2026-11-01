@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Витрина V1 — фон из L</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3F2FA}
+@keyframes v1d1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,30px) scale(1.12)}}
+@keyframes v1d2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,40px) scale(.9)}}
+.v1-b1{animation:v1d1 16s ease-in-out infinite}
+.v1-b2{animation:v1d2 20s ease-in-out infinite}
+.v1-btn{cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.v1-btn:active{transform:translateY(3px)}
+.v1-btn:focus-visible{outline:3px solid #3B2FD9;outline-offset:2px}
+.v1-chips{overflow-x:auto;scrollbar-width:none}
+.v1-chips::-webkit-scrollbar{display:none}
+@media (prefers-reduced-motion: reduce){.v1-b1,.v1-b2{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1700px; position: relative; overflow: hidden; font-family: 'Geologica', system-ui, sans-serif; color: #17133D; background: #F3F2FA">
+<div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none">
+<div class="v1-b1" style="position: absolute; left: -160px; top: -120px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(255,122,182,.45), rgba(255,122,182,0) 68%)"></div>
+<div class="v1-b2" style="position: absolute; right: -180px; top: 60px; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(circle, rgba(124,108,255,.45), rgba(124,108,255,0) 68%)"></div>
+<div class="v1-b1" style="position: absolute; left: -120px; top: 700px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(255,210,63,.35), rgba(255,210,63,0) 68%)"></div>
+<div class="v1-b2" style="position: absolute; right: -140px; top: 1150px; width: 440px; height: 440px; border-radius: 50%; background: radial-gradient(circle, rgba(94,230,176,.38), rgba(94,230,176,0) 68%)"></div>
+</div>
+
+<div style="position: relative">
+<div style="margin: 12px 12px 0; padding: 14px; border-radius: 28px; background: rgba(255,255,255,.6); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); border: 1px solid rgba(255,255,255,.9); box-shadow: 0 10px 40px rgba(40,30,110,.06)">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 46px; height: 46px; border-radius: 50%; flex: none; background: linear-gradient(140deg, #FF9CC8, #7C6CFF); color: #ffffff; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center">АK</div>
+<div style="flex: 1; min-width: 0"><div style="font-weight: 800; font-size: 17px">Айгерим Kids</div><div style="font-size: 12px; color: #4A4570; margin-top: 2px">ТЦ «Мега», 2 этаж · <span style="color: #157A52; font-weight: 600">Открыто до 20:00</span></div></div>
+<button class="v1-btn" type="button" aria-label="Корзина" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #3B2FD9; box-shadow: 0 4px 0 #2419A8; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"></path><path d="M9 7a3 3 0 0 1 6 0"></path></svg><sc-if value="{{hasCart}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px; border-radius: 999px; background: #FFD23F; color: #17133D; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center">{{cart}}</span></sc-if></button>
+</div>
+</div>
+
+<div style="display: flex; gap: 8px; margin: 12px 12px 0">
+<div style="flex: 1; display: flex; align-items: center; gap: 8px; padding: 0 14px; height: 48px; border-radius: 16px; background: rgba(255,255,255,.85); border: 1px solid rgba(255,255,255,.95); color: #6B6694; font-size: 15px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6694" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Поиск по каталогу</div>
+<button class="v1-btn" type="button" style="height: 48px; padding: 0 16px; border: 0; border-radius: 16px; background: #17133D; color: #ffffff; font: 600 14px Geologica, sans-serif; box-shadow: 0 4px 0 #0B0A26">Фильтры</button>
+</div>
+
+<div class="v1-chips" style="display: flex; gap: 8px; padding: 12px 12px 0">
+<sc-for list="{{cats}}" as="c" hint-placeholder-count="5"><button class="v1-btn" type="button" onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">{{c.label}}</button></sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 14px 12px 0">
+<sc-for list="{{grid}}" as="p" hint-placeholder-count="8">
+<article style="background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(40,30,110,.08)">
+<div style="position: relative">
+<img src="{{p.img}}" alt="{{p.name}}" style="display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: #EEECF8">
+<button class="v1-btn" type="button" onClick="{{p.add}}" aria-label="{{p.addLabel}}" style="position: absolute; right: 8px; bottom: 8px; width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #17133D; font: 800 20px Geologica, sans-serif; box-shadow: 0 4px 0 rgba(150,130,220,.45)">+</button>
+</div>
+<div style="padding: 10px 12px 12px">
+<div style="font-weight: 500; font-size: 13px; line-height: 1.3; color: #4A4570">{{p.name}}</div>
+<div style="font-weight: 800; font-size: 15px; margin-top: 4px; font-variant-numeric: tabular-nums">{{p.price}}</div>
+<div style="display: flex; align-items: center; gap: 5px; margin-top: 5px; font-size: 11px; font-weight: 600; color: {{p.tone}}"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{p.tone}}"></span>{{p.badge}}</div>
+</div>
+</article>
+</sc-for>
+</div>
+<p style="text-align: center; margin: 18px 16px 0; font-size: 11px; color: #6E6993">Фон и свечения как в варианте L. Фото — Unsplash</p>
+</div>
+
+<sc-if value="{{hasCart}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 12px; right: 12px; top: 760px; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 18px; border-radius: 999px; background: rgba(23,19,61,.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #ffffff">
+<div style="flex: 1; font-size: 13px"><div style="opacity: .75">В корзине</div><div style="font-weight: 800; font-size: 15px">{{total}}</div></div>
+<div style="padding: 12px 18px; border-radius: 999px; background: #FFD23F; color: #17133D; font-weight: 700; font-size: 14px; box-shadow: 0 4px 0 #C79A00">В корзину</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { cat: 'all', cart: 0, sum: 0 }; }
+  renderVals() {
+    var s = this.state, self = this, B = '/_blob/';
+    var P = [
+      ['Куртка демисезонная', 'outer', 18900, '1260977f2c0c34a5b933572bb6e99e94', 8], ['Платье трикотажное', 'dress', 9500, '7d0f77b8370d9af612d61812d7452e5f', 9],
+      ['Кроссовки на липучках', 'shoes', 14200, '04a201bc58d35022516d4467e49b7f41', 6], ['Шапка вязаная', 'acc', 4200, 'b7e066c9d74196dbd3a06f17035798be', 14],
+      ['Дождевик жёлтый', 'outer', 7900, 'a3bc2f157acffb785bd68c64b69fa957', 9], ['Джинсовая куртка', 'outer', 12500, '8a58a9934844266efb16a8c4761e7f7b', 6],
+      ['Худи с капюшоном', 'tops', 8900, 'b10ce1436e13380c548fa804ef4347fd', 9], ['Футболка хлопок', 'tops', 3500, '167257d6a7f8ad684c2d856ae3a11150', 22],
+      ['Платье летнее', 'dress', 8200, '7cb5296df170d7a0aca0d4bd8ec7cb9e', 4], ['Кеды', 'shoes', 11800, '2ec542edaef6635ace484ac3c7ad1f4a', 3],
+      ['Пальто шерстяное', 'outer', 24900, '4425d713fea616a795f8125f90d8aed0', 3], ['Шапка с помпоном', 'acc', 4900, 'ca2b511d14dcdf080d3e936049667bed', 5],
+      ['Кардиган серый', 'tops', 10400, '93fc374092f690eb46aa0b0cf74bcce4', 6], ['Платье в цветочек', 'dress', 9900, 'ed10ba6d31f748a438a21db8a7387c8a', 6]
+    ];
+    function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸'; }
+    var CATS = [['all', 'Все'], ['outer', 'Верхняя одежда'], ['dress', 'Платья'], ['tops', 'Кофты'], ['shoes', 'Обувь'], ['acc', 'Аксессуары']];
+    var cats = CATS.map(function (c) { var on = c[0] === s.cat; return { label: c[1], pressed: on ? 'true' : 'false', pick: function () { self.setState({ cat: c[0] }); }, style: 'flex: none; border: 0; border-radius: 999px; padding: 10px 16px; min-height: 42px; font: 600 14px Geologica, sans-serif; ' + (on ? 'background: #17133D; color: #ffffff; box-shadow: 0 3px 0 #0B0A26;' : 'background: rgba(255,255,255,.85); color: #17133D; border: 1px solid rgba(255,255,255,.95);') }; });
+    var grid = P.filter(function (p) { return s.cat === 'all' || p[1] === s.cat; }).slice(0, 10).map(function (p) {
+      var few = p[4] <= 4;
+      return { name: p[0], price: fmt(p[2]), img: B + p[3], badge: few ? 'Осталось мало' : 'В наличии', tone: few ? '#A35A00' : '#157A52', addLabel: 'Добавить: ' + p[0], add: function () { self.setState({ cart: self.state.cart + 1, sum: self.state.sum + p[2] }); } };
+    });
+    return { cats: cats, grid: grid, hasCart: s.cart > 0, cart: s.cart, total: fmt(s.sum) };
+  }
+}
+</script>
+</body>
+</html>

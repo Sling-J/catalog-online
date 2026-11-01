@@ -1,0 +1,450 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Aurora.dc.html": {
+      "expand": "fill",
+      "h": 3400,
+      "is_interactive": true,
+      "title": "M · Аврора + стеклянные предметы",
+      "w": 1440,
+      "x": 0,
+      "y": 39872
+    },
+    "Bento.dc.html": {
+      "expand": "fill",
+      "h": 3400,
+      "is_interactive": true,
+      "title": "E · Бенто + градиенты",
+      "w": 1440,
+      "x": 0,
+      "y": 32472
+    },
+    "Brutal.dc.html": {
+      "expand": "fill",
+      "h": 3400,
+      "is_interactive": true,
+      "title": "K · Необрутализм",
+      "w": 1440,
+      "x": 3040,
+      "y": 36172
+    },
+    "Clay.dc.html": {
+      "expand": "fill",
+      "h": 3400,
+      "is_interactive": true,
+      "title": "L · Стекло + пластилин",
+      "w": 1440,
+      "x": 4560,
+      "y": 36172
+    },
+    "Cord.dc.html": {
+      "expand": "fill",
+      "h": 3900,
+      "is_interactive": true,
+      "title": "C · Шнур",
+      "w": 1440,
+      "x": 3040,
+      "y": 28272
+    },
+    "Dark.dc.html": {
+      "expand": "fill",
+      "h": 3400,
+      "is_interactive": true,
+      "title": "F · Тёмный техно-премиум",
+      "w": 1440,
+      "x": 1520,
+      "y": 32472
+    },
+    "DesignSystem.dc.html": {
+      "expand": "fill",
+      "h": 3300,
+      "is_interactive": true,
+      "title": "Дизайн-система · Магазин в кармане",
+      "w": 1440,
+      "x": 0,
+      "y": 6020
+    },
+    "Duo.dc.html": {
+      "expand": "fill",
+      "h": 3400,
+      "is_interactive": true,
+      "title": "Лендинг N · компьютер 1440",
+      "w": 1440,
+      "x": 0,
+      "y": 660
+    },
+    "DuoMobile.dc.html": {
+      "expand": "fill",
+      "h": 4700,
+      "is_interactive": true,
+      "title": "Лендинг N · телефон 390",
+      "w": 390,
+      "x": 2434,
+      "y": 660
+    },
+    "DuoTablet.dc.html": {
+      "expand": "fill",
+      "h": 3900,
+      "is_interactive": true,
+      "title": "Лендинг N · планшет 834",
+      "w": 834,
+      "x": 1520,
+      "y": 660
+    },
+    "Friendly.dc.html": {
+      "expand": "fill",
+      "h": 3400,
+      "is_interactive": true,
+      "title": "G · Яркий дружелюбный",
+      "w": 1440,
+      "x": 3040,
+      "y": 32472
+    },
+    "Glass.dc.html": {
+      "expand": "fill",
+      "h": 3400,
+      "is_interactive": true,
+      "title": "D · Стекло и градиенты + история",
+      "w": 1440,
+      "x": 4560,
+      "y": 28272
+    },
+    "Magazine.dc.html": {
+      "expand": "fill",
+      "h": 3400,
+      "is_interactive": true,
+      "title": "H · Модный журнал",
+      "w": 1440,
+      "x": 4560,
+      "y": 32472
+    },
+    "Main.dc.html": {
+      "expand": "fill",
+      "h": 3900,
+      "is_interactive": true,
+      "title": "A · Сырмак",
+      "w": 1440,
+      "x": 0,
+      "y": 28272
+    },
+    "StoreDesktop.dc.html": {
+      "expand": "fill",
+      "h": 2200,
+      "is_interactive": true,
+      "title": "Витрина v1 · компьютер",
+      "w": 1440,
+      "x": 470,
+      "y": 43932
+    },
+    "StoreMobile.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "radius": 40,
+      "title": "Витрина v1 · телефон (прототип)",
+      "w": 390,
+      "x": 0,
+      "y": 43932
+    },
+    "StoreStates.dc.html": {
+      "h": 1960,
+      "title": "Состояния · телефон",
+      "w": 1760,
+      "x": 0,
+      "y": 11600
+    },
+    "StoreStatesDesk.dc.html": {
+      "h": 4328,
+      "title": "Состояния · компьютер 1440",
+      "w": 3136,
+      "x": 0,
+      "y": 13760
+    },
+    "StoreV1.dc.html": {
+      "h": 1700,
+      "is_interactive": true,
+      "radius": 40,
+      "title": "V1 · Фон и свечения из L",
+      "w": 390,
+      "x": 0,
+      "y": 46432
+    },
+    "StoreV2.dc.html": {
+      "h": 1700,
+      "is_interactive": true,
+      "radius": 40,
+      "title": "V2 · Классический магазин",
+      "w": 390,
+      "x": 470,
+      "y": 46432
+    },
+    "StoreV3.dc.html": {
+      "h": 1700,
+      "is_interactive": true,
+      "radius": 40,
+      "title": "V3 · Как профиль Instagram",
+      "w": 390,
+      "x": 940,
+      "y": 46432
+    },
+    "StoreV4.dc.html": {
+      "h": 1700,
+      "is_interactive": true,
+      "radius": 40,
+      "title": "V4 · Плитки категорий и подборки",
+      "w": 390,
+      "x": 1410,
+      "y": 46432
+    },
+    "StoreV5.dc.html": {
+      "h": 1700,
+      "is_interactive": true,
+      "radius": 40,
+      "title": "V5 · Список с размерами",
+      "w": 390,
+      "x": 1880,
+      "y": 46432
+    },
+    "StoreV6.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "radius": 40,
+      "title": "Витрина · телефон (прототип)",
+      "w": 390,
+      "x": 0,
+      "y": 9980
+    },
+    "StoreV6DeskModal.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Витрина · компьютер — товар окном поверх сетки",
+      "w": 1440,
+      "x": 470,
+      "y": 9980
+    },
+    "StoreV6DeskSide.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "V6 · компьютер, вариант Б: панель справа",
+      "w": 1440,
+      "x": 2010,
+      "y": 43932
+    },
+    "Swiss.dc.html": {
+      "expand": "fill",
+      "h": 3400,
+      "is_interactive": true,
+      "title": "J · Швейцарский минимализм",
+      "w": 1440,
+      "x": 1520,
+      "y": 36172
+    },
+    "Tactile.dc.html": {
+      "expand": "fill",
+      "h": 3400,
+      "is_interactive": true,
+      "title": "I · Тактильный",
+      "w": 1440,
+      "x": 0,
+      "y": 36172
+    },
+    "Tag.dc.html": {
+      "expand": "fill",
+      "h": 3900,
+      "is_interactive": true,
+      "title": "B · Бирка",
+      "w": 1440,
+      "x": 1520,
+      "y": 28272
+    },
+    "AdminPhone.dc.html": {
+      "h": 1000,
+      "is_interactive": false,
+      "title": "Админка · телефон",
+      "w": 2190,
+      "x": 0,
+      "y": 19188
+    },
+    "AdminDesk.dc.html": {
+      "h": 1088,
+      "is_interactive": false,
+      "title": "Админка · компьютер 1440",
+      "w": 4680,
+      "x": 0,
+      "y": 20388
+    },
+    "AdminPhone2.dc.html": {
+      "h": 1960,
+      "is_interactive": false,
+      "title": "Админка · телефон — регистрация, мастер 1–4 и остальные экраны",
+      "w": 2620,
+      "x": 0,
+      "y": 22576
+    },
+    "AdminDesk2.dc.html": {
+      "h": 2176,
+      "is_interactive": false,
+      "title": "Админка · компьютер 1440 — регистрация и мастер; новый товар, о магазине",
+      "w": 7800,
+      "x": 0,
+      "y": 24736
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-31T16:30:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "noteOrder": [
+    "secApproved",
+    "subLanding",
+    "nChosen",
+    "subDS",
+    "subStore",
+    "storeV6Hint",
+    "subStates",
+    "secReview",
+    "secReview2",
+    "secArchive",
+    "subArchLanding",
+    "subArchStore"
+  ],
+  "notes": {
+    "secApproved": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "УТВЕРЖДЕНО — по этим макетам делаем продукт",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "subLanding": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Лендинг сервиса — вариант N (1440 / 834 / 390)",
+      "w": 240,
+      "x": 0,
+      "y": 400
+    },
+    "nChosen": {
+      "fill": "green",
+      "size": 24,
+      "text": "Один файл, три ширины. На телефоне два экрана переключаются вкладками. Цвета мелкого текста исправлены (контраст). Демо: заказ уходит в WhatsApp, магазин отвечает в чате, остатки не списываются (заказы не храним).",
+      "w": 320,
+      "x": 2904,
+      "y": 660
+    },
+    "subDS": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Дизайн-система «Магазин в кармане»",
+      "w": 240,
+      "x": 0,
+      "y": 5760
+    },
+    "subStore": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Витрина магазина — V6",
+      "w": 240,
+      "x": 0,
+      "y": 9720
+    },
+    "storeV6Hint": {
+      "fill": "purple",
+      "size": 24,
+      "text": "Нажмите Play. Шапка магазина → расположение. Фото → карточка товара → размер → «В корзину» → «Заказать через WhatsApp».",
+      "w": 390,
+      "x": 0,
+      "y": 10850
+    },
+    "subStates": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Витрина — пустые и служебные состояния (телефон, компьютер)",
+      "w": 240,
+      "x": 0,
+      "y": 11340
+    },
+    "secReview": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Админка магазина — ключевые экраны (без заказов)",
+      "w": 240,
+      "x": 0,
+      "y": 18788
+    },
+    "secArchive": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "АРХИВ — варианты, которые не выбрали (для истории)",
+      "w": 240,
+      "x": 0,
+      "y": 27612
+    },
+    "subArchLanding": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Лендинг: варианты A–M",
+      "w": 240,
+      "x": 0,
+      "y": 28012
+    },
+    "subArchStore": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Витрина: первая версия, варианты V1–V5, компьютер «вариант Б»",
+      "w": 240,
+      "x": 0,
+      "y": 43672
+    },
+    "secReview2": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Админка — регистрация, мастер, новый товар, настройки, статистика",
+      "w": 240,
+      "x": 0,
+      "y": 22176
+    }
+  },
+  "order": [
+    "Duo.dc.html",
+    "DuoTablet.dc.html",
+    "DuoMobile.dc.html",
+    "DesignSystem.dc.html",
+    "StoreV6.dc.html",
+    "StoreV6DeskModal.dc.html",
+    "StoreStates.dc.html",
+    "StoreStatesDesk.dc.html",
+    "AdminPhone.dc.html",
+    "AdminDesk.dc.html",
+    "AdminPhone2.dc.html",
+    "AdminDesk2.dc.html",
+    "Main.dc.html",
+    "Tag.dc.html",
+    "Cord.dc.html",
+    "Glass.dc.html",
+    "Bento.dc.html",
+    "Dark.dc.html",
+    "Friendly.dc.html",
+    "Magazine.dc.html",
+    "Tactile.dc.html",
+    "Swiss.dc.html",
+    "Brutal.dc.html",
+    "Clay.dc.html",
+    "Aurora.dc.html",
+    "StoreMobile.dc.html",
+    "StoreDesktop.dc.html",
+    "StoreV6DeskSide.dc.html",
+    "StoreV1.dc.html",
+    "StoreV2.dc.html",
+    "StoreV3.dc.html",
+    "StoreV4.dc.html",
+    "StoreV5.dc.html"
+  ],
+  "pages": [],
+  "title": "catalog-online — дизайн"
+}

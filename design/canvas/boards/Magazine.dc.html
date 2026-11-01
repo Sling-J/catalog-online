@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Лендинг — Журнал</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prata&amp;family=Golos+Text:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#111111}a:hover{color:#C8221A}
+::selection{background:#111111;color:#ffffff}
+.mg-link{text-decoration:none;background-image:linear-gradient(currentColor,currentColor);background-size:0 1px;background-repeat:no-repeat;background-position:0 100%;transition:background-size .35s cubic-bezier(.16,1,.3,1)}
+.mg-link:hover{background-size:100% 1px}
+.mg-btn{transition:background-color .25s,color .25s}
+.mg-btn:hover{background:#C8221A !important;color:#ffffff !important}
+.mg-btn:focus-visible,.mg-size:focus-visible{outline:2px solid #C8221A;outline-offset:3px}
+.mg-size{cursor:pointer}
+@keyframes mgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.mg-in{animation:mgIn .6s cubic-bezier(.16,1,.3,1) both}
+@media (prefers-reduced-motion: reduce){.mg-in{animation:none}}
+</style>
+</helmet>
+<div style="font-family: 'Golos Text', system-ui, sans-serif; color: #111111; background: #FFFFFF; width: 100%; min-height: 100vh">
+
+<header style="max-width: 1320px; margin: 0 auto; padding: 22px 32px 0">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase">
+<nav aria-label="Основное" style="display: flex; flex-wrap: wrap; gap: 24px">
+<a class="mg-link" href="#look">Пример</a>
+<a class="mg-link" href="#how">Как это работает</a>
+<a class="mg-link" href="#faq">Вопросы</a>
+</nav>
+<a class="mg-btn" href="#start" style="text-decoration: none; background: #111111; color: #ffffff; padding: 12px 20px">Создать каталог</a>
+</div>
+<a href="#top" style="display: block; text-align: center; text-decoration: none; font-family: 'Prata', serif; font-size: clamp(48px, 9vw, 132px); line-height: 1; letter-spacing: -0.02em; margin-top: 28px; padding-bottom: 18px; border-bottom: 1px solid #111111">catalog·online</a>
+</header>
+
+<section id="top" style="max-width: 1320px; margin: 0 auto; padding: 64px 32px 0; display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-end">
+<h1 style="flex: 3 1 640px; font-family: 'Prata', serif; font-weight: 400; font-size: clamp(46px, 6.4vw, 96px); line-height: 1.02; letter-spacing: -0.02em; margin: 0">Хватит отвечать <span style="font-style: italic; color: #C8221A">«есть ли размер?»</span></h1>
+<div style="flex: 1 1 300px">
+<p style="margin: 0; font-size: 18px; line-height: 1.6; color: #333333">Каталог вашего магазина с наличием, размерами и ценами — из той же таблицы, что ведёт касса. Покупатель выбирает сам и присылает заказ в WhatsApp.</p>
+<a class="mg-btn" href="#start" style="display: inline-block; margin-top: 24px; text-decoration: none; background: #111111; color: #ffffff; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; padding: 18px 28px">Создать каталог бесплатно</a>
+</div>
+</section>
+
+<section id="look" aria-label="Пример каталога" style="max-width: 1320px; margin: 0 auto; padding: 72px 32px 0">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 16px; border-top: 1px solid #111111; padding-top: 16px">
+<div style="font-family: 'Prata', serif; font-size: 26px">Айгерим Kids, осень</div>
+<div role="group" aria-label="Размер" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase">
+<span style="margin-right: 10px; color: #666666">Рост</span>
+<sc-for list="{{sizes}}" as="s" hint-placeholder-count="4">
+<button class="mg-size" type="button" onClick="{{s.pick}}" aria-pressed="{{s.pressed}}" style="{{s.style}}">{{s.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 40px 24px; margin-top: 32px">
+<sc-for list="{{visible}}" as="p" hint-placeholder-count="4">
+<figure class="mg-in" style="margin: 0">
+<div style="{{p.photo}}" role="img" aria-label="{{p.alt}}"><span style="position: absolute; left: 14px; bottom: 12px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,.85)">фото товара</span></div>
+<figcaption style="margin-top: 14px; display: flex; justify-content: space-between; gap: 12px; align-items: baseline">
+<span style="font-size: 15px; line-height: 1.35">{{p.name}}</span>
+<span style="font-family: 'Prata', serif; font-size: 18px; white-space: nowrap; font-variant-numeric: tabular-nums">{{p.price}}</span>
+</figcaption>
+<div style="{{p.ss}}">{{p.status}}</div>
+</figure>
+</sc-for>
+</div>
+<p style="margin: 28px 0 0; font-size: 13px; color: #666666">Пример магазина. Товары и цены вымышлены, вместо фотографий — тоновые заглушки</p>
+</section>
+
+<section style="max-width: 1320px; margin: 0 auto; padding: 120px 32px 0">
+<div style="border-top: 1px solid #111111; padding-top: 48px; display: flex; flex-wrap: wrap; gap: 56px">
+<blockquote style="flex: 1 1 420px; margin: 0; font-family: 'Prata', serif; font-size: clamp(34px, 4.4vw, 62px); line-height: 1.08; letter-spacing: -0.01em">«Здравствуйте, куртка синяя есть на&nbsp;110?»<span style="display: block; font-family: 'Golos Text', sans-serif; font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; color: #666666; margin-top: 20px">Директ, 23:41 · без ответа</span></blockquote>
+<div style="flex: 1 1 420px; columns: 2 220px; column-gap: 32px; font-size: 17px; line-height: 1.65; color: #333333">
+<p style="margin: 0 0 16px">Каждый такой вопрос — это покупатель, которому интересно. И ваше время: сходить на склад, найти размер, ответить, пока он не ушёл к соседям.</p>
+<p style="margin: 0 0 16px">С каталогом покупатель видит размер и наличие сам. А вам приходит уже готовое сообщение:</p>
+<div style="break-inside: avoid; border: 1px solid #111111; padding: 18px 20px; font-size: 15px; line-height: 1.6; font-variant-numeric: tabular-nums; color: #111111">
+<div style="font-weight: 600">Заказ №128 с сайта «Айгерим Kids»</div>
+<div style="margin-top: 6px">1. Куртка демисезонная (110) — 18 900 ₸</div>
+<div>2. Шапка вязаная (52) — 4 200 ₸</div>
+<div style="margin-top: 6px; font-weight: 600">Итого: 23 100 ₸</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="how" style="max-width: 1320px; margin: 0 auto; padding: 120px 32px 0">
+<h2 style="font-family: 'Prata', serif; font-weight: 400; font-size: clamp(36px, 4.6vw, 64px); margin: 0; border-top: 1px solid #111111; padding-top: 28px">Как это работает</h2>
+<ol style="list-style: none; padding: 0; margin: 40px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px">
+<li><div style="font-family: 'Prata', serif; font-size: 80px; line-height: 1; color: #C8221A">I</div><h3 style="font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; margin: 20px 0 10px; font-weight: 600">Загрузите Excel</h3><p style="margin: 0; font-size: 17px; line-height: 1.6; color: #333333">Выгрузка из кассовой программы или 1С. Повторная загрузка обновит остатки и цены.</p></li>
+<li><div style="font-family: 'Prata', serif; font-size: 80px; line-height: 1; color: #C8221A">II</div><h3 style="font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; margin: 20px 0 10px; font-weight: 600">Добавьте фото</h3><p style="margin: 0; font-size: 17px; line-height: 1.6; color: #333333">С телефона, несколько снимков на товар. Каталог работает и без фото.</p></li>
+<li><div style="font-family: 'Prata', serif; font-size: 80px; line-height: 1; color: #C8221A">III</div><h3 style="font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; margin: 20px 0 10px; font-weight: 600">Поделитесь ссылкой</h3><p style="margin: 0; font-size: 17px; line-height: 1.6; color: #333333">В шапке Instagram и в WhatsApp. Заказы приходят вам в WhatsApp.</p></li>
+</ol>
+</section>
+
+<section id="faq" style="max-width: 1320px; margin: 0 auto; padding: 120px 32px 0; display: flex; flex-wrap: wrap; gap: 48px">
+<h2 style="flex: 1 1 300px; font-family: 'Prata', serif; font-weight: 400; font-size: clamp(36px, 4.6vw, 64px); margin: 0">Вопросы</h2>
+<dl style="flex: 2 1 560px; margin: 0; border-top: 1px solid #111111">
+<div style="padding: 22px 0; border-bottom: 1px solid #DDDDDD"><dt style="font-size: 19px; font-weight: 500">Нужен сайт или программист?</dt><dd style="margin: 8px 0 0; font-size: 17px; line-height: 1.6; color: #444444">Нет. Каталог появляется сразу после загрузки таблицы.</dd></div>
+<div style="padding: 22px 0; border-bottom: 1px solid #DDDDDD"><dt style="font-size: 19px; font-weight: 500">Сколько стоит?</dt><dd style="margin: 8px 0 0; font-size: 17px; line-height: 1.6; color: #444444">Бесплатно на время пилота.</dd></div>
+<div style="padding: 22px 0; border-bottom: 1px solid #DDDDDD"><dt style="font-size: 19px; font-weight: 500">А если товар продали в магазине?</dt><dd style="margin: 8px 0 0; font-size: 17px; line-height: 1.6; color: #444444">Загрузите свежую выгрузку. Каждый заказ вы подтверждаете сами.</dd></div>
+</dl>
+</section>
+
+<section id="start" style="max-width: 1320px; margin: 0 auto; padding: 140px 32px 48px; text-align: center">
+<h2 style="font-family: 'Prata', serif; font-weight: 400; font-size: clamp(40px, 6.4vw, 100px); line-height: 1; letter-spacing: -0.02em; margin: 0 auto; max-width: 13ch">Пусть покупатели смотрят <span style="font-style: italic; color: #C8221A">сами</span></h2>
+<a class="mg-btn" href="#start" style="display: inline-block; margin-top: 40px; text-decoration: none; background: #111111; color: #ffffff; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; padding: 20px 34px">Создать каталог бесплатно</a>
+<p style="margin: 16px 0 0; font-size: 14px; color: #666666">Понадобится только email и таблица товаров</p>
+<footer style="margin-top: 96px; padding-top: 20px; border-top: 1px solid #111111; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #666666; text-align: left">
+<span>catalog·online — рабочее название</span>
+<span>Казахстан · [контакты]</span>
+</footer>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3400}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { size: 'all' };
+  }
+  renderVals() {
+    var size = this.state.size;
+    var self = this;
+    var sizes = ['all', '104', '110', '116'].map(function (id) {
+      var on = id === size;
+      return {
+        label: id === 'all' ? 'Все' : id, pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ size: id }); },
+        style: 'border: 0; background: transparent; padding: 10px 10px; min-height: 44px; font: 500 13px Golos Text, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: ' + (on ? '#C8221A; text-decoration: underline; text-underline-offset: 6px;' : '#111111;')
+      };
+    });
+    var products = [
+      { name: 'Куртка демисезонная, синяя', price: '18 900 ₸', tone: '#3E4766', h: 380, stock: { '104': 3, '110': 1, '116': 4 } },
+      { name: 'Платье трикотажное', price: '9 500 ₸', tone: '#9B5A55', h: 380, stock: { '104': 2, '110': 5, '116': 0 } },
+      { name: 'Кроссовки на липучках', price: '14 200 ₸', tone: '#B09A7A', h: 380, stock: { '104': 0, '110': 2, '116': 1 } },
+      { name: 'Шапка вязаная', price: '4 200 ₸', tone: '#6D7A73', h: 380, stock: { '104': 6, '110': 6, '116': 2 } },
+      { name: 'Комбинезон зимний', price: '27 400 ₸', tone: '#2E2A33', h: 380, stock: { '104': 1, '110': 0, '116': 0 } }
+    ];
+    var visible = products.filter(function (p) { return size === 'all' || p.stock[size] > 0; }).map(function (p) {
+      var n = size === 'all' ? (p.stock['104'] + p.stock['110'] + p.stock['116']) : p.stock[size];
+      var few = n <= 2;
+      return {
+        name: p.name, price: p.price, alt: 'Фото товара: ' + p.name,
+        photo: 'position: relative; height: ' + p.h + 'px; background: ' + p.tone + '; background-image: linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.22))',
+        status: few ? 'Осталось мало' : 'В наличии',
+        ss: 'margin-top: 6px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: ' + (few ? '#C8221A' : '#666666')
+      };
+    });
+    return { sizes: sizes, visible: visible };
+  }
+}
+</script>
+</body>
+</html>

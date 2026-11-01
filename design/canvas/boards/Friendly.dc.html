@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Лендинг — Дружелюбный</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#C7B8FF}
+a{color:#1D1B4B}a:hover{color:#000000}
+::selection{background:#FFD23F;color:#1D1B4B}
+@keyframes frFloat{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-16px) rotate(var(--r,0deg))}}
+@keyframes frBump{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.fr-float{animation:frFloat 5s ease-in-out infinite}
+.fr-float2{animation:frFloat 6.5s ease-in-out infinite .8s}
+.fr-float3{animation:frFloat 5.8s ease-in-out infinite 1.6s}
+@keyframes frBump2{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.fr-bump{animation:frBump .45s cubic-bezier(.34,1.56,.64,1)}
+.fr-bump2{animation:frBump2 .45s cubic-bezier(.34,1.56,.64,1)}
+.fr-btn{transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.fr-btn:hover{transform:translateY(-3px) scale(1.03)}
+.fr-btn:active{transform:translateY(1px) scale(.98)}
+.fr-btn:focus-visible,.fr-pill:focus-visible{outline:3px solid #1D1B4B;outline-offset:3px}
+.fr-pill{cursor:pointer}
+@media (prefers-reduced-motion: reduce){.fr-float,.fr-float2,.fr-float3,.fr-bump{animation:none}}
+</style>
+</helmet>
+<div style="font-family: 'Nunito', system-ui, sans-serif; color: #1D1B4B; background: #C7B8FF; width: 100%; min-height: 100vh; overflow: hidden">
+
+<header style="max-width: 1200px; margin: 0 auto; padding: 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<a href="#top" style="font-weight: 900; font-size: 24px; text-decoration: none; letter-spacing: -0.02em">catalog·online</a>
+<nav aria-label="Основное" style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; font-weight: 800; font-size: 16px">
+<a href="#how" style="text-decoration: none">Как это работает</a>
+<a href="#faq" style="text-decoration: none">Вопросы</a>
+<a class="fr-btn" href="#start" style="text-decoration: none; background: #1D1B4B; color: #ffffff; padding: 13px 22px; border-radius: 999px; box-shadow: 0 6px 0 #0E0C2E">Создать каталог</a>
+</nav>
+</header>
+
+<section id="top" style="max-width: 1200px; margin: 0 auto; padding: 56px 24px 0; text-align: center">
+<h1 style="font-weight: 900; font-size: clamp(46px, 7.4vw, 108px); line-height: 0.96; letter-spacing: -0.035em; margin: 0 auto; max-width: 12ch; width: 925px">Хватит отвечать «есть ли размер?»</h1>
+<p style="font-size: clamp(19px, 1.7vw, 23px); line-height: 1.5; font-weight: 700; color: #3A3672; margin: 26px auto 0; max-width: 40ch">Загрузите таблицу товаров — и покупатели сами увидят размеры, цены и наличие. А заказ пришлют вам в WhatsApp.</p>
+<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 34px">
+<a class="fr-btn" href="#start" style="text-decoration: none; background: #FFD23F; color: #1D1B4B; font-weight: 900; font-size: 19px; padding: 20px 32px; border-radius: 999px; box-shadow: 0 7px 0 #C79A00">Создать каталог бесплатно</a>
+<a class="fr-btn" href="#stage" style="text-decoration: none; background: #ffffff; color: #1D1B4B; font-weight: 800; font-size: 19px; padding: 20px 30px; border-radius: 999px; box-shadow: 0 7px 0 #9E8FE0">Попробовать пример</a>
+</div>
+</section>
+
+<section id="stage" aria-label="Пример каталога" style="position: relative; max-width: 1200px; margin: 0 auto; padding: 72px 24px 40px; min-height: 760px; display: flex; justify-content: center">
+
+<div aria-hidden="true" class="fr-float" style="--r: -12deg; position: absolute; left: 4%; top: 120px; width: 190px; height: 210px; border-radius: 36px 36px 44px 44px; background: radial-gradient(120% 90% at 30% 20%, #FFB39C, #FF7A59 55%, #D9532F); box-shadow: inset -14px -18px 30px rgba(120,30,0,.35), inset 12px 14px 24px rgba(255,255,255,.45), 0 40px 50px rgba(60,30,120,.28)">
+<div style="position: absolute; left: 50%; top: -58px; width: 96px; height: 96px; margin-left: -48px; border-radius: 50%; border: 16px solid #E96440; border-bottom-color: transparent; border-left-color: #E96440; box-sizing: border-box; transform: rotate(45deg)"></div>
+</div>
+
+<div aria-hidden="true" class="fr-float2" style="--r: 14deg; position: absolute; right: 6%; top: 90px; width: 150px; height: 200px; border-radius: 24px; background: radial-gradient(120% 90% at 30% 15%, #FFF0A8, #FFD23F 55%, #E3AE00); box-shadow: inset -12px -16px 26px rgba(130,90,0,.35), inset 10px 12px 20px rgba(255,255,255,.55), 0 40px 50px rgba(60,30,120,.28)">
+<div style="width: 30px; height: 30px; border-radius: 50%; margin: 22px auto 0; background: #C7B8FF; box-shadow: inset 4px 6px 10px rgba(29,27,75,.35)"></div>
+<div style="text-align: center; font-weight: 900; font-size: 30px; margin-top: 18px; color: #6B4E00">110</div>
+<div style="text-align: center; font-weight: 800; font-size: 16px; margin-top: 4px; color: #6B4E00">мало</div>
+</div>
+
+<div aria-hidden="true" class="fr-float3" style="--r: -6deg; position: absolute; right: 2%; top: 470px; width: 220px; padding: 20px 22px; border-radius: 30px 30px 30px 8px; background: radial-gradient(120% 120% at 25% 15%, #B8FFE1, #5EE6B0 55%, #26B985); box-shadow: inset -10px -14px 24px rgba(0,90,60,.3), inset 10px 12px 20px rgba(255,255,255,.5), 0 36px 46px rgba(60,30,120,.25); font-weight: 800; font-size: 16px; color: #0B4A33; line-height: 1.35">Заказ №128 · 23 100 ₸</div>
+
+<div style="position: relative; z-index: 1; width: 360px; max-width: 100%; border-radius: 54px; padding: 14px; box-sizing: border-box; background: radial-gradient(120% 80% at 30% 10%, #4A4690, #1D1B4B 60%); box-shadow: inset -10px -14px 26px rgba(0,0,0,.45), inset 8px 10px 18px rgba(255,255,255,.18), 0 50px 70px rgba(40,20,110,.4)">
+<div style="border-radius: 42px; background: #ffffff; overflow: hidden; padding: 22px 18px 18px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="font-weight: 900; font-size: 20px">Айгерим Kids</div>
+<div class="{{bumpCls}}" style="min-width: 42px; height: 42px; border-radius: 999px; background: #FFD23F; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px" aria-label="Товаров в корзине">{{cart}}</div>
+</div>
+<div role="group" aria-label="Размер" style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap">
+<sc-for list="{{sizes}}" as="s" hint-placeholder-count="3">
+<button class="fr-pill" type="button" onClick="{{s.pick}}" aria-pressed="{{s.pressed}}" style="{{s.style}}">{{s.label}}</button>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px">
+<sc-for list="{{items}}" as="p" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 22px; background: #F4F1FF">
+<div style="{{p.sw}}" role="img" aria-label="{{p.alt}}"></div>
+<div style="flex: 1; min-width: 0">
+<div style="font-weight: 800; font-size: 15px; line-height: 1.25">{{p.name}}</div>
+<div style="font-weight: 900; font-size: 16px; margin-top: 2px">{{p.price}}</div>
+<div style="{{p.bs}}">{{p.badge}}</div>
+</div>
+<button class="fr-btn" type="button" onClick="{{p.add}}" aria-label="{{p.addLabel}}" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: #1D1B4B; color: #ffffff; font: 900 22px Nunito, sans-serif; cursor: pointer; flex: none">+</button>
+</div>
+</sc-for>
+</div>
+<div style="margin-top: 14px; background: #5EE6B0; color: #0B4A33; text-align: center; font-weight: 900; font-size: 16px; padding: 15px; border-radius: 20px">Заказать через WhatsApp</div>
+</div>
+</div>
+<p style="position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; margin: 0; font-size: 14px; font-weight: 700; color: #4A4580">Пример магазина. Объёмные предметы — заглушки под финальные 3D-иллюстрации</p>
+</section>
+
+<section style="background: #ffffff; border-radius: 56px 56px 0 0; margin-top: 40px; padding: 96px 0 0">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 24px">
+<h2 style="font-weight: 900; font-size: clamp(34px, 4.8vw, 66px); line-height: 1; letter-spacing: -0.03em; margin: 0; max-width: 16ch">Было: переписка до ночи. Стало: готовый заказ.</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 24px; margin-top: 48px">
+<div style="flex: 1 1 400px; border-radius: 40px; padding: 34px; background: #F1EEFF">
+<div style="font-weight: 800; font-size: 15px; color: #6B66A8">Директ · 23:41</div>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px; font-size: 17px; font-weight: 700; line-height: 1.4">
+<div style="align-self: flex-start; background: #ffffff; padding: 13px 18px; border-radius: 22px 22px 22px 6px">Куртка синяя есть на 110?</div>
+<div style="align-self: flex-start; background: #ffffff; padding: 13px 18px; border-radius: 22px 22px 22px 6px">А цена? А шапка?</div>
+<div style="align-self: flex-start; background: #ffffff; padding: 13px 18px; border-radius: 22px 22px 22px 6px">Ау-у?</div>
+<div style="color: #6B66A8; font-size: 15px">Покупатель ушёл к соседям</div>
+</div>
+</div>
+<div style="flex: 1 1 400px; border-radius: 40px; padding: 34px; background: #D8FFEE">
+<div style="font-weight: 800; font-size: 15px; color: #1E7A55">WhatsApp · 10:05</div>
+<div style="margin-top: 16px; background: #ffffff; border-radius: 22px 22px 6px 22px; padding: 20px 22px; font-size: 16px; font-weight: 700; line-height: 1.55; font-variant-numeric: tabular-nums">
+<div style="font-weight: 900">Заказ №128 с сайта «Айгерим Kids»</div>
+<div style="margin-top: 6px">1. Куртка демисезонная (110) — 18 900 ₸</div>
+<div>2. Шапка вязаная (52) — 4 200 ₸</div>
+<div style="margin-top: 6px; font-weight: 900">Итого: 23 100 ₸</div>
+</div>
+<p style="margin: 16px 0 0; font-size: 17px; font-weight: 700; color: #1E7A55">Размер покупатель выбрал сам. Вам — только подтвердить.</p>
+</div>
+</div>
+</div>
+
+<div id="how" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 0">
+<h2 style="font-weight: 900; font-size: clamp(34px, 4.8vw, 66px); letter-spacing: -0.03em; margin: 0">Три шага — и готово</h2>
+<ol style="list-style: none; padding: 0; margin: 48px 0 0; display: flex; flex-wrap: wrap; gap: 20px">
+<li style="flex: 1 1 300px; border-radius: 40px; padding: 34px; background: #FFD23F">
+<div style="font-weight: 900; font-size: 64px; line-height: 1">1</div>
+<h3 style="font-weight: 900; font-size: 26px; margin: 16px 0 8px">Загрузите Excel</h3>
+<p style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.5; color: #4A3A00">Из кассовой программы или 1С. Новая загрузка — свежие остатки.</p>
+</li>
+<li style="flex: 1 1 300px; border-radius: 40px; padding: 34px; background: #FF7A59; color: #2A0A00">
+<div style="font-weight: 900; font-size: 64px; line-height: 1">2</div>
+<h3 style="font-weight: 900; font-size: 26px; margin: 16px 0 8px">Добавьте фото</h3>
+<p style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.5">Прямо с телефона. Можно и без фото.</p>
+</li>
+<li style="flex: 1 1 300px; border-radius: 40px; padding: 34px; background: #5EE6B0; color: #0B3A28">
+<div style="font-weight: 900; font-size: 64px; line-height: 1">3</div>
+<h3 style="font-weight: 900; font-size: 26px; margin: 16px 0 8px">Поделитесь ссылкой</h3>
+<p style="margin: 0; font-size: 17px; font-weight: 700; line-height: 1.5">В Instagram и WhatsApp. Заказы — вам в WhatsApp.</p>
+</li>
+</ol>
+</div>
+
+<div id="faq" style="max-width: 860px; margin: 0 auto; padding: 120px 24px 0">
+<h2 style="font-weight: 900; font-size: clamp(34px, 4.4vw, 58px); letter-spacing: -0.03em; margin: 0; text-align: center">Частые вопросы</h2>
+<dl style="margin: 36px 0 0; display: flex; flex-direction: column; gap: 12px">
+<div style="border-radius: 28px; padding: 24px 28px; background: #F1EEFF"><dt style="font-weight: 900; font-size: 19px">Нужен сайт или программист?</dt><dd style="margin: 6px 0 0; font-size: 17px; font-weight: 600; line-height: 1.5; color: #4A4580">Нет. Каталог появляется сразу после загрузки таблицы.</dd></div>
+<div style="border-radius: 28px; padding: 24px 28px; background: #F1EEFF"><dt style="font-weight: 900; font-size: 19px">Сколько стоит?</dt><dd style="margin: 6px 0 0; font-size: 17px; font-weight: 600; line-height: 1.5; color: #4A4580">Бесплатно на время пилота.</dd></div>
+<div style="border-radius: 28px; padding: 24px 28px; background: #F1EEFF"><dt style="font-weight: 900; font-size: 19px">А если товар продали в магазине?</dt><dd style="margin: 6px 0 0; font-size: 17px; font-weight: 600; line-height: 1.5; color: #4A4580">Загрузите свежую выгрузку. Каждый заказ вы подтверждаете сами.</dd></div>
+</dl>
+</div>
+
+<div id="start" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 48px">
+<div style="border-radius: 56px; background: #1D1B4B; color: #ffffff; padding: clamp(40px, 6vw, 88px) 32px; text-align: center">
+<h2 style="font-weight: 900; font-size: clamp(38px, 5.6vw, 80px); line-height: 0.98; letter-spacing: -0.035em; margin: 0 auto; max-width: 13ch">Пусть покупатели смотрят сами</h2>
+<a class="fr-btn" href="#start" style="display: inline-block; margin-top: 36px; text-decoration: none; background: #FFD23F; color: #1D1B4B; font-weight: 900; font-size: 20px; padding: 20px 36px; border-radius: 999px; box-shadow: 0 7px 0 #C79A00">Создать каталог бесплатно</a>
+<p style="margin: 18px 0 0; font-size: 16px; font-weight: 700; color: #B9B5E8">Понадобится только email и таблица товаров</p>
+</div>
+<footer style="margin-top: 40px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 14px; font-weight: 700; color: #6B66A8">
+<span>catalog·online — рабочее название</span>
+<span>Казахстан · [контакты]</span>
+</footer>
+</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3400}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { size: '110', cart: 0, bump: 0 };
+  }
+  renderVals() {
+    var s = this.state;
+    var self = this;
+    var sizes = ['104', '110', '116'].map(function (id) {
+      var on = id === s.size;
+      return {
+        label: id, pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ size: id }); },
+        style: 'border: 0; border-radius: 999px; padding: 10px 18px; min-height: 44px; font: 800 15px Nunito, sans-serif; ' + (on ? 'background: #1D1B4B; color: #ffffff;' : 'background: #F1EEFF; color: #1D1B4B;')
+      };
+    });
+    var products = [
+      { name: 'Куртка демисезонная', price: '18 900 ₸', c1: '#8C9BFF', c2: '#3C4BD6', stock: { '104': 3, '110': 1, '116': 4 } },
+      { name: 'Платье трикотажное', price: '9 500 ₸', c1: '#FFB3CF', c2: '#E2508F', stock: { '104': 2, '110': 5, '116': 0 } },
+      { name: 'Кроссовки', price: '14 200 ₸', c1: '#FFD99A', c2: '#F08A2C', stock: { '104': 0, '110': 2, '116': 1 } },
+      { name: 'Шапка вязаная', price: '4 200 ₸', c1: '#A6F5E6', c2: '#2FB5BC', stock: { '104': 6, '110': 6, '116': 2 } }
+    ];
+    var items = products.filter(function (p) { return p.stock[s.size] > 0; }).slice(0, 3).map(function (p) {
+      var few = p.stock[s.size] <= 2;
+      return {
+        name: p.name, price: p.price, alt: 'Фото товара: ' + p.name,
+        addLabel: 'Добавить в корзину: ' + p.name,
+        sw: 'width: 64px; height: 64px; flex: none; border-radius: 18px; background: radial-gradient(120% 120% at 30% 20%, ' + p.c1 + ', ' + p.c2 + '); box-shadow: inset -6px -8px 12px rgba(0,0,0,.18), inset 5px 6px 10px rgba(255,255,255,.4)',
+        badge: few ? 'Осталось мало' : 'Есть',
+        bs: 'display: inline-block; margin-top: 4px; font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 999px; ' + (few ? 'background: #FFE2D7; color: #8A2A0C;' : 'background: #D8FFEE; color: #0B4A33;'),
+        add: function () { self.setState({ cart: self.state.cart + 1, bump: self.state.bump + 1 }); }
+      };
+    });
+    return { sizes: sizes, items: items, cart: s.cart, bumpCls: s.bump === 0 ? '' : (s.bump % 2 === 1 ? 'fr-bump' : 'fr-bump2') };
+  }
+}
+</script>
+</body>
+</html>

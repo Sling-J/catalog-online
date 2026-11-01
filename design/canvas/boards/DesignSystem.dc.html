@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Дизайн-система — Магазин в кармане</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#C9BBFF}
+::selection{background:#FFD23F;color:#1D1B4B}
+@keyframes dsFloat{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-12px) rotate(calc(var(--r,0deg) + 3deg))}}
+.ds-f1{animation:dsFloat 5.4s ease-in-out infinite}
+.ds-f2{animation:dsFloat 6.6s ease-in-out infinite .8s}
+.ds-f3{animation:dsFloat 6s ease-in-out infinite 1.5s}
+.ds-f4{animation:dsFloat 7s ease-in-out infinite 2.2s}
+.ds-puffy{transition:transform .25s cubic-bezier(.34,1.56,.64,1);cursor:pointer}
+.ds-puffy:hover{transform:translateY(-3px)}
+.ds-puffy:active{transform:translateY(4px)}
+.ds-puffy:focus-visible,.ds-chip:focus-visible{outline:3px solid #1D1B4B;outline-offset:3px}
+.ds-chip{cursor:pointer}
+.ds-input{transition:border-color .2s,box-shadow .2s}
+.ds-input::placeholder{color:#6B6694}
+.ds-input:focus{outline:none;border:2px solid #1D1B4B !important;padding:13px 17px !important;box-shadow:0 0 0 6px rgba(201,187,255,.6)}
+@media (prefers-reduced-motion: reduce){.ds-f1,.ds-f2,.ds-f3,.ds-f4{animation:none}}
+</style>
+</helmet>
+<div style="font-family: 'Geologica', system-ui, sans-serif; color: #1D1B4B; background: #C9BBFF; width: 100%; min-height: 100vh">
+<div style="max-width: 1240px; margin: 0 auto; padding: 56px 24px 64px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px">
+<div>
+<div style="font-size: 15px; font-weight: 600; color: #3A3672">catalog·online · дизайн-система</div>
+<h1 style="font-weight: 800; font-size: clamp(44px, 6vw, 84px); line-height: 1; letter-spacing: -0.045em; margin: 10px 0 0">Магазин в кармане</h1>
+</div>
+<p style="margin: 0; max-width: 44ch; font-size: 17px; line-height: 1.55; color: #3A3672">Один мир на лендинг, витрину и админку: сиреневое поле, стекло, пухлые кнопки с подложкой, пластилиновые предметы, шрифт Geologica. Источник правды — DESIGN.md в корне проекта.</p>
+</header>
+
+<section aria-label="Цвета" style="margin-top: 56px; border-radius: 48px; padding: 40px; background: rgba(255,255,255,.55); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); border: 1px solid rgba(255,255,255,.85)">
+<h2 style="font-weight: 800; font-size: 36px; letter-spacing: -0.04em; margin: 0">Цвета</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-top: 28px">
+<sc-for list="{{swatches}}" as="c" hint-placeholder-count="12">
+<div style="background: #ffffff; border-radius: 22px; overflow: hidden; box-shadow: 0 6px 16px rgba(40,30,110,.07)">
+<div style="{{c.sw}}"></div>
+<div style="padding: 12px 14px 14px">
+<div style="font-weight: 700; font-size: 15px">{{c.name}}</div>
+<div style="font-size: 13px; color: #6B6694; margin-top: 2px">{{c.token}} · {{c.hex}}</div>
+<div style="font-size: 13px; color: #3A3672; margin-top: 6px; line-height: 1.4">{{c.role}}</div>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px">
+<span style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: #ffffff; font-size: 14px; font-weight: 600; color: #157A52"><span style="width: 9px; height: 9px; border-radius: 50%; background: #157A52"></span>В наличии · stock-in</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: #ffffff; font-size: 14px; font-weight: 600; color: #A35A00"><span style="width: 9px; height: 9px; border-radius: 50%; background: #A35A00"></span>Осталось 1 · stock-low</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: #ffffff; font-size: 14px; font-weight: 600; color: #7A7598"><span style="width: 9px; height: 9px; border-radius: 50%; background: #7A7598"></span>Нет в наличии · stock-out</span>
+</div>
+</section>
+
+<section aria-label="Типографика" style="margin-top: 24px; border-radius: 48px; padding: 40px; background: #FCFBFF; box-shadow: 0 20px 60px rgba(40,20,110,.12)">
+<h2 style="font-weight: 800; font-size: 36px; letter-spacing: -0.04em; margin: 0">Типографика · Geologica</h2>
+<div style="display: flex; flex-direction: column; margin-top: 24px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 32px; padding: 18px 0; border-bottom: 1px solid #EEECF8"><span style="width: 140px; font-size: 13px; font-weight: 600; color: #6B6694">Display · 800</span><span style="font-weight: 800; font-size: clamp(40px, 5.4vw, 80px); line-height: 1; letter-spacing: -0.045em">Есть размер?</span></div>
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 32px; padding: 18px 0; border-bottom: 1px solid #EEECF8"><span style="width: 140px; font-size: 13px; font-weight: 600; color: #6B6694">Headline · 800</span><span style="font-weight: 800; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -0.04em">Три шага — и готово</span></div>
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 32px; padding: 18px 0; border-bottom: 1px solid #EEECF8"><span style="width: 140px; font-size: 13px; font-weight: 600; color: #6B6694">Title · 700 · 23</span><span style="font-weight: 700; font-size: 23px">Загрузите Excel</span></div>
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 32px; padding: 18px 0; border-bottom: 1px solid #EEECF8"><span style="width: 140px; font-size: 13px; font-weight: 600; color: #6B6694">Body · 400 · 16</span><span style="font-size: 16px; line-height: 1.55; max-width: 60ch; color: #3A3672">Покупатель сам видит размеры и наличие, а готовый заказ приходит вам в WhatsApp.</span></div>
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 32px; padding: 18px 0; border-bottom: 1px solid #EEECF8"><span style="width: 140px; font-size: 13px; font-weight: 600; color: #6B6694">Label · 600 · 15</span><span style="font-weight: 600; font-size: 15px">Подтвердить заказ</span></div>
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 32px; padding: 18px 0; border-bottom: 1px solid #EEECF8"><span style="width: 140px; font-size: 13px; font-weight: 600; color: #6B6694">Caption · 500 · 13</span><span style="font-weight: 500; font-size: 13px; color: #6B6694">Пример. Товары и цены вымышлены</span></div>
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 32px; padding: 18px 0"><span style="width: 140px; font-size: 13px; font-weight: 600; color: #6B6694">Price · 800 · tnum</span><span style="font-weight: 800; font-size: 22px; font-variant-numeric: tabular-nums">18 900 ₸ · 4 200 ₸ · 23 100 ₸</span></div>
+</div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; margin-top: 24px">
+
+<section aria-label="Кнопки" style="flex: 3 1 560px; border-radius: 48px; padding: 40px; background: rgba(255,255,255,.55); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); border: 1px solid rgba(255,255,255,.85)">
+<h2 style="font-weight: 800; font-size: 36px; letter-spacing: -0.04em; margin: 0">Кнопки</h2>
+<p style="margin: 8px 0 0; font-size: 15px; color: #3A3672">Наведите и нажмите: кнопка приподнимается и проседает на высоту подложки.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 28px">
+<button class="ds-puffy" type="button" style="border: 0; background: #FFD23F; color: #1D1B4B; font: 700 18px Geologica, sans-serif; padding: 19px 32px; border-radius: 999px; box-shadow: 0 7px 0 #C79A00">Создать каталог</button>
+<button class="ds-puffy" type="button" style="border: 0; background: #1D1B4B; color: #ffffff; font: 600 15px Geologica, sans-serif; padding: 14px 24px; border-radius: 999px; box-shadow: 0 5px 0 #0B0A26">Тёмная</button>
+<button class="ds-puffy" type="button" style="border: 0; background: #5EE6B0; color: #0B3A28; font: 700 15px Geologica, sans-serif; padding: 15px 24px; border-radius: 999px; box-shadow: 0 5px 0 #26B985">Подтвердить заказ</button>
+<button class="ds-puffy" type="button" style="border: 1px solid rgba(255,255,255,.95); background: rgba(255,255,255,.65); color: #1D1B4B; font: 600 16px Geologica, sans-serif; padding: 16px 26px; border-radius: 999px; box-shadow: 0 6px 0 rgba(150,130,220,.45)">Стекло</button>
+<button type="button" disabled style="border: 0; background: #EEECF8; color: #6B6694; font: 600 15px Geologica, sans-serif; padding: 15px 24px; border-radius: 999px">Неактивная</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 24px">
+<button class="ds-puffy" type="button" onClick="{{addOne}}" aria-label="Добавить товар" style="{{addStyle}}">{{addLabel}}</button>
+<span style="font-size: 14px; color: #3A3672">Круглая «+»: после добавления становится жёлтой и показывает количество</span>
+</div>
+</section>
+
+<section aria-label="Чипы и поля" style="flex: 2 1 380px; border-radius: 48px; padding: 40px; background: #FCFBFF; box-shadow: 0 20px 60px rgba(40,20,110,.12)">
+<h2 style="font-weight: 800; font-size: 36px; letter-spacing: -0.04em; margin: 0">Чипы и поля</h2>
+<div role="group" aria-label="Размер" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px">
+<sc-for list="{{chips}}" as="z" hint-placeholder-count="4">
+<button class="ds-chip" type="button" onClick="{{z.pick}}" disabled="{{z.out}}" aria-pressed="{{z.pressed}}" style="{{z.style}}">{{z.label}}</button>
+</sc-for>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; margin-top: 28px">
+<span style="font-size: 13px; font-weight: 600">Номер WhatsApp</span>
+<input class="ds-input" placeholder="+7 700 000 00 00" style="font: 400 16px Geologica, sans-serif; color: #1D1B4B; background: #ffffff; border: 1px solid #DCD8EE; border-radius: 16px; padding: 14px 18px">
+</label>
+<label style="display: flex; flex-direction: column; gap: 6px; margin-top: 16px">
+<span style="font-size: 13px; font-weight: 600">Поддомен</span>
+<input class="ds-input" value="aigerim kids" style="font: 400 16px Geologica, sans-serif; color: #1D1B4B; background: #ffffff; border: 2px solid #D9532F; border-radius: 16px; padding: 13px 17px">
+<span style="font-size: 13px; font-weight: 500; color: #9A3418">Только латиница, цифры и дефис: aigerim-kids</span>
+</label>
+</section>
+
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; margin-top: 24px">
+
+<section aria-label="Фирменные компоненты" style="flex: 2 1 460px; border-radius: 48px; padding: 40px; background: rgba(255,255,255,.55); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); border: 1px solid rgba(255,255,255,.85)">
+<h2 style="font-weight: 800; font-size: 36px; letter-spacing: -0.04em; margin: 0">Строка товара и стекло</h2>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 24px; max-width: 360px">
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 22px; background: #ffffff; box-shadow: 0 6px 16px rgba(40,30,110,.07)">
+<div role="img" aria-label="Фото товара" style="width: 60px; height: 60px; border-radius: 18px; background: radial-gradient(120% 120% at 30% 20%, #9C90FF, #3B2FD9)"></div>
+<div style="flex: 1"><div style="font-weight: 600; font-size: 14px">Куртка демисезонная</div><div style="font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums">18 900 ₸</div><div style="display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #A35A00"><span style="width: 7px; height: 7px; border-radius: 50%; background: #A35A00"></span>Осталось 1</div></div>
+<button class="ds-puffy" type="button" aria-label="Добавить" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: #1D1B4B; color: #ffffff; font: 800 18px Geologica, sans-serif; box-shadow: 0 4px 0 #0B0A26">+</button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 22px; background: #ffffff; box-shadow: 0 6px 16px rgba(40,30,110,.07)">
+<div role="img" aria-label="Фото товара" style="width: 60px; height: 60px; border-radius: 18px; background: radial-gradient(120% 120% at 30% 20%, #B8FFE1, #26B985)"></div>
+<div style="flex: 1"><div style="font-weight: 600; font-size: 14px">Шапка вязаная</div><div style="font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums">4 200 ₸</div><div style="display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #157A52"><span style="width: 7px; height: 7px; border-radius: 50%; background: #157A52"></span>В наличии</div></div>
+<button class="ds-puffy" type="button" aria-label="Добавить" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: #FFD23F; color: #1D1B4B; font: 800 18px Geologica, sans-serif; box-shadow: 0 4px 0 #C79A00">2</button>
+</div>
+</div>
+<div style="margin-top: 20px; padding: 24px 28px; border-radius: 30px; background: rgba(255,255,255,.6); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,.9); max-width: 460px">
+<div style="font-weight: 700; font-size: 18px">Стеклянная панель</div>
+<div style="font-size: 16px; line-height: 1.55; color: #3A3672; margin-top: 6px">Навигация, вопросы, вкладки. Размытие 16–24px и белая кромка.</div>
+</div>
+</section>
+
+<section aria-label="Предметы" style="flex: 1 1 340px; border-radius: 48px; padding: 40px; background: #1D1B4B; color: #ffffff; position: relative; overflow: hidden; min-height: 420px">
+<h2 style="font-weight: 800; font-size: 36px; letter-spacing: -0.04em; margin: 0">Предметы</h2>
+<p style="margin: 8px 0 0; font-size: 15px; color: #C8C3EE; max-width: 30ch">Пока CSS-заглушки. Финально — 3D-иллюстрации в том же цвете и свете.</p>
+<div aria-hidden="true" class="ds-f1" style="--r: -12deg; position: absolute; left: 40px; bottom: 60px; width: 96px; height: 106px; border-radius: 22px 22px 28px 28px; background: radial-gradient(120% 90% at 30% 20%, #FFB39C, #FF7A59 55%, #D9532F); box-shadow: inset -8px -12px 18px rgba(120,30,0,.35), inset 7px 8px 14px rgba(255,255,255,.45), 0 24px 32px rgba(0,0,0,.35)"><div style="position: absolute; left: 50%; top: -30px; width: 50px; height: 50px; margin-left: -25px; border-radius: 50%; border: 9px solid #E96440; border-bottom-color: transparent; border-left-color: #E96440; box-sizing: border-box; transform: rotate(45deg)"></div></div>
+<div aria-hidden="true" class="ds-f2" style="--r: 12deg; position: absolute; left: 160px; bottom: 120px; width: 80px; height: 106px; border-radius: 18px; background: radial-gradient(120% 90% at 30% 15%, #FFF0A8, #FFD23F 55%, #E3AE00); box-shadow: inset -8px -12px 18px rgba(130,90,0,.35), inset 7px 8px 14px rgba(255,255,255,.55), 0 24px 32px rgba(0,0,0,.35)"><div style="width: 16px; height: 16px; border-radius: 50%; margin: 12px auto 0; background: #1D1B4B"></div><div style="text-align: center; font-weight: 800; font-size: 20px; margin-top: 10px; color: #6B4E00">110</div></div>
+<div aria-hidden="true" class="ds-f3" style="--r: 8deg; position: absolute; right: 40px; bottom: 70px; width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(120% 120% at 30% 25%, #B8FFE1, #5EE6B0 55%, #26B985); box-shadow: inset -7px -9px 14px rgba(0,90,60,.3), inset 6px 7px 12px rgba(255,255,255,.5), 0 22px 30px rgba(0,0,0,.35)"></div>
+<div aria-hidden="true" class="ds-f4" style="--r: -6deg; position: absolute; right: 30px; bottom: 170px; padding: 12px 16px; border-radius: 22px 22px 22px 6px; background: radial-gradient(120% 120% at 25% 15%, #FFC3DD, #FF7AB6 55%, #D9468A); box-shadow: inset -6px -8px 14px rgba(120,0,50,.3), inset 6px 7px 12px rgba(255,255,255,.45), 0 20px 28px rgba(0,0,0,.35); font-weight: 700; font-size: 14px; color: #4A0A28">Заказ №128</div>
+</section>
+
+</div>
+
+<section aria-label="Формы и радиусы" style="margin-top: 24px; border-radius: 48px; padding: 40px; background: #FCFBFF; box-shadow: 0 20px 60px rgba(40,20,110,.12)">
+<h2 style="font-weight: 800; font-size: 36px; letter-spacing: -0.04em; margin: 0">Радиусы растут с размером</h2>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 20px; margin-top: 28px">
+<sc-for list="{{radii}}" as="r" hint-placeholder-count="8">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div style="{{r.box}}"></div>
+<div style="font-size: 13px; font-weight: 600">{{r.name}}</div>
+<div style="font-size: 12px; color: #6B6694">{{r.value}}</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { qty: 0, size: '110' };
+  }
+  renderVals() {
+    var s = this.state;
+    var self = this;
+    var swatches = [
+      { name: 'Сиреневое поле', token: 'lilac-field', hex: '#C9BBFF', role: 'Фон каждой страницы', u: null },
+      { name: 'Чернила-ночь', token: 'ink-night', hex: '#1D1B4B', role: 'Текст, тёмные кнопки', u: '#0B0A26' },
+      { name: 'Солнечный жёлтый', token: 'sun', hex: '#FFD23F', role: 'Одно главное действие', u: '#C79A00' },
+      { name: 'Мята', token: 'mint', hex: '#5EE6B0', role: 'Отправка, подтверждение', u: '#26B985' },
+      { name: 'Коралл', token: 'coral', hex: '#FF8F6B', role: 'Тёплый акцент', u: '#D9532F' },
+      { name: 'Бумага', token: 'paper', hex: '#FCFBFF', role: 'Поверхности с данными', u: null },
+      { name: 'Дымка чипов', token: 'chip-haze', hex: '#EEECF8', role: 'Невыбранные чипы', u: null },
+      { name: 'Сиреневая дымка', token: 'lilac-mist', hex: '#E4DCFF', role: 'Спокойные зоны, пустые состояния', u: null },
+      { name: 'Чернила мягкие', token: 'ink-soft', hex: '#3A3672', role: 'Вторичный текст на поле', u: null },
+      { name: 'Чернила приглушённые', token: 'ink-muted', hex: '#6B6694', role: 'Подписи на бумаге', u: null },
+      { name: 'Румянец', token: 'blush', hex: '#FF9CC8', role: 'Градиенты аватаров', u: null },
+      { name: 'Фиалка', token: 'violet', hex: '#7C6CFF', role: 'Градиенты предметов', u: null }
+    ].map(function (c) {
+      return {
+        name: c.name, token: c.token, hex: c.hex, role: c.role,
+        sw: 'height: 96px; background: ' + c.hex + '; ' + (c.u ? 'box-shadow: inset 0 -14px 0 ' + c.u + ';' : 'box-shadow: inset 0 -1px 0 rgba(29,27,75,.08);')
+      };
+    });
+    var stock = { '104': true, '110': true, '116': false, '122': true };
+    var chips = ['104', '110', '116', '122'].map(function (id) {
+      var on = id === s.size, out = !stock[id];
+      return {
+        label: id, out: out, pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ size: id }); },
+        style: 'border: 0; border-radius: 999px; padding: 10px 18px; min-height: 44px; font: 600 14px Geologica, sans-serif; ' + (on ? 'background: #1D1B4B; color: #ffffff; box-shadow: 0 3px 0 #0B0A26;' : (out ? 'background: #EEECF8; color: #7A7598; text-decoration: line-through; cursor: default;' : 'background: #EEECF8; color: #1D1B4B;'))
+      };
+    });
+    var radii = [
+      ['field', 16, 56], ['thumb', 18, 60], ['row', 22, 70], ['panel', 30, 84], ['card', 36, 96], ['stage', 48, 116], ['device', 52, 128], ['pill', 999, 64]
+    ].map(function (r) {
+      return {
+        name: r[0], value: r[1] === 999 ? '999px' : r[1] + 'px',
+        box: 'width: ' + (r[0] === 'pill' ? 140 : r[2]) + 'px; height: ' + r[2] + 'px; border-radius: ' + r[1] + 'px; background: #C9BBFF; border: 2px solid #1D1B4B'
+      };
+    });
+    return {
+      swatches: swatches, chips: chips, radii: radii,
+      addOne: function () { self.setState({ qty: (self.state.qty + 1) % 4 }); },
+      addLabel: s.qty === 0 ? '+' : String(s.qty),
+      addStyle: 'width: 48px; height: 48px; border-radius: 50%; border: 0; font: 800 19px Geologica, sans-serif; ' + (s.qty === 0 ? 'background: #1D1B4B; color: #ffffff; box-shadow: 0 4px 0 #0B0A26;' : 'background: #FFD23F; color: #1D1B4B; box-shadow: 0 4px 0 #C79A00;')
+    };
+  }
+}
+</script>
+</body>
+</html>

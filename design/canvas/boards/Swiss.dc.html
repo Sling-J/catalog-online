@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Лендинг — Швейцарский</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#000000}a:hover{color:#1F3BFF}
+::selection{background:#1F3BFF;color:#ffffff}
+.sw-btn{transition:background-color .2s,color .2s}
+.sw-btn:hover{background:#1F3BFF !important;color:#ffffff !important}
+.sw-btn:focus-visible,.sw-col:focus-visible{outline:2px solid #1F3BFF;outline-offset:2px}
+.sw-col{cursor:pointer}
+.sw-row:hover{background:#F2F4FF}
+</style>
+</helmet>
+<div style="font-family: 'Golos Text', system-ui, sans-serif; color: #000000; background: #FFFFFF; width: 100%; min-height: 100vh">
+
+<header style="max-width: 1320px; margin: 0 auto; padding: 0 32px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 0; border-bottom: 2px solid #000000">
+<a href="#top" style="font-weight: 900; font-size: 20px; text-decoration: none; letter-spacing: -0.02em">catalog·online</a>
+<nav aria-label="Основное" style="display: flex; flex-wrap: wrap; align-items: center; gap: 28px; font-size: 15px; font-weight: 500">
+<a href="#matrix" style="text-decoration: none">Пример</a>
+<a href="#how" style="text-decoration: none">Как это работает</a>
+<a href="#faq" style="text-decoration: none">Вопросы</a>
+<a class="sw-btn" href="#start" style="text-decoration: none; background: #000000; color: #ffffff; font-weight: 600; padding: 12px 20px">Создать каталог</a>
+</nav>
+</div>
+</header>
+
+<section id="top" style="max-width: 1320px; margin: 0 auto; padding: 0 32px">
+<div style="display: flex; flex-wrap: wrap; gap: 32px; padding: 72px 0 80px; border-bottom: 2px solid #000000">
+<h1 style="flex: 2 1 720px; font-weight: 800; font-size: clamp(50px, 8.2vw, 124px); line-height: 0.92; letter-spacing: -0.05em; margin: 0">Хватит отвечать «есть ли размер?»</h1>
+<div style="flex: 1 1 300px; display: flex; flex-direction: column; justify-content: flex-end; gap: 28px">
+<p style="margin: 0; font-size: 19px; line-height: 1.5">Каталог с наличием, размерами и ценами из таблицы вашей кассовой программы. Покупатель выбирает сам. Заказ приходит в WhatsApp.</p>
+<a class="sw-btn" href="#start" style="align-self: flex-start; text-decoration: none; background: #1F3BFF; color: #ffffff; font-weight: 600; font-size: 18px; padding: 20px 30px">Создать каталог бесплатно →</a>
+</div>
+</div>
+</section>
+
+<section id="matrix" aria-label="Пример: наличие по размерам" style="max-width: 1320px; margin: 0 auto; padding: 0 32px">
+<div style="display: flex; flex-wrap: wrap; gap: 32px; padding: 64px 0; border-bottom: 2px solid #000000">
+<div style="flex: 1 1 300px">
+<h2 style="font-weight: 800; font-size: 34px; line-height: 1.05; letter-spacing: -0.03em; margin: 0">Всё наличие одним взглядом</h2>
+<p style="margin: 16px 0 0; font-size: 17px; line-height: 1.55; color: #333333; max-width: 34ch">Нажмите на размер: покупатель видит то же самое и не пишет вам, если размера нет.</p>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 28px; font-size: 14px">
+<div style="display: flex; align-items: center; gap: 10px"><span style="width: 14px; height: 14px; background: #000000"></span>Есть</div>
+<div style="display: flex; align-items: center; gap: 10px"><span style="width: 14px; height: 14px; background: #1F3BFF"></span>Осталось мало</div>
+<div style="display: flex; align-items: center; gap: 10px"><span style="width: 14px; height: 14px; border: 1.5px solid #000000; box-sizing: border-box"></span>Нет</div>
+</div>
+<p style="margin: 28px 0 0; font-size: 13px; color: #666666">Пример магазина «Айгерим Kids». Товары и цены вымышлены</p>
+</div>
+<div style="flex: 2 1 620px; overflow-x: auto">
+<table style="width: 100%; min-width: 600px; border-collapse: collapse; font-size: 16px; font-variant-numeric: tabular-nums">
+<thead>
+<tr style="border-bottom: 2px solid #000000">
+<th style="text-align: left; padding: 12px 8px 12px 0; font-weight: 600">Товар</th>
+<sc-for list="{{cols}}" as="c" hint-placeholder-count="4">
+<th style="padding: 4px 0; width: 76px"><button class="sw-col" type="button" onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">{{c.label}}</button></th>
+</sc-for>
+<th style="text-align: right; padding: 12px 0 12px 8px; font-weight: 600">Цена</th>
+</tr>
+</thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<tr class="sw-row" style="border-bottom: 1px solid #000000">
+<td style="padding: 16px 8px 16px 0; font-weight: 500">{{r.name}}</td>
+<sc-for list="{{r.cells}}" as="x" hint-placeholder-count="4">
+<td style="{{x.td}}"><span style="{{x.box}}" title="{{x.title}}"></span></td>
+</sc-for>
+<td style="padding: 16px 0 16px 8px; text-align: right; font-weight: 600">{{r.price}}</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section style="max-width: 1320px; margin: 0 auto; padding: 0 32px">
+<div style="display: flex; flex-wrap: wrap; border-bottom: 2px solid #000000">
+<div style="flex: 1 1 420px; padding: 64px 32px 64px 0; border-right: 2px solid #000000">
+<div style="font-size: 14px; font-weight: 600">Было · Директ, 23:41</div>
+<p style="margin: 20px 0 0; font-weight: 700; font-size: clamp(28px, 3vw, 40px); line-height: 1.12; letter-spacing: -0.03em">«Куртка синяя есть на 110? А цена? А шапка такая же?»</p>
+<p style="margin: 16px 0 0; font-size: 16px; color: #666666">Ответ через час. Покупатель ушёл к соседям.</p>
+</div>
+<div style="flex: 1 1 420px; padding: 64px 0 64px 32px">
+<div style="font-size: 14px; font-weight: 600; color: #1F3BFF">Стало · WhatsApp, 10:05</div>
+<div style="margin-top: 20px; font-size: 17px; line-height: 1.6">
+<div style="font-weight: 700">Заказ №128 с сайта «Айгерим Kids»</div>
+<div style="display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid #000000; padding-top: 8px; margin-top: 8px"><span>Куртка демисезонная, 110</span><span>18 900 ₸</span></div>
+<div style="display: flex; justify-content: space-between; gap: 16px"><span>Шапка вязаная, 52</span><span>4 200 ₸</span></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; border-top: 2px solid #000000; padding-top: 8px; margin-top: 8px; font-weight: 700"><span>Итого</span><span>23 100 ₸</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="how" style="max-width: 1320px; margin: 0 auto; padding: 0 32px">
+<div style="padding: 64px 0; border-bottom: 2px solid #000000">
+<h2 style="font-weight: 800; font-size: clamp(34px, 4.4vw, 60px); letter-spacing: -0.04em; margin: 0">Три шага</h2>
+<ol style="list-style: none; padding: 0; margin: 40px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px">
+<li style="border-top: 2px solid #000000; padding-top: 18px"><div style="font-weight: 800; font-size: 96px; line-height: 0.9; letter-spacing: -0.05em">1</div><h3 style="font-size: 22px; font-weight: 700; margin: 18px 0 8px">Загрузите Excel</h3><p style="margin: 0; font-size: 17px; line-height: 1.55; color: #333333">Выгрузка из кассовой программы или 1С. Повторная загрузка обновит остатки и цены.</p></li>
+<li style="border-top: 2px solid #000000; padding-top: 18px"><div style="font-weight: 800; font-size: 96px; line-height: 0.9; letter-spacing: -0.05em">2</div><h3 style="font-size: 22px; font-weight: 700; margin: 18px 0 8px">Добавьте фото</h3><p style="margin: 0; font-size: 17px; line-height: 1.55; color: #333333">С телефона. Каталог работает и без фото.</p></li>
+<li style="border-top: 2px solid #1F3BFF; padding-top: 18px"><div style="font-weight: 800; font-size: 96px; line-height: 0.9; letter-spacing: -0.05em; color: #1F3BFF">3</div><h3 style="font-size: 22px; font-weight: 700; margin: 18px 0 8px">Поделитесь ссылкой</h3><p style="margin: 0; font-size: 17px; line-height: 1.55; color: #333333">В Instagram и WhatsApp. Заказы приходят вам в WhatsApp.</p></li>
+</ol>
+</div>
+</section>
+
+<section id="faq" style="max-width: 1320px; margin: 0 auto; padding: 0 32px">
+<div style="display: flex; flex-wrap: wrap; gap: 32px; padding: 64px 0; border-bottom: 2px solid #000000">
+<h2 style="flex: 1 1 300px; font-weight: 800; font-size: clamp(34px, 4.4vw, 60px); letter-spacing: -0.04em; margin: 0">Вопросы</h2>
+<dl style="flex: 2 1 620px; margin: 0">
+<div style="display: flex; flex-wrap: wrap; gap: 8px 32px; padding: 18px 0; border-top: 1px solid #000000"><dt style="flex: 1 1 240px; font-weight: 700; font-size: 17px">Нужен сайт или программист?</dt><dd style="flex: 2 1 300px; margin: 0; font-size: 17px; line-height: 1.55; color: #333333">Нет. Каталог появляется сразу после загрузки таблицы.</dd></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px 32px; padding: 18px 0; border-top: 1px solid #000000"><dt style="flex: 1 1 240px; font-weight: 700; font-size: 17px">Сколько стоит?</dt><dd style="flex: 2 1 300px; margin: 0; font-size: 17px; line-height: 1.55; color: #333333">Бесплатно на время пилота.</dd></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px 32px; padding: 18px 0; border-top: 1px solid #000000"><dt style="flex: 1 1 240px; font-weight: 700; font-size: 17px">Если товар продали в магазине?</dt><dd style="flex: 2 1 300px; margin: 0; font-size: 17px; line-height: 1.55; color: #333333">Загрузите свежую выгрузку. Каждый заказ вы подтверждаете сами.</dd></div>
+</dl>
+</div>
+</section>
+
+<section id="start" style="background: #1F3BFF; color: #ffffff; margin-top: 0">
+<div style="max-width: 1320px; margin: 0 auto; padding: 96px 32px 40px">
+<h2 style="font-weight: 800; font-size: clamp(46px, 7.6vw, 116px); line-height: 0.92; letter-spacing: -0.05em; margin: 0; max-width: 12ch">Пусть покупатели смотрят сами</h2>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; margin-top: 40px">
+<a class="sw-btn" href="#start" style="text-decoration: none; background: #ffffff; color: #000000; font-weight: 600; font-size: 19px; padding: 21px 32px">Создать каталог бесплатно →</a>
+<span style="font-size: 16px">Понадобится только email и таблица товаров</span>
+</div>
+<footer style="margin-top: 96px; padding-top: 18px; border-top: 2px solid #ffffff; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 14px">
+<span>catalog·online — рабочее название</span>
+<span>Казахстан · [контакты]</span>
+</footer>
+</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3400}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { col: '110' };
+  }
+  renderVals() {
+    var col = this.state.col;
+    var self = this;
+    var sz = ['104', '110', '116', '122'];
+    var cols = sz.map(function (id) {
+      var on = id === col;
+      return {
+        label: id, pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ col: id }); },
+        style: 'width: 100%; min-height: 44px; border: 0; font: 600 16px Golos Text, sans-serif; font-variant-numeric: tabular-nums; ' + (on ? 'background: #000000; color: #ffffff;' : 'background: transparent; color: #000000;')
+      };
+    });
+    var products = [
+      { name: 'Куртка демисезонная', price: '18 900 ₸', stock: [3, 1, 4, 0] },
+      { name: 'Платье трикотажное', price: '9 500 ₸', stock: [2, 5, 0, 2] },
+      { name: 'Кроссовки на липучках', price: '14 200 ₸', stock: [0, 2, 1, 3] },
+      { name: 'Шапка вязаная', price: '4 200 ₸', stock: [6, 6, 2, 0] },
+      { name: 'Комбинезон зимний', price: '27 400 ₸', stock: [1, 0, 0, 1] },
+      { name: 'Футболка хлопок, 2 шт.', price: '6 800 ₸', stock: [8, 4, 6, 5] }
+    ];
+    var rows = products.map(function (p) {
+      return {
+        name: p.name, price: p.price,
+        cells: p.stock.map(function (n, i) {
+          var on = sz[i] === col;
+          var box = n === 0 ? 'border: 1.5px solid #000000; box-sizing: border-box; background: transparent;' : (n <= 2 ? 'background: #1F3BFF;' : 'background: #000000;');
+          return {
+            title: n === 0 ? 'Нет' : (n <= 2 ? 'Осталось мало' : 'Есть'),
+            td: 'text-align: center; padding: 16px 0; ' + (on ? 'background: #F2F4FF;' : ''),
+            box: 'display: inline-block; width: 16px; height: 16px; vertical-align: middle; ' + box
+          };
+        })
+      };
+    });
+    return { cols: cols, rows: rows };
+  }
+}
+</script>
+</body>
+</html>

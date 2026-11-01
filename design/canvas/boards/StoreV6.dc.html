@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Витрина V6 — сетка 3 в ряд, классическая шапка</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FBFAFF}
+.s6-btn{cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.s6-btn:active{transform:translateY(2px)}
+.s6-btn:focus-visible{outline:3px solid #3B2FD9;outline-offset:2px}
+.s6-row{overflow-x:auto;scrollbar-width:none}
+.s6-row::-webkit-scrollbar{display:none}
+.s6-scroll{overflow-y:auto;scrollbar-width:none}
+.s6-scroll::-webkit-scrollbar{display:none}
+.s6-tile img{transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.s6-tile:hover img{transform:scale(1.04)}
+.s6-in{animation:s6in .32s cubic-bezier(.16,1,.3,1)}
+.s6-up{animation:s6up .34s cubic-bezier(.16,1,.3,1)}
+.s6-fade{animation:s6fade .25s ease}
+@keyframes s6in{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes s6up{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+@keyframes s6fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.s6-in,.s6-up,.s6-fade{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; font-family: 'Geologica', system-ui, sans-serif; color: #17133D; background: #FBFAFF">
+
+<div class="s6-scroll" style="position: absolute; inset: 0; padding-bottom: 110px; box-sizing: border-box">
+<header style="position: sticky; top: 0; z-index: 5; background: rgba(251,250,255,.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid #ECEAF5">
+<div style="display: flex; align-items: center; gap: 10px; padding: 14px 16px 0">
+<button class="s6-btn" type="button" onClick="{{openInfo}}" aria-label="О магазине: адрес, график, контакты" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; border: 0; background: transparent; padding: 0; text-align: left; font-family: Geologica, sans-serif; color: #17133D">
+<span style="width: 44px; height: 44px; flex: none; border-radius: 50%; background: linear-gradient(140deg, #FF9CC8, #7C6CFF); color: #ffffff; font-weight: 800; font-size: 15px; display: flex; align-items: center; justify-content: center">АK</span>
+<span style="min-width: 0">
+<span style="display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 17px">Айгерим Kids <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B6694" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></span>
+<span style="display: block; font-size: 13px; color: #4A4580; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">ТЦ «Мега», 2 этаж · <span style="color: #157A52; font-weight: 600">Открыто до 20:00</span></span>
+</span>
+</button>
+<button class="s6-btn" type="button" aria-label="Написать в WhatsApp" style="width: 44px; height: 44px; flex: none; border-radius: 50%; border: 0; background: #5EE6B0; box-shadow: 0 3px 0 #26B985; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B3A28" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"></path><path d="M9.5 9.5c.3 1.8 1.7 3.6 4 4.6l1.2-1.2 1.8.8-.4 1.6c-3.4.2-7.4-3.4-7.6-7l1.6-.4.8 1.8z"></path></svg></button>
+</div>
+<div style="display: flex; gap: 8px; padding: 12px 16px 0">
+<div style="flex: 1; display: flex; align-items: center; gap: 8px; height: 46px; padding: 0 14px; border-radius: 16px; background: #EEECF8; color: #6B6694; font-size: 15px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6694" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>Поиск по магазину</div>
+<button class="s6-btn" type="button" onClick="{{openFilters}}" aria-label="{{filterLabel}}" style="position: relative; width: 46px; height: 46px; flex: none; border-radius: 16px; border: 0; background: #EEECF8; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>
+<sc-if value="{{hasFilterCount}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: -4px; top: -4px; min-width: 20px; height: 20px; padding: 0 5px; box-sizing: border-box; border-radius: 999px; background: #3B2FD9; color: #ffffff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{filterCount}}</span></sc-if>
+</button>
+</div>
+<div class="s6-row" style="display: flex; gap: 8px; padding: 12px 16px 12px">
+<sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+<button class="s6-btn" type="button" onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">{{c.label}}</button>
+</sc-for>
+</div>
+</header>
+
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 10px">
+<div style="font-size: 13px; color: #4A4580">{{countText}}</div>
+<button class="s6-btn" type="button" onClick="{{cycleSort}}" style="display: flex; align-items: center; gap: 4px; border: 0; background: transparent; padding: 6px 0; font: 600 13px Geologica, sans-serif; color: #17133D">{{sortLabel}} <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2.4" stroke-linecap="round"><path d="M7 10l5 5 5-5"></path></svg></button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px">
+<sc-for list="{{grid}}" as="p" hint-placeholder-count="12">
+<button class="s6-btn s6-tile" type="button" onClick="{{p.open}}" aria-label="{{p.label}}" style="position: relative; display: block; padding: 0; border: 0; background: #EEECF8; overflow: hidden">
+<img src="{{p.img}}" alt="" style="display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover">
+<span style="position: absolute; left: 6px; bottom: 6px; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font: 700 12px Geologica, sans-serif; color: #17133D; font-variant-numeric: tabular-nums">{{p.price}}</span>
+<sc-if value="{{p.few}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 6px; top: 6px; padding: 3px 7px; border-radius: 999px; background: #FFF1D6; color: #7A4300; font: 700 10px Geologica, sans-serif">мало</span></sc-if>
+</button>
+</sc-for>
+</div>
+<sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 60px 24px; text-align: center"><div style="font-weight: 800; font-size: 18px">Ничего не нашлось</div><div style="font-size: 14px; color: #4A4580; margin-top: 6px">Попробуйте другой размер или категорию</div>
+<button class="s6-btn" type="button" onClick="{{resetFilters}}" style="margin-top: 16px; height: 44px; padding: 0 20px; border: 0; border-radius: 999px; background: #17133D; color: #ffffff; font: 700 14px Geologica, sans-serif">Сбросить фильтры</button></div>
+</sc-if>
+<p style="text-align: center; margin: 16px 16px 0; font-size: 11px; color: #6B6694">Нажмите на фото — откроется карточка товара. Фото — Unsplash</p>
+</div>
+
+<sc-if value="{{showPill}}" hint-placeholder-val="{{ false }}">
+<button class="s6-btn s6-up" type="button" onClick="{{openCart}}" style="position: absolute; left: 12px; right: 12px; bottom: 20px; z-index: 6; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 18px; border: 0; border-radius: 999px; background: rgba(23,19,61,.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #ffffff; font-family: Geologica, sans-serif; text-align: left">
+<span style="flex: 1; font-size: 13px"><span style="display: block; opacity: .8">{{cartText}}</span><span style="display: block; font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums">{{total}}</span></span>
+<span style="padding: 12px 18px; border-radius: 999px; background: #FFD23F; color: #17133D; font-weight: 700; font-size: 14px; box-shadow: 0 4px 0 #C79A00">В корзину</span>
+</button>
+</sc-if>
+
+<sc-if value="{{hasOpen}}" hint-placeholder-val="{{ false }}">
+<div class="s6-in" style="position: absolute; inset: 0; z-index: 8; background: #FBFAFF">
+<div class="s6-scroll" style="position: absolute; inset: 0; padding-bottom: 120px; box-sizing: border-box">
+<div style="position: relative">
+<button type="button" onClick="{{nextPhoto}}" aria-label="Следующее фото" style="display: block; width: 100%; padding: 0; border: 0; background: #EEECF8; cursor: pointer"><img src="{{pImg}}" alt="{{pName}}" style="display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover"></button>
+<sc-if value="{{pMulti}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 6px"><sc-for list="{{pDots}}" as="d" hint-placeholder-count="2"><span style="{{d.style}}"></span></sc-for></div></sc-if>
+</div>
+<div style="padding: 18px 16px 0">
+<div style="font-size: 13px; color: #4A4580">{{pCat}}</div>
+<h1 style="margin: 4px 0 0; font-weight: 800; font-size: 24px; letter-spacing: -0.02em; line-height: 1.15">{{pName}}</h1>
+<div style="margin-top: 8px; font-weight: 800; font-size: 26px; font-variant-numeric: tabular-nums">{{pPrice}}</div>
+<div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 20px"><div style="font-weight: 700; font-size: 15px">{{pSizeTitle}}</div><div style="font-size: 13px; color: #4A4580">зачёркнутых нет в наличии</div></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px">
+<sc-for list="{{pSizes}}" as="z" hint-placeholder-count="7">
+<button class="s6-btn" type="button" onClick="{{z.pick}}" aria-pressed="{{z.pressed}}" aria-disabled="{{z.out}}" style="{{z.style}}">{{z.v}}</button>
+</sc-for>
+</div>
+<div style="margin-top: 12px; font-size: 14px; font-weight: 600; color: {{pStockColor}}">{{pStock}}</div>
+<p style="margin: 16px 0 0; font-size: 15px; line-height: 1.55; color: #3A3672">{{pDesc}}</p>
+<div style="margin-top: 18px; padding: 14px 16px; border-radius: 18px; background: #F1EFFA; font-size: 14px; line-height: 1.5; color: #3A3672">Можно примерить в магазине: ТЦ «Мега», 2 этаж, бутик 214. После заказа магазин подтвердит наличие в WhatsApp.</div>
+</div>
+</div>
+<button class="s6-btn" type="button" onClick="{{closeProduct}}" aria-label="Назад к каталогу" style="position: absolute; left: 14px; top: 14px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(23,19,61,.12)"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+<button class="s6-btn" type="button" aria-label="Поделиться" style="position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(23,19,61,.12)"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6"></path></svg></button>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 22px; background: linear-gradient(rgba(251,250,255,0), #FBFAFF 30%)">
+<button class="s6-btn" type="button" onClick="{{addToCart}}" style="{{ctaStyle}}">{{ctaText}}</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{hasSheet}}" hint-placeholder-val="{{ false }}">
+<div class="s6-fade" onClick="{{closeSheet}}" style="position: absolute; inset: 0; z-index: 10; background: rgba(23,19,61,.42)"></div>
+<div class="s6-up s6-scroll" style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 11; max-height: 88%; background: #ffffff; border-radius: 28px 28px 0 0; padding: 10px 16px 24px; box-sizing: border-box">
+<div style="width: 40px; height: 5px; border-radius: 999px; background: #DCD8EE; margin: 0 auto 14px"></div>
+
+<sc-if value="{{sheetInfo}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 56px; height: 56px; flex: none; border-radius: 50%; background: linear-gradient(140deg, #FF9CC8, #7C6CFF); color: #ffffff; font-weight: 800; font-size: 19px; display: flex; align-items: center; justify-content: center">АK</span><div><div style="font-weight: 800; font-size: 20px">Айгерим Kids</div><div style="font-size: 14px; color: #4A4580">Детская одежда от 1 до 10 лет</div></div></div>
+<div style="margin-top: 18px; border-radius: 22px; background: #F1EFFA; padding: 16px">
+<div style="display: flex; gap: 12px"><span style="width: 40px; height: 40px; flex: none; border-radius: 14px; background: #ffffff; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B2FD9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg></span>
+<div><div style="font-weight: 700; font-size: 15px">Шымкент, ТЦ «Мега»</div><div style="font-size: 14px; line-height: 1.5; color: #3A3672; margin-top: 2px">2 этаж, бутик 214. Вход со стороны парковки, от эскалатора направо, рядом с фуд-кортом.</div></div></div>
+<div style="display: flex; gap: 8px; margin-top: 14px">
+<button class="s6-btn" type="button" style="flex: 1; height: 44px; border: 0; border-radius: 14px; background: #17133D; color: #ffffff; font: 700 14px Geologica, sans-serif">Открыть в 2ГИС</button>
+<button class="s6-btn" type="button" style="flex: 1; height: 44px; border: 0; border-radius: 14px; background: #ffffff; color: #17133D; font: 600 14px Geologica, sans-serif">Скопировать адрес</button>
+</div>
+</div>
+<div style="margin-top: 18px; font-weight: 700; font-size: 15px">График работы</div>
+<div style="margin-top: 8px; font-size: 14px; line-height: 1.5">
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F0EEF7"><span>Пн–Пт</span><span style="font-variant-numeric: tabular-nums">10:00–20:00</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F0EEF7; font-weight: 700"><span>Сегодня, суббота</span><span style="color: #157A52; font-variant-numeric: tabular-nums">11:00–20:00 · открыто</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0"><span>Воскресенье</span><span style="font-variant-numeric: tabular-nums">11:00–18:00</span></div>
+</div>
+<div style="margin-top: 14px; font-weight: 700; font-size: 15px">Связаться</div>
+<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px">
+<div style="display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 16px; border-radius: 16px; background: #E6FBF2"><span style="font-weight: 600; font-size: 15px; color: #0B3A28">WhatsApp</span><span style="font-size: 14px; color: #0B3A28; font-variant-numeric: tabular-nums">+7 700 000 00 00</span></div>
+<div style="display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 16px; border-radius: 16px; background: #F6F5FB"><span style="font-weight: 600; font-size: 15px">Instagram</span><span style="font-size: 14px; color: #4A4580">@aigerim.kids</span></div>
+</div>
+<p style="margin: 16px 0 0; font-size: 14px; line-height: 1.55; color: #3A3672">Одежда и обувь для детей от 1 до 10 лет. Новые поступления каждую неделю. Если нужного размера нет — напишите, привезём под заказ.</p>
+</sc-if>
+
+<sc-if value="{{sheetFilters}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; align-items: center; justify-content: space-between"><div style="font-weight: 800; font-size: 20px">Фильтры</div><button class="s6-btn" type="button" onClick="{{resetFilters}}" style="border: 0; background: transparent; padding: 6px 0; font: 600 14px Geologica, sans-serif; color: #3B2FD9">Сбросить</button></div>
+<div style="margin-top: 16px; font-weight: 700; font-size: 15px">Рост, см</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px"><sc-for list="{{fHeights}}" as="f" hint-placeholder-count="7"><button class="s6-btn" type="button" onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="{{f.style}}">{{f.v}}</button></sc-for></div>
+<div style="margin-top: 18px; font-weight: 700; font-size: 15px">Размер обуви</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px"><sc-for list="{{fShoes}}" as="f" hint-placeholder-count="8"><button class="s6-btn" type="button" onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="{{f.style}}">{{f.v}}</button></sc-for></div>
+<div style="margin-top: 18px; font-weight: 700; font-size: 15px">Цена, ₸</div>
+<div style="display: flex; gap: 8px; margin-top: 10px"><div style="flex: 1; height: 48px; padding: 0 14px; display: flex; align-items: center; border-radius: 16px; background: #F1EFFA; color: #6B6694; font-size: 15px">от 3 500</div><div style="flex: 1; height: 48px; padding: 0 14px; display: flex; align-items: center; border-radius: 16px; background: #F1EFFA; color: #6B6694; font-size: 15px">до 24 900</div></div>
+<button class="s6-btn" type="button" onClick="{{toggleStock}}" aria-pressed="{{stockPressed}}" style="margin-top: 18px; width: 100%; display: flex; align-items: center; justify-content: space-between; border: 0; background: transparent; padding: 4px 0; font: 600 15px Geologica, sans-serif; color: #17133D">Только в наличии <span style="{{switchStyle}}"><span style="{{knobStyle}}"></span></span></button>
+<button class="s6-btn" type="button" onClick="{{closeSheet}}" style="margin-top: 20px; width: 100%; height: 54px; border: 0; border-radius: 999px; background: #17133D; color: #ffffff; font: 700 16px Geologica, sans-serif">{{showText}}</button>
+</sc-if>
+
+<sc-if value="{{sheetCart}}" hint-placeholder-val="{{ false }}">
+<div style="font-weight: 800; font-size: 20px">Корзина</div>
+<div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px">
+<sc-for list="{{cartItems}}" as="it" hint-placeholder-count="2">
+<div style="display: flex; gap: 12px; align-items: center">
+<img src="{{it.img}}" alt="" style="width: 64px; height: 64px; border-radius: 16px; object-fit: cover; background: #EEECF8; flex: none">
+<div style="flex: 1; min-width: 0"><div style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.name}}</div><div style="font-size: 13px; color: #4A4580">{{it.size}}</div><div style="font-weight: 800; font-size: 15px; margin-top: 2px; font-variant-numeric: tabular-nums">{{it.price}}</div></div>
+<div style="display: flex; align-items: center; gap: 2px; border-radius: 999px; background: #F1EFFA; padding: 3px">
+<button class="s6-btn" type="button" onClick="{{it.minus}}" aria-label="Меньше" style="width: 34px; height: 34px; border: 0; border-radius: 50%; background: #ffffff; font: 700 17px Geologica, sans-serif; color: #17133D">−</button>
+<span style="min-width: 24px; text-align: center; font-weight: 700; font-size: 15px">{{it.qty}}</span>
+<button class="s6-btn" type="button" onClick="{{it.plus}}" aria-label="Больше" style="width: 34px; height: 34px; border: 0; border-radius: 50%; background: #ffffff; font: 700 17px Geologica, sans-serif; color: #17133D">+</button>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="margin-top: 16px; height: 48px; padding: 0 14px; display: flex; align-items: center; border-radius: 16px; background: #F6F5FB; color: #6B6694; font-size: 15px">Комментарий для магазина</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 18px"><span style="font-size: 15px; color: #3A3672">Итого</span><span style="font-weight: 800; font-size: 22px; font-variant-numeric: tabular-nums">{{total}}</span></div>
+<button class="s6-btn" type="button" onClick="{{sendOrder}}" style="margin-top: 14px; width: 100%; height: 56px; border: 0; border-radius: 999px; background: #5EE6B0; color: #0B3A28; font: 700 16px Geologica, sans-serif; box-shadow: 0 5px 0 #26B985">Заказать через WhatsApp</button>
+<div style="margin-top: 10px; text-align: center; font-size: 12px; color: #6B6694">Откроется WhatsApp с готовым сообщением для магазина</div>
+</sc-if>
+
+<sc-if value="{{sheetSent}}" hint-placeholder-val="{{ false }}">
+<div style="text-align: center; padding: 10px 0 6px">
+<div style="display: inline-block; padding: 14px 22px; border-radius: 26px; background: #5EE6B0; color: #0B3A28; font-weight: 800; font-size: 22px; box-shadow: 0 6px 0 #26B985; transform: rotate(-3deg)">Отправлено ✓</div>
+<div style="margin-top: 22px; font-weight: 800; font-size: 20px">Заявка ушла в WhatsApp</div>
+<div style="margin-top: 6px; font-size: 15px; line-height: 1.5; color: #3A3672">Магазин проверит наличие и ответит вам в чате</div>
+<button class="s6-btn" type="button" onClick="{{closeSheet}}" style="margin-top: 20px; width: 100%; height: 54px; border: 0; border-radius: 999px; background: #17133D; color: #ffffff; font: 700 16px Geologica, sans-serif">Вернуться в каталог</button>
+</div>
+</sc-if>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cat: 'all', sort: 0, open: -1, photo: 0, size: null, sheet: null, cart: [], fs: [], inStock: true, order: 127 };
+  }
+  renderVals() {
+    var s = this.state, self = this, B = '/_blob/';
+    var CL = ['92', '98', '104', '110', '116', '122', '128'], SH = ['24', '25', '26', '27', '28', '29', '30', '31'];
+    var P = [
+      ['Куртка демисезонная', 'outer', 18900, ['1260977f2c0c34a5b933572bb6e99e94', '4469123d08e33e3b8a0e21393b6e426b'], 8, 'Лёгкая куртка на весну и осень, утеплитель 100 г. Капюшон отстёгивается, манжеты на резинке.'],
+      ['Платье трикотажное', 'dress', 9500, ['7d0f77b8370d9af612d61812d7452e5f'], 9, 'Мягкий хлопковый трикотаж, не мнётся. Подходит для садика и праздников.'],
+      ['Кроссовки на липучках', 'shoes', 14200, ['04a201bc58d35022516d4467e49b7f41'], 6, 'Лёгкая подошва, дышащий верх. Липучки — ребёнок обувается сам.'],
+      ['Шапка вязаная', 'acc', 4200, ['b7e066c9d74196dbd3a06f17035798be'], 14, 'Шерсть с акрилом, не колется. Тянется, подходит на обхват 48–54 см.'],
+      ['Дождевик жёлтый', 'outer', 7900, ['a3bc2f157acffb785bd68c64b69fa957'], 9, 'Непромокаемый, со светоотражающими полосками. Складывается в карман.'],
+      ['Джинсовая куртка', 'outer', 12500, ['8a58a9934844266efb16a8c4761e7f7b'], 6, 'Плотный деним, хлопок 100%. Кнопки вместо пуговиц.'],
+      ['Худи с капюшоном', 'tops', 8900, ['b10ce1436e13380c548fa804ef4347fd'], 9, 'Футер с начёсом, карман-кенгуру. Не садится после стирки.'],
+      ['Футболка хлопок', 'tops', 3500, ['167257d6a7f8ad684c2d856ae3a11150'], 22, 'Базовая белая футболка, хлопок 100%.'],
+      ['Платье летнее', 'dress', 8200, ['7cb5296df170d7a0aca0d4bd8ec7cb9e'], 4, 'Лёгкий хлопок, свободный крой. На жару и для прогулок.'],
+      ['Кеды', 'shoes', 11800, ['2ec542edaef6635ace484ac3c7ad1f4a'], 3, 'Текстильный верх, резиновая подошва. Шнурки на резинке.'],
+      ['Пальто шерстяное', 'outer', 24900, ['4425d713fea616a795f8125f90d8aed0'], 3, 'Шерсть 70%, подкладка из вискозы. Нарядное, на прохладную погоду.'],
+      ['Шапка с помпоном', 'acc', 4900, ['ca2b511d14dcdf080d3e936049667bed'], 5, 'Двойная вязка, помпон из искусственного меха.'],
+      ['Кардиган серый', 'tops', 10400, ['93fc374092f690eb46aa0b0cf74bcce4'], 6, 'Мягкая вязка на пуговицах. Носится поверх футболки и платья.'],
+      ['Платье в цветочек', 'dress', 9900, ['ed10ba6d31f748a438a21db8a7387c8a'], 6, 'Хлопок с вискозой, пояс завязывается сзади.']
+    ];
+    var CATN = { outer: 'Куртки и верхняя одежда', dress: 'Платья', tops: 'Кофты и футболки', shoes: 'Обувь', acc: 'Шапки' };
+    function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸'; }
+    function plural(n, f) { var a = n % 10, b = n % 100; return n + ' ' + (a === 1 && b !== 11 ? f[0] : a >= 2 && a <= 4 && (b < 10 || b >= 20) ? f[1] : f[2]); }
+    function sizes(p, i) {
+      var list = p[1] === 'shoes' ? SH : p[1] === 'acc' ? ['Один размер'] : CL;
+      return list.map(function (v, j) { return { v: v, out: list.length > 1 && (j + i) % 4 === 0, left: list.length > 1 && (j + i) % 5 === 1 ? 1 : p[4] }; });
+    }
+    function chip(on) { return 'flex: none; height: 38px; padding: 0 16px; border-radius: 999px; border: 0; font: 600 14px Geologica, sans-serif; background: ' + (on ? '#17133D' : '#EEECF8') + '; color: ' + (on ? '#ffffff' : '#17133D'); }
+    function sizeChip(on, out) {
+      var base = 'min-width: 56px; height: 46px; padding: 0 14px; border-radius: 16px; font: 600 15px Geologica, sans-serif; font-variant-numeric: tabular-nums; ';
+      if (out) return base + 'cursor: default; border: 1.5px dashed #D6D2E8; background: transparent; color: #7A7598; text-decoration: line-through';
+      return base + (on ? 'border: 1.5px solid #17133D; background: #17133D; color: #ffffff' : 'border: 1.5px solid #DAD6EC; background: #ffffff; color: #17133D');
+    }
+    function set(o) { self.setState(o); }
+
+    var cats = [['all', 'Все'], ['outer', 'Куртки'], ['dress', 'Платья'], ['tops', 'Кофты'], ['shoes', 'Обувь'], ['acc', 'Шапки']].map(function (c) {
+      var on = s.cat === c[0];
+      return { label: c[1], pressed: on ? 'true' : 'false', style: chip(on), pick: function () { set({ cat: c[0] }); } };
+    });
+
+    var list = P.map(function (p, i) { return { p: p, i: i, z: sizes(p, i) }; }).filter(function (x) {
+      if (s.cat !== 'all' && x.p[1] !== s.cat) return false;
+      if (s.fs.length && !x.z.some(function (z) { return !z.out && s.fs.indexOf(z.v) >= 0; })) return false;
+      return true;
+    });
+    if (s.sort === 1) list.sort(function (a, b) { return a.p[2] - b.p[2]; });
+    if (s.sort === 2) list.sort(function (a, b) { return b.p[2] - a.p[2]; });
+    var grid = list.map(function (x) {
+      return { img: B + x.p[3][0], price: fmt(x.p[2]), few: x.p[4] <= 4, label: x.p[0] + ', ' + fmt(x.p[2]), open: function () { set({ open: x.i, photo: 0, size: x.z.length === 1 ? x.z[0].v : null }); } };
+    });
+
+    var v = { cats: cats, grid: grid, empty: grid.length === 0, countText: plural(grid.length, ['товар', 'товара', 'товаров']), sortLabel: ['Сначала новые', 'Сначала дешевле', 'Сначала дороже'][s.sort] };
+    v.cycleSort = function () { set({ sort: (s.sort + 1) % 3 }); };
+    v.filterCount = s.fs.length; v.hasFilterCount = s.fs.length > 0;
+    v.filterLabel = s.fs.length ? 'Фильтры, выбрано ' + s.fs.length : 'Фильтры';
+    v.openInfo = function () { set({ sheet: 'info' }); };
+    v.openFilters = function () { set({ sheet: 'filters' }); };
+    v.openCart = function () { set({ sheet: 'cart' }); };
+    v.closeSheet = function () { set({ sheet: null }); };
+    v.resetFilters = function () { set({ fs: [], cat: 'all' }); };
+
+    function fchips(arr) {
+      return arr.map(function (val) {
+        var on = s.fs.indexOf(val) >= 0;
+        return { v: val, pressed: on ? 'true' : 'false', style: sizeChip(on, false), pick: function () { set({ fs: on ? s.fs.filter(function (q) { return q !== val; }) : s.fs.concat([val]) }); } };
+      });
+    }
+    v.fHeights = fchips(CL); v.fShoes = fchips(SH);
+    v.stockPressed = s.inStock ? 'true' : 'false';
+    v.toggleStock = function () { set({ inStock: !s.inStock }); };
+    v.switchStyle = 'width: 50px; height: 30px; border-radius: 999px; position: relative; display: block; transition: background .2s; background: ' + (s.inStock ? '#157A52' : '#DCD8EE');
+    v.knobStyle = 'position: absolute; top: 3px; left: ' + (s.inStock ? '23px' : '3px') + '; width: 24px; height: 24px; border-radius: 50%; background: #ffffff; transition: left .2s; box-shadow: 0 2px 4px rgba(0,0,0,.15)';
+    v.showText = 'Показать ' + plural(grid.length, ['товар', 'товара', 'товаров']);
+
+    var count = 0, sum = 0;
+    s.cart.forEach(function (c) { count += c.qty; sum += c.qty * P[c.i][2]; });
+    v.total = fmt(sum); v.cartText = plural(count, ['товар', 'товара', 'товаров']) + ' в корзине';
+    v.showPill = count > 0 && s.open < 0 && !s.sheet;
+    v.cartItems = s.cart.map(function (c, k) {
+      var p = P[c.i];
+      return {
+        img: B + p[3][0], name: p[0], size: c.size === 'Один размер' ? c.size : (p[1] === 'shoes' ? 'Размер ' : 'Рост ') + c.size, price: fmt(p[2] * c.qty), qty: c.qty,
+        plus: function () { var n = s.cart.slice(); n[k] = { i: c.i, size: c.size, qty: Math.min(c.qty + 1, p[4]) }; set({ cart: n }); },
+        minus: function () { var n = s.cart.slice(); if (c.qty > 1) n[k] = { i: c.i, size: c.size, qty: c.qty - 1 }; else n.splice(k, 1); set({ cart: n, sheet: n.length ? 'cart' : null }); }
+      };
+    });
+    v.sendOrder = function () { set({ sheet: 'sent', cart: [], order: s.order + 1 }); };
+    v.orderNo = s.order;
+    v.sheetInfo = s.sheet === 'info'; v.sheetFilters = s.sheet === 'filters'; v.sheetCart = s.sheet === 'cart'; v.sheetSent = s.sheet === 'sent';
+    v.hasSheet = !!s.sheet;
+
+    v.hasOpen = s.open >= 0;
+    var op = P[Math.max(s.open, 0)], oz = sizes(op, Math.max(s.open, 0));
+    v.pName = op[0]; v.pPrice = fmt(op[2]); v.pCat = CATN[op[1]]; v.pDesc = op[5];
+    v.pImg = B + op[3][s.photo % op[3].length];
+    v.pMulti = op[3].length > 1;
+    v.pDots = op[3].map(function (_, k) { var on = k === s.photo % op[3].length; return { style: 'width: ' + (on ? '18px' : '7px') + '; height: 7px; border-radius: 999px; background: ' + (on ? '#ffffff' : 'rgba(255,255,255,.6)') + '; box-shadow: 0 1px 3px rgba(0,0,0,.2)' }; });
+    v.nextPhoto = function () { set({ photo: s.photo + 1 }); };
+    v.pSizeTitle = op[1] === 'shoes' ? 'Размер обуви' : op[1] === 'acc' ? 'Размер' : 'Рост, см';
+    v.pSizes = oz.map(function (z) {
+      var on = s.size === z.v;
+      return { v: z.v, out: z.out ? 'true' : 'false', pressed: on ? 'true' : 'false', style: sizeChip(on, z.out), pick: function () { if (!z.out) set({ size: z.v }); } };
+    });
+    var sel = oz.filter(function (z) { return z.v === s.size; })[0];
+    v.pStock = sel ? (sel.left <= 2 ? 'Осталось ' + sel.left + ' шт.' : 'В наличии') : 'Выберите размер, чтобы увидеть наличие';
+    v.pStockColor = sel ? (sel.left <= 2 ? '#A35A00' : '#157A52') : '#4A4580';
+    var inCart = s.cart.some(function (c) { return c.i === s.open && c.size === s.size; });
+    var ctaBase = 'width: 100%; height: 56px; border: 0; border-radius: 999px; font: 700 16px Geologica, sans-serif; font-variant-numeric: tabular-nums; ';
+    if (!sel) { v.ctaText = 'Выберите размер'; v.ctaStyle = ctaBase + 'background: #EEECF8; color: #4A4580; cursor: default'; }
+    else if (inCart) { v.ctaText = 'В корзине · открыть'; v.ctaStyle = ctaBase + 'background: #5EE6B0; color: #0B3A28; box-shadow: 0 5px 0 #26B985'; }
+    else { v.ctaText = 'В корзину · ' + fmt(op[2]); v.ctaStyle = ctaBase + 'background: #FFD23F; color: #17133D; box-shadow: 0 5px 0 #C79A00'; }
+    v.addToCart = function () {
+      if (!sel) return;
+      if (inCart) { set({ open: -1, sheet: 'cart' }); return; }
+      set({ cart: s.cart.concat([{ i: s.open, size: s.size, qty: 1 }]) });
+    };
+    v.closeProduct = function () { set({ open: -1 }); };
+    return v;
+  }
+}
+</script>
+</body>
+</html>

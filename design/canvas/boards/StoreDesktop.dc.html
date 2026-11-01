@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Витрина — компьютер</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#C9BBFF}
+::selection{background:#FFD23F;color:#1D1B4B}
+@keyframes sdIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes sdFloat{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-10px) rotate(calc(var(--r,0deg) + 3deg))}}
+.sd-in{animation:sdIn .35s cubic-bezier(.16,1,.3,1) both}
+.sd-float{animation:sdFloat 6s ease-in-out infinite}
+.sd-btn{cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.sd-btn:hover{transform:translateY(-2px)}
+.sd-btn:active{transform:translateY(3px)}
+.sd-btn:focus-visible{outline:3px solid #1D1B4B;outline-offset:2px}
+.sd-card img{transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.sd-card:hover img{transform:scale(1.04)}
+.sd-link{cursor:pointer}
+.sd-link:focus-visible{outline:3px solid #1D1B4B;outline-offset:2px}
+.sd-input::placeholder{color:#6B6694}
+.sd-input:focus{outline:none;box-shadow:0 0 0 3px #1D1B4B}
+@media (prefers-reduced-motion: reduce){.sd-in,.sd-float{animation:none}}
+</style>
+</helmet>
+<div style="font-family: 'Geologica', system-ui, sans-serif; color: #1D1B4B; background: #C9BBFF; width: 100%; min-height: 100vh">
+<div style="max-width: 1360px; margin: 0 auto; padding: 20px 24px 48px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 14px 14px 14px 18px; border-radius: 999px; background: rgba(255,255,255,.55); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); border: 1px solid rgba(255,255,255,.85)">
+<div style="width: 52px; height: 52px; border-radius: 50%; flex: none; background: linear-gradient(140deg, #FF9CC8, #7C6CFF); color: #ffffff; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center">АK</div>
+<div style="flex: 1 1 220px; min-width: 0">
+<div style="font-weight: 800; font-size: 20px">Айгерим Kids</div>
+<div style="font-size: 13px; color: #3A3672; margin-top: 2px">Детская одежда · Шымкент, ТЦ «Мега», 2 этаж · <span style="color: #157A52; font-weight: 600">Открыто до 20:00</span></div>
+</div>
+<label style="flex: 2 1 300px; display: flex; align-items: center; gap: 10px; height: 50px; padding: 0 18px; border-radius: 999px; background: #ffffff">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6694" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+<input class="sd-input" placeholder="Поиск по каталогу" aria-label="Поиск по каталогу" style="flex: 1; min-width: 0; border: 0; background: transparent; font: 400 15px Geologica, sans-serif; color: #1D1B4B; border-radius: 6px">
+</label>
+<div style="display: flex; gap: 8px">
+<button class="sd-btn" type="button" style="height: 50px; padding: 0 18px; border: 0; border-radius: 999px; background: #ffffff; color: #1D1B4B; font: 600 14px Geologica, sans-serif; display: flex; align-items: center; gap: 8px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#157A52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12z"></path></svg>WhatsApp</button>
+<button class="sd-btn" type="button" style="height: 50px; padding: 0 18px; border: 0; border-radius: 999px; background: #ffffff; color: #1D1B4B; font: 600 14px Geologica, sans-serif; display: flex; align-items: center; gap: 8px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4B32D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>О магазине</button>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; align-items: flex-start">
+
+<aside aria-label="Фильтры" style="flex: 1 1 240px; max-width: 280px; padding: 22px; border-radius: 30px; background: rgba(255,255,255,.55); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); border: 1px solid rgba(255,255,255,.85); box-sizing: border-box">
+<div style="font-weight: 800; font-size: 17px">Категории</div>
+<div style="display: flex; flex-direction: column; gap: 4px; margin-top: 10px">
+<sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+<button class="sd-link" type="button" onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="{{c.style}}"><span>{{c.label}}</span><span style="font-size: 12px; opacity: .7">{{c.count}}</span></button>
+</sc-for>
+</div>
+<div style="font-weight: 800; font-size: 17px; margin-top: 22px">Рост</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px">
+<sc-for list="{{fHeights}}" as="z" hint-placeholder-count="6"><button class="sd-btn" type="button" onClick="{{z.pick}}" aria-pressed="{{z.pressed}}" style="{{z.style}}">{{z.label}}</button></sc-for>
+</div>
+<div style="font-weight: 800; font-size: 17px; margin-top: 22px">Размер обуви</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px">
+<sc-for list="{{fShoes}}" as="z" hint-placeholder-count="6"><button class="sd-btn" type="button" onClick="{{z.pick}}" aria-pressed="{{z.pressed}}" style="{{z.style}}">{{z.label}}</button></sc-for>
+</div>
+<div style="font-weight: 800; font-size: 17px; margin-top: 22px">Цена</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px">
+<sc-for list="{{fPrices}}" as="z" hint-placeholder-count="3"><button class="sd-btn" type="button" onClick="{{z.pick}}" aria-pressed="{{z.pressed}}" style="{{z.style}}">{{z.label}}</button></sc-for>
+</div>
+<button class="sd-link" type="button" onClick="{{toggleStock}}" aria-pressed="{{stockPressed}}" style="width: 100%; margin-top: 22px; display: flex; align-items: center; justify-content: space-between; border: 0; background: #ffffff; border-radius: 16px; padding: 12px 14px; font: 600 14px Geologica, sans-serif; color: #1D1B4B">Только в наличии<span style="{{stockSwitch}}"><span style="width: 20px; height: 20px; border-radius: 50%; background: #ffffff; display: block"></span></span></button>
+<sc-if value="{{hasFilters}}" hint-placeholder-val="{{ false }}">
+<button class="sd-btn" type="button" onClick="{{resetFilters}}" style="width: 100%; margin-top: 12px; border: 0; border-radius: 999px; padding: 12px; background: #EEECF8; color: #1D1B4B; font: 600 14px Geologica, sans-serif">Сбросить фильтры</button>
+</sc-if>
+</aside>
+
+<main style="flex: 999 1 560px; min-width: 0">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; padding: 4px 6px 0">
+<h1 style="margin: 0; font-weight: 800; font-size: 34px; letter-spacing: -0.035em">{{catTitle}}</h1>
+<div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap">
+<span style="font-size: 14px; color: #3A3672; margin-right: 6px">{{countLabel}}</span>
+<sc-for list="{{sorts}}" as="o" hint-placeholder-count="3"><button class="sd-btn" type="button" onClick="{{o.pick}}" aria-pressed="{{o.pressed}}" style="{{o.style}}">{{o.label}}</button></sc-for>
+</div>
+</div>
+
+<sc-if value="{{hasItems}}" hint-placeholder-val="{{ true }}">
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; margin-top: 16px">
+<sc-for list="{{grid}}" as="p" hint-placeholder-count="8">
+<article class="sd-card sd-in" style="background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 6px 16px rgba(40,30,110,.08); display: flex; flex-direction: column">
+<div style="position: relative; overflow: hidden; background: #EEECF8">
+<img src="{{p.img}}" alt="{{p.name}}" style="display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover">
+<sc-if value="{{p.few}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 10px; top: 10px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font-size: 12px; font-weight: 700; color: #A35A00">Осталось мало</span></sc-if>
+<sc-if value="{{p.closed}}" hint-placeholder-val="{{ true }}">
+<button class="sd-btn" type="button" onClick="{{p.toggle}}" aria-label="{{p.addLabel}}" style="position: absolute; right: 10px; bottom: 10px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #1D1B4B; color: #ffffff; font: 800 20px Geologica, sans-serif; box-shadow: 0 4px 0 #0B0A26">+</button>
+</sc-if>
+<sc-if value="{{p.opened}}" hint-placeholder-val="{{ false }}">
+<div class="sd-in" style="position: absolute; left: 8px; right: 8px; bottom: 8px; padding: 12px; border-radius: 20px; background: rgba(255,255,255,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid #ffffff">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 12px; font-weight: 700; color: #3A3672">{{p.sizeTitle}}</span><button class="sd-btn" type="button" onClick="{{p.toggle}}" aria-label="Закрыть выбор размера" style="width: 28px; height: 28px; border-radius: 50%; border: 0; background: #EEECF8; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1D1B4B" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px">
+<sc-for list="{{p.sizes}}" as="z" hint-placeholder-count="4"><button class="sd-btn" type="button" onClick="{{z.pick}}" disabled="{{z.out}}" aria-label="{{z.aria}}" style="{{z.style}}">{{z.label}}</button></sc-for>
+</div>
+</div>
+</sc-if>
+</div>
+<div style="padding: 12px 14px 14px">
+<div style="font-weight: 500; font-size: 14px; line-height: 1.3; color: #3A3672">{{p.name}}</div>
+<div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px">
+<span style="font-weight: 800; font-size: 17px; font-variant-numeric: tabular-nums">{{p.price}}</span>
+<span style="display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: {{p.tone}}"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{p.tone}}"></span>{{p.badge}}</span>
+</div>
+</div>
+</article>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{noItems}}" hint-placeholder-val="{{ false }}">
+<div style="margin-top: 16px; padding: 56px 24px; border-radius: 30px; background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.85); text-align: center">
+<div aria-hidden="true" class="sd-float" style="--r: 10deg; width: 80px; height: 100px; margin: 0 auto; border-radius: 18px; background: radial-gradient(120% 90% at 30% 15%, #FFF0A8, #FFD23F 55%, #E3AE00); box-shadow: inset -8px -12px 18px rgba(130,90,0,.35), inset 7px 8px 14px rgba(255,255,255,.55), 0 20px 30px rgba(60,30,120,.25)"><div style="width: 16px; height: 16px; border-radius: 50%; margin: 12px auto 0; background: #C9BBFF"></div><div style="text-align: center; font-weight: 800; font-size: 22px; margin-top: 10px; color: #6B4E00">?</div></div>
+<div style="font-weight: 800; font-size: 22px; margin-top: 22px">Ничего не нашлось</div>
+<p style="margin: 8px auto 0; font-size: 15px; color: #3A3672; max-width: 40ch">По этим фильтрам сейчас нет товаров в наличии.</p>
+<button class="sd-btn" type="button" onClick="{{resetFilters}}" style="margin-top: 18px; border: 0; border-radius: 999px; padding: 14px 22px; background: #1D1B4B; color: #ffffff; font: 600 15px Geologica, sans-serif; box-shadow: 0 4px 0 #0B0A26">Сбросить фильтры</button>
+</div>
+</sc-if>
+<p style="margin: 20px 6px 0; font-size: 12px; color: #4A4580">Пример магазина. Фото — Unsplash, товары, цены и адрес вымышлены</p>
+</main>
+
+<aside aria-label="Корзина" style="flex: 1 1 300px; max-width: 340px; padding: 22px; border-radius: 30px; background: #FCFBFF; box-shadow: 0 20px 60px rgba(40,20,110,.15); box-sizing: border-box">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="font-weight: 800; font-size: 20px">Корзина</div>
+<span style="font-size: 13px; color: #6B6694">{{cartCountLabel}}</span>
+</div>
+<sc-if value="{{cartEmpty}}" hint-placeholder-val="{{ true }}">
+<div style="text-align: center; padding: 28px 8px 8px">
+<div aria-hidden="true" class="sd-float" style="--r: -10deg; width: 70px; height: 78px; margin: 0 auto; border-radius: 18px 18px 24px 24px; background: radial-gradient(120% 90% at 30% 20%, #FFB39C, #FF7A59 55%, #D9532F); box-shadow: inset -8px -12px 18px rgba(120,30,0,.35), inset 7px 8px 14px rgba(255,255,255,.45), 0 20px 28px rgba(60,30,120,.22); position: relative"><div style="position: absolute; left: 50%; top: -24px; width: 40px; height: 40px; margin-left: -20px; border-radius: 50%; border: 7px solid #E96440; border-bottom-color: transparent; border-left-color: #E96440; box-sizing: border-box; transform: rotate(45deg)"></div></div>
+<p style="margin: 18px 0 0; font-size: 14px; line-height: 1.5; color: #3A3672">Пока пусто. Нажмите «+» на товаре и выберите размер</p>
+</div>
+</sc-if>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px">
+<sc-for list="{{lines}}" as="l" hint-placeholder-count="2">
+<div class="sd-in" style="display: flex; gap: 10px; padding: 8px; border-radius: 20px; background: #ffffff; box-shadow: 0 6px 16px rgba(40,30,110,.07)">
+<img src="{{l.img}}" alt="{{l.name}}" style="width: 56px; height: 70px; flex: none; border-radius: 14px; object-fit: cover; background: #EEECF8">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<div style="display: flex; justify-content: space-between; gap: 6px"><span style="font-weight: 600; font-size: 13px; line-height: 1.3">{{l.name}}</span><button class="sd-btn" type="button" onClick="{{l.remove}}" aria-label="{{l.removeLabel}}" style="flex: none; width: 26px; height: 26px; border-radius: 50%; border: 0; background: #EEECF8; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1D1B4B" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div style="font-size: 12px; color: #6B6694">{{l.variant}}</div>
+<div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto">
+<div style="display: flex; align-items: center; gap: 2px; background: #EEECF8; border-radius: 999px; padding: 2px">
+<button class="sd-btn" type="button" onClick="{{l.minus}}" aria-label="Меньше" style="width: 28px; height: 28px; border-radius: 50%; border: 0; background: #ffffff; font: 700 15px Geologica, sans-serif; color: #1D1B4B">−</button>
+<span style="min-width: 18px; text-align: center; font-weight: 700; font-size: 13px">{{l.q}}</span>
+<button class="sd-btn" type="button" onClick="{{l.plus}}" disabled="{{l.atMax}}" aria-label="Больше" style="{{l.plusStyle}}">+</button>
+</div>
+<span style="font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums">{{l.sum}}</span>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{hasCart}}" hint-placeholder-val="{{ false }}">
+<label style="display: flex; flex-direction: column; gap: 6px; margin-top: 14px">
+<span style="font-size: 12px; font-weight: 600; color: #3A3672">Комментарий для магазина</span>
+<input class="sd-input" placeholder="Например: заберу в субботу" style="font: 400 14px Geologica, sans-serif; color: #1D1B4B; background: #ffffff; border: 1px solid #DCD8EE; border-radius: 14px; padding: 11px 14px">
+</label>
+<div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px"><span style="font-size: 14px; color: #3A3672">Итого</span><span style="font-weight: 800; font-size: 22px; font-variant-numeric: tabular-nums">{{cartTotal}}</span></div>
+<button class="sd-btn" type="button" onClick="{{sendOrder}}" style="width: 100%; margin-top: 12px; border: 0; border-radius: 999px; padding: 16px; background: #5EE6B0; color: #0B3A28; font: 700 15px Geologica, sans-serif; box-shadow: 0 5px 0 #26B985">Заказать через WhatsApp</button>
+<p style="margin: 10px 0 0; text-align: center; font-size: 12px; color: #6B6694">Оплата при получении. Магазин подтвердит наличие</p>
+</sc-if>
+<sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+<div class="sd-in" style="margin-top: 14px; padding: 16px; border-radius: 20px; background: #E1FBF0; text-align: center">
+<div style="font-weight: 800; font-size: 16px; color: #0B3A28">Заказ №{{orderNo}} отправлен</div>
+<div style="font-size: 13px; color: #105C3F; margin-top: 4px">Мы открыли WhatsApp с готовым сообщением</div>
+</div>
+</sc-if>
+</aside>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2200}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var B = '/_blob/';
+    this.state = { cat: 'all', sizes: [], price: 'any', inStock: true, sort: 0, open: null, cart: [{ id: 1, z: '110', q: 1 }, { id: 4, z: '52', q: 1 }], sent: false, orderNo: 127 };
+  }
+  renderVals() {
+    var s = this.state, self = this;
+    var B = '/_blob/';
+    var P = [
+      { id: 1, name: 'Куртка демисезонная', cat: 'outer', price: 18900, img: B + '1260977f2c0c34a5b933572bb6e99e94', kind: 'h', stock: { '104': 3, '110': 1, '116': 4, '122': 0 } },
+      { id: 2, name: 'Платье трикотажное', cat: 'dress', price: 9500, img: B + '7d0f77b8370d9af612d61812d7452e5f', kind: 'h', stock: { '104': 2, '110': 5, '116': 0, '122': 2 } },
+      { id: 3, name: 'Кроссовки на липучках', cat: 'shoes', price: 14200, img: B + '04a201bc58d35022516d4467e49b7f41', kind: 's', stock: { '28': 0, '29': 2, '30': 1, '31': 3 } },
+      { id: 4, name: 'Шапка вязаная', cat: 'acc', price: 4200, img: B + 'b7e066c9d74196dbd3a06f17035798be', kind: 'c', stock: { '50': 6, '52': 6, '54': 2 } },
+      { id: 5, name: 'Дождевик жёлтый', cat: 'outer', price: 7900, img: B + 'a3bc2f157acffb785bd68c64b69fa957', kind: 'h', stock: { '104': 4, '110': 2, '116': 3 } },
+      { id: 6, name: 'Джинсовая куртка', cat: 'outer', price: 12500, img: B + '8a58a9934844266efb16a8c4761e7f7b', kind: 'h', stock: { '110': 1, '116': 2, '122': 3, '128': 0 } },
+      { id: 7, name: 'Худи с капюшоном', cat: 'tops', price: 8900, img: B + 'b10ce1436e13380c548fa804ef4347fd', kind: 'h', stock: { '116': 3, '122': 4, '128': 2 } },
+      { id: 8, name: 'Футболка хлопок', cat: 'tops', price: 3500, img: B + '167257d6a7f8ad684c2d856ae3a11150', kind: 'h', stock: { '98': 5, '104': 7, '110': 6, '116': 4 } },
+      { id: 9, name: 'Платье летнее', cat: 'dress', price: 8200, img: B + '7cb5296df170d7a0aca0d4bd8ec7cb9e', kind: 'h', stock: { '98': 1, '104': 3, '110': 0 } },
+      { id: 10, name: 'Кеды', cat: 'shoes', price: 11800, img: B + '2ec542edaef6635ace484ac3c7ad1f4a', kind: 's', stock: { '26': 2, '27': 0, '28': 1 } },
+      { id: 11, name: 'Пальто шерстяное', cat: 'outer', price: 24900, img: B + '4425d713fea616a795f8125f90d8aed0', kind: 'h', stock: { '110': 2, '116': 1, '122': 0 } },
+      { id: 12, name: 'Шапка с помпоном', cat: 'acc', price: 4900, img: B + 'ca2b511d14dcdf080d3e936049667bed', kind: 'c', stock: { '50': 3, '52': 0, '54': 2 } },
+      { id: 13, name: 'Кардиган серый', cat: 'tops', price: 10400, img: B + '93fc374092f690eb46aa0b0cf74bcce4', kind: 'h', stock: { '104': 2, '110': 3, '116': 1 } },
+      { id: 14, name: 'Платье в цветочек', cat: 'dress', price: 9900, img: B + 'ed10ba6d31f748a438a21db8a7387c8a', kind: 'h', stock: { '104': 0, '110': 2, '116': 3, '122': 1 } }
+    ];
+    var CATS = [['all', 'Все товары'], ['outer', 'Верхняя одежда'], ['dress', 'Платья'], ['tops', 'Кофты'], ['shoes', 'Обувь'], ['acc', 'Аксессуары']];
+    function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸'; }
+    function byId(id) { for (var i = 0; i < P.length; i++) if (P[i].id === id) return P[i]; return null; }
+    function total(p) { var t = 0; for (var k in p.stock) t += p.stock[k]; return t; }
+    function plural(n) { var a = n % 10, b = n % 100; return n + ' ' + (a === 1 && b !== 11 ? 'товар' : (a >= 2 && a <= 4 && (b < 12 || b > 14) ? 'товара' : 'товаров')); }
+    function chip(on, out) { return 'border: 0; border-radius: 999px; padding: 8px 13px; min-height: 36px; font: 600 13px Geologica, sans-serif; ' + (on ? 'background: #1D1B4B; color: #ffffff; box-shadow: 0 3px 0 #0B0A26;' : (out ? 'background: #F3F1FA; color: #7A7598; text-decoration: line-through; cursor: default;' : 'background: #ffffff; color: #1D1B4B;')); }
+    function sizeTitle(p) { return p.kind === 's' ? 'Размер обуви' : (p.kind === 'c' ? 'Обхват головы' : 'Рост'); }
+    function inCart(id, z) { for (var i = 0; i < s.cart.length; i++) if (s.cart[i].id === id && s.cart[i].z === z) return s.cart[i].q; return 0; }
+    var priceOk = function (p) { return s.price === 'any' || (s.price === 'low' && p.price < 5000) || (s.price === 'mid' && p.price >= 5000 && p.price <= 15000) || (s.price === 'high' && p.price > 15000); };
+    function passes(p, ignoreCat) {
+      if (!ignoreCat && s.cat !== 'all' && p.cat !== s.cat) return false;
+      if (!priceOk(p)) return false;
+      if (s.inStock && total(p) === 0) return false;
+      if (s.sizes.length) { var ok = false; s.sizes.forEach(function (z) { if ((p.stock[z] || 0) > 0) ok = true; }); if (!ok) return false; }
+      return true;
+    }
+    var list = P.filter(function (p) { return passes(p, false); });
+    if (s.sort === 1) list.sort(function (a, b) { return a.price - b.price; });
+    if (s.sort === 2) list.sort(function (a, b) { return b.price - a.price; });
+    var grid = list.map(function (p) {
+      var t = total(p), isOpen = s.open === p.id;
+      return {
+        name: p.name, img: p.img, price: fmt(p.price), few: t <= 2,
+        badge: t <= 2 ? 'Мало' : 'Есть', tone: t <= 2 ? '#A35A00' : '#157A52',
+        addLabel: 'Выбрать размер: ' + p.name, sizeTitle: sizeTitle(p),
+        opened: isOpen, closed: !isOpen,
+        toggle: function () { self.setState({ open: isOpen ? null : p.id }); },
+        sizes: Object.keys(p.stock).map(function (z) {
+          var out = p.stock[z] === 0 || inCart(p.id, z) >= p.stock[z];
+          return {
+            label: z, out: out, aria: 'Добавить размер ' + z, style: chip(false, out),
+            pick: function () {
+              if (out) return;
+              var c = self.state.cart.map(function (x) { return Object.assign({}, x); }), f = false;
+              c.forEach(function (x) { if (x.id === p.id && x.z === z) { x.q += 1; f = true; } });
+              if (!f) c.push({ id: p.id, z: z, q: 1 });
+              self.setState({ cart: c, open: null, sent: false });
+            }
+          };
+        })
+      };
+    });
+    var cats = CATS.map(function (c) {
+      var on = c[0] === s.cat;
+      var n = P.filter(function (p) { return (c[0] === 'all' || p.cat === c[0]) && passes(p, true); }).length;
+      return { label: c[1], count: n, pressed: on ? 'true' : 'false', pick: function () { self.setState({ cat: c[0] }); }, style: 'display: flex; justify-content: space-between; align-items: center; width: 100%; border: 0; border-radius: 14px; padding: 10px 12px; min-height: 40px; text-align: left; font: ' + (on ? '700' : '500') + ' 14px Geologica, sans-serif; ' + (on ? 'background: #1D1B4B; color: #ffffff;' : 'background: transparent; color: #1D1B4B;') };
+    });
+    function toggleSize(z) { var a = self.state.sizes.slice(); var i = a.indexOf(z); if (i >= 0) a.splice(i, 1); else a.push(z); self.setState({ sizes: a }); }
+    var fHeights = ['98', '104', '110', '116', '122', '128'].map(function (z) { var on = s.sizes.indexOf(z) >= 0; return { label: z, pressed: on ? 'true' : 'false', pick: function () { toggleSize(z); }, style: chip(on, false) }; });
+    var fShoes = ['26', '27', '28', '29', '30', '31'].map(function (z) { var on = s.sizes.indexOf(z) >= 0; return { label: z, pressed: on ? 'true' : 'false', pick: function () { toggleSize(z); }, style: chip(on, false) }; });
+    var fPrices = [['low', 'до 5 000'], ['mid', '5–15 000'], ['high', 'от 15 000']].map(function (x) { var on = s.price === x[0]; return { label: x[1], pressed: on ? 'true' : 'false', pick: function () { self.setState({ price: on ? 'any' : x[0] }); }, style: chip(on, false) }; });
+    var sorts = ['Новые', 'Дешевле', 'Дороже'].map(function (l, i) { var on = i === s.sort; return { label: l, pressed: on ? 'true' : 'false', pick: function () { self.setState({ sort: i }); }, style: 'border: 0; border-radius: 999px; padding: 8px 14px; min-height: 36px; font: 600 13px Geologica, sans-serif; ' + (on ? 'background: #ffffff; color: #1D1B4B; box-shadow: 0 3px 0 rgba(150,130,220,.5);' : 'background: transparent; color: #3A3672;') }; });
+    var count = 0, sum = 0;
+    var lines = s.cart.map(function (x, i) {
+      var p = byId(x.id); count += x.q; sum += x.q * p.price;
+      var atMax = x.q >= p.stock[x.z];
+      return {
+        name: p.name, img: p.img, q: x.q, sum: fmt(x.q * p.price), variant: sizeTitle(p) + ': ' + x.z, atMax: atMax, removeLabel: 'Убрать: ' + p.name,
+        plusStyle: 'width: 28px; height: 28px; border-radius: 50%; border: 0; font: 700 15px Geologica, sans-serif; ' + (atMax ? 'background: transparent; color: #B3AFD0; cursor: default;' : 'background: #ffffff; color: #1D1B4B;'),
+        minus: function () { var c = self.state.cart.map(function (y) { return Object.assign({}, y); }); c[i].q -= 1; if (c[i].q <= 0) c.splice(i, 1); self.setState({ cart: c }); },
+        plus: function () { if (atMax) return; var c = self.state.cart.map(function (y) { return Object.assign({}, y); }); c[i].q += 1; self.setState({ cart: c }); },
+        remove: function () { var c = self.state.cart.slice(); c.splice(i, 1); self.setState({ cart: c }); }
+      };
+    });
+    var catTitle = CATS.filter(function (c) { return c[0] === s.cat; })[0][1];
+    return {
+      cats: cats, fHeights: fHeights, fShoes: fShoes, fPrices: fPrices, sorts: sorts,
+      grid: grid, hasItems: grid.length > 0, noItems: grid.length === 0,
+      catTitle: catTitle, countLabel: plural(grid.length),
+      hasFilters: s.sizes.length > 0 || s.price !== 'any' || !s.inStock || s.cat !== 'all',
+      stockPressed: s.inStock ? 'true' : 'false',
+      stockSwitch: 'width: 44px; height: 26px; border-radius: 999px; padding: 3px; box-sizing: border-box; display: flex; ' + (s.inStock ? 'background: #1D1B4B; justify-content: flex-end;' : 'background: #DCD8EE; justify-content: flex-start;'),
+      toggleStock: function () { self.setState({ inStock: !self.state.inStock }); },
+      resetFilters: function () { self.setState({ sizes: [], price: 'any', inStock: true, cat: 'all' }); },
+      lines: lines, hasCart: s.cart.length > 0, cartEmpty: s.cart.length === 0 && !s.sent,
+      cartCountLabel: plural(count), cartTotal: fmt(sum), sent: s.sent, orderNo: s.orderNo,
+      sendOrder: function () { self.setState({ cart: [], sent: true, orderNo: self.state.orderNo + 1 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

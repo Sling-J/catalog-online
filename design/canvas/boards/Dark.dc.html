@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Лендинг — Тёмный</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#07070B}
+a{color:#A99BFF}a:hover{color:#ffffff}
+::selection{background:#7C5CFF;color:#ffffff}
+.dk-btn{transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .3s}
+.dk-btn:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(255,255,255,.25),0 12px 40px rgba(124,92,255,.45)}
+.dk-btn:focus-visible{outline:2px solid #22D3EE;outline-offset:3px}
+@keyframes dkPulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.9;transform:scale(1.08)}}
+@keyframes dkRow{from{background:rgba(124,92,255,.28)}to{background:transparent}}
+@keyframes dkDot{0%,100%{opacity:1}50%{opacity:.25}}
+.dk-glow{animation:dkPulse 7s ease-in-out infinite}
+.dk-hot{animation:dkRow 1.6s ease-out both}
+.dk-live{animation:dkDot 1.4s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.dk-glow,.dk-hot,.dk-live{animation:none}}
+</style>
+</helmet>
+<div style="font-family: 'Jost', system-ui, sans-serif; color: #ECEBF5; background: #07070B; width: 100%; min-height: 100vh; position: relative; overflow: hidden">
+<div aria-hidden="true" style="position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px); background-size: 72px 72px; mask-image: radial-gradient(ellipse 80% 40% at 50% 12%, #000 30%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse 80% 40% at 50% 12%, #000 30%, transparent 75%)"></div>
+<div aria-hidden="true" class="dk-glow" style="position: absolute; left: 50%; top: 520px; width: 900px; height: 520px; margin-left: -450px; border-radius: 50%; background: radial-gradient(ellipse, rgba(124,92,255,.45), rgba(34,211,238,.18) 45%, transparent 70%); filter: blur(30px)"></div>
+
+<div style="position: relative">
+<header style="max-width: 1200px; margin: 0 auto; padding: 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<a href="#top" style="font-weight: 600; font-size: 20px; letter-spacing: 0.02em; text-decoration: none; color: #ffffff">catalog·online</a>
+<nav aria-label="Основное" style="display: flex; flex-wrap: wrap; align-items: center; gap: 26px; font-size: 15px">
+<a href="#live" style="text-decoration: none; color: #9C9AB3">Как это работает</a>
+<a href="#how" style="text-decoration: none; color: #9C9AB3">Шаги</a>
+<a href="#faq" style="text-decoration: none; color: #9C9AB3">Вопросы</a>
+<a class="dk-btn" href="#start" style="text-decoration: none; color: #ffffff; font-weight: 500; padding: 11px 20px; border-radius: 12px; border: 1px solid transparent; background: linear-gradient(#111118, #111118) padding-box, linear-gradient(120deg, #7C5CFF, #22D3EE) border-box">Создать каталог</a>
+</nav>
+</header>
+
+<section id="top" style="max-width: 1200px; margin: 0 auto; padding: 104px 24px 0; text-align: center">
+<div style="display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.03); font-size: 14px; color: #B7B5CC"><span class="dk-live" aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #22D3EE; box-shadow: 0 0 12px #22D3EE"></span>Пилот бесплатный для магазинов Казахстана</div>
+<h1 style="font-weight: 600; font-size: clamp(44px, 7vw, 100px); line-height: 1; letter-spacing: -0.04em; margin: 28px auto 0; max-width: 13ch; color: #ffffff">Хватит отвечать «есть ли&nbsp;размер?»</h1>
+<p style="font-size: clamp(18px, 1.6vw, 21px); line-height: 1.6; color: #9C9AB3; margin: 28px auto 0; max-width: 46ch">Онлайн-каталог из вашей таблицы товаров: наличие, размеры, цены. Покупатель выбирает сам, заказ приходит в WhatsApp.</p>
+<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 36px">
+<a class="dk-btn" href="#start" style="text-decoration: none; background: #ffffff; color: #07070B; font-weight: 600; font-size: 17px; padding: 17px 30px; border-radius: 14px">Создать каталог бесплатно</a>
+<a class="dk-btn" href="#live" style="text-decoration: none; color: #ffffff; font-weight: 500; font-size: 17px; padding: 17px 28px; border-radius: 14px; border: 1px solid rgba(255,255,255,.16)">Смотреть, как работает</a>
+</div>
+</section>
+
+<section id="live" aria-label="Пример: каталог в реальном времени" style="max-width: 1040px; margin: 0 auto; padding: 88px 24px 0">
+<div style="border-radius: 24px; padding: 1px; background: linear-gradient(140deg, rgba(124,92,255,.8), rgba(255,255,255,.08) 40%, rgba(34,211,238,.6))">
+<div style="border-radius: 23px; background: rgba(13,13,20,.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); overflow: hidden">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,.08)">
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="font-weight: 600; font-size: 17px">Айгерим Kids</span>
+<span style="font-size: 13px; color: #6F6D88">aigerim-kids.[сервис].kz</span>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9C9AB3"><span class="dk-live" aria-hidden="true" style="width: 7px; height: 7px; border-radius: 50%; background: #3BE38B"></span>{{syncLabel}}</div>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 620px; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums">
+<thead><tr style="color: #6F6D88; text-align: left"><th style="padding: 14px 24px; font-weight: 500">Товар</th><th style="padding: 14px 12px; font-weight: 500">104</th><th style="padding: 14px 12px; font-weight: 500">110</th><th style="padding: 14px 12px; font-weight: 500">116</th><th style="padding: 14px 24px; font-weight: 500; text-align: right">Цена</th></tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<tr class="{{r.cls}}" style="border-top: 1px solid rgba(255,255,255,.06)">
+<td style="padding: 14px 24px; color: #ECEBF5">{{r.name}}</td>
+<sc-for list="{{r.cells}}" as="c" hint-placeholder-count="3">
+<td style="padding: 14px 12px"><span style="{{c.style}}">{{c.label}}</span></td>
+</sc-for>
+<td style="padding: 14px 24px; text-align: right; color: #ECEBF5">{{r.price}}</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="padding: 14px 24px; border-top: 1px solid rgba(255,255,255,.08); font-size: 14px; color: #9C9AB3">{{event}}</div>
+</div>
+</div>
+<p style="margin: 14px 0 0; font-size: 13px; color: #6F6D88; text-align: center">Пример. Товары, цены и продажи вымышлены</p>
+</section>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 140px 24px 0">
+<h2 style="font-weight: 600; font-size: clamp(32px, 4.2vw, 56px); line-height: 1.05; letter-spacing: -0.035em; margin: 0; max-width: 18ch; color: #ffffff">Было: переписка до ночи. Стало: готовый заказ.</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 48px">
+<div style="flex: 1 1 420px; border-radius: 22px; padding: 30px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08)">
+<div style="font-size: 14px; color: #6F6D88">Директ · 23:41</div>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px; font-size: 16px; line-height: 1.4">
+<div style="align-self: flex-start; background: #1A1A24; padding: 12px 16px; border-radius: 16px 16px 16px 4px; max-width: 82%">Куртка синяя есть на 110?</div>
+<div style="align-self: flex-start; background: #1A1A24; padding: 12px 16px; border-radius: 16px 16px 16px 4px; max-width: 82%">А цена? Шапка такая же есть?</div>
+<div style="align-self: flex-end; background: #262634; padding: 12px 16px; border-radius: 16px 16px 4px 16px; max-width: 82%">Сейчас уточню…</div>
+<div style="color: #6F6D88; font-size: 14px">Покупатель ушёл к соседям</div>
+</div>
+</div>
+<div style="flex: 1 1 420px; border-radius: 22px; padding: 1px; background: linear-gradient(140deg, #7C5CFF, #22D3EE)">
+<div style="height: 100%; box-sizing: border-box; border-radius: 21px; padding: 29px; background: #0D0D14">
+<div style="font-size: 14px; color: #22D3EE">WhatsApp · 10:05</div>
+<div style="margin-top: 16px; background: #ECEBF5; color: #07070B; border-radius: 16px 16px 4px 16px; padding: 18px 20px; font-size: 16px; line-height: 1.55; font-variant-numeric: tabular-nums">
+<div style="font-weight: 600">Заказ №128 с сайта «Айгерим Kids»</div>
+<div style="margin-top: 6px">1. Куртка демисезонная (110) — 18 900 ₸</div>
+<div>2. Шапка вязаная (52) — 4 200 ₸</div>
+<div style="margin-top: 6px; font-weight: 600">Итого: 23 100 ₸</div>
+</div>
+<p style="margin: 16px 0 0; font-size: 16px; color: #9C9AB3">Размер и наличие покупатель увидел сам.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="how" style="max-width: 1200px; margin: 0 auto; padding: 140px 24px 0">
+<h2 style="font-weight: 600; font-size: clamp(32px, 4.2vw, 56px); letter-spacing: -0.035em; margin: 0; color: #ffffff">Три шага</h2>
+<ol style="list-style: none; padding: 0; margin: 48px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px">
+<li style="padding: 28px; border-radius: 22px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08)">
+<div style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: rgba(124,92,255,.18); color: #C5BAFF; box-shadow: 0 0 24px rgba(124,92,255,.35)">1</div>
+<h3 style="font-size: 22px; font-weight: 600; margin: 22px 0 8px">Загрузите Excel</h3>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #9C9AB3">Выгрузка из кассовой программы или 1С. Повторная загрузка обновит остатки.</p>
+</li>
+<li style="padding: 28px; border-radius: 22px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08)">
+<div style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: rgba(34,211,238,.15); color: #8FEFFF; box-shadow: 0 0 24px rgba(34,211,238,.3)">2</div>
+<h3 style="font-size: 22px; font-weight: 600; margin: 22px 0 8px">Добавьте фото</h3>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #9C9AB3">С телефона. Каталог работает и без фото.</p>
+</li>
+<li style="padding: 28px; border-radius: 22px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08)">
+<div style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: rgba(59,227,139,.15); color: #8DF2BE; box-shadow: 0 0 24px rgba(59,227,139,.3)">3</div>
+<h3 style="font-size: 22px; font-weight: 600; margin: 22px 0 8px">Поделитесь ссылкой</h3>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #9C9AB3">В Instagram и WhatsApp. Заказы приходят вам в WhatsApp.</p>
+</li>
+</ol>
+</section>
+
+<section id="faq" style="max-width: 860px; margin: 0 auto; padding: 140px 24px 0">
+<h2 style="font-weight: 600; font-size: clamp(32px, 4vw, 52px); letter-spacing: -0.035em; margin: 0; text-align: center; color: #ffffff">Частые вопросы</h2>
+<dl style="margin: 36px 0 0">
+<div style="padding: 22px 0; border-bottom: 1px solid rgba(255,255,255,.08)"><dt style="font-weight: 500; font-size: 18px">Нужен сайт или программист?</dt><dd style="margin: 8px 0 0; font-size: 16px; line-height: 1.6; color: #9C9AB3">Нет. Каталог появляется сразу после загрузки таблицы.</dd></div>
+<div style="padding: 22px 0; border-bottom: 1px solid rgba(255,255,255,.08)"><dt style="font-weight: 500; font-size: 18px">Сколько стоит?</dt><dd style="margin: 8px 0 0; font-size: 16px; line-height: 1.6; color: #9C9AB3">Бесплатно на время пилота.</dd></div>
+<div style="padding: 22px 0"><dt style="font-weight: 500; font-size: 18px">А если товар продали в магазине?</dt><dd style="margin: 8px 0 0; font-size: 16px; line-height: 1.6; color: #9C9AB3">Загрузите свежую выгрузку. Каждый заказ вы подтверждаете сами.</dd></div>
+</dl>
+</section>
+
+<section id="start" style="max-width: 1200px; margin: 0 auto; padding: 140px 24px 48px; text-align: center">
+<h2 style="font-weight: 600; font-size: clamp(38px, 5.6vw, 80px); line-height: 1; letter-spacing: -0.04em; margin: 0 auto; max-width: 13ch; color: #ffffff">Пусть покупатели смотрят сами</h2>
+<a class="dk-btn" href="#start" style="display: inline-block; margin-top: 36px; text-decoration: none; background: #ffffff; color: #07070B; font-weight: 600; font-size: 18px; padding: 19px 34px; border-radius: 14px">Создать каталог бесплатно</a>
+<p style="margin: 14px 0 0; font-size: 15px; color: #6F6D88">Понадобится только email и таблица товаров</p>
+<footer style="margin-top: 96px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.08); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 14px; color: #6F6D88; text-align: left">
+<span>catalog·online — рабочее название</span>
+<span>Казахстан · [контакты]</span>
+</footer>
+</section>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3400}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tick: 0, hot: -1, event: 'Остатки синхронизированы с вашей последней выгрузкой',
+      stock: [[3, 1, 4], [2, 5, 0], [0, 2, 1], [6, 6, 2], [1, 0, 0]]
+    };
+  }
+  componentDidMount() {
+    var self = this;
+    var names = ['Куртка демисезонная', 'Платье трикотажное', 'Кроссовки', 'Шапка вязаная', 'Комбинезон зимний'];
+    var sz = ['104', '110', '116'];
+    this.timer = setInterval(function () {
+      var st = self.state.stock.map(function (r) { return r.slice(); });
+      var tries = 0, i, j;
+      do { i = Math.floor(Math.random() * 5); j = Math.floor(Math.random() * 3); tries++; } while (st[i][j] === 0 && tries < 20);
+      if (st[i][j] > 0) {
+        st[i][j] -= 1;
+        self.setState({ stock: st, hot: i, tick: self.state.tick + 1, event: 'Подтверждён заказ: ' + names[i] + ', ' + sz[j] + '. Остаток обновлён в каталоге' });
+      } else {
+        self.setState({ stock: [[3, 1, 4], [2, 5, 0], [0, 2, 1], [6, 6, 2], [1, 0, 0]], hot: -1, event: 'Загружена свежая выгрузка: остатки обновлены' });
+      }
+    }, 2800);
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+  renderVals() {
+    var s = this.state;
+    var meta = [
+      { name: 'Куртка демисезонная', price: '18 900 ₸' },
+      { name: 'Платье трикотажное', price: '9 500 ₸' },
+      { name: 'Кроссовки', price: '14 200 ₸' },
+      { name: 'Шапка вязаная', price: '4 200 ₸' },
+      { name: 'Комбинезон зимний', price: '27 400 ₸' }
+    ];
+    var rows = meta.map(function (m, i) {
+      return {
+        name: m.name, price: m.price,
+        cls: i === s.hot ? 'dk-hot' : '',
+        cells: s.stock[i].map(function (n) {
+          var st = n === 0 ? 'color: #4E4C63; text-decoration: line-through;' : (n <= 2 ? 'color: #FFB86B; background: rgba(255,184,107,.12); padding: 4px 9px; border-radius: 8px;' : 'color: #3BE38B; background: rgba(59,227,139,.1); padding: 4px 9px; border-radius: 8px;');
+          return { label: n === 0 ? 'нет' : (n <= 2 ? 'мало' : 'есть'), style: 'font-size: 14px; font-weight: 500; ' + st };
+        })
+      };
+    });
+    return { rows: rows, event: s.event, syncLabel: s.tick === 0 ? 'Синхронизировано' : 'Обновлено только что' };
+  }
+}
+</script>
+</body>
+</html>

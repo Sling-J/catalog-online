@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Лендинг — Бирка</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&amp;family=Golos+Text:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#12352A}
+a{color:#E9D3AE}a:hover{color:#ffffff}
+::selection{background:#FF5A1F;color:#12352A}
+.tg-btn{transition:transform .25s cubic-bezier(.16,1,.3,1)}
+.tg-btn:hover{transform:translateY(-2px) rotate(-1deg)}
+.tg-btn:focus-visible,.tg-pill:focus-visible{outline:3px solid #FF5A1F;outline-offset:3px}
+.tg-pill{cursor:pointer}
+.tg-tag{transform-origin:50% 0;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.tg-tag:hover{transform:rotate(0deg) !important}
+</style>
+</helmet>
+<div style="font-family: 'Golos Text', system-ui, sans-serif; color: #F4EBDC; background: #12352A; width: 100%; min-height: 100vh">
+
+<header style="max-width: 1280px; margin: 0 auto; padding: 26px 32px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px">
+<a href="#top" style="font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: 0.02em; text-transform: uppercase; text-decoration: none; color: #F4EBDC">catalog·online</a>
+<nav aria-label="Основное" style="display: flex; flex-wrap: wrap; align-items: center; gap: 28px; font-weight: 500; font-size: 16px">
+<a href="#how" style="text-decoration: none">Как это работает</a>
+<a href="#demo" style="text-decoration: none">Пример</a>
+<a href="#faq" style="text-decoration: none">Вопросы</a>
+<a class="tg-btn" href="#start" style="text-decoration: none; background: #FF5A1F; color: #1A1206; font-weight: 700; padding: 13px 22px; border-radius: 6px">Создать каталог</a>
+</nav>
+</header>
+
+<section id="top" style="max-width: 1280px; margin: 0 auto; padding: 48px 32px 0">
+<h1 style="font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; font-size: clamp(52px, 9vw, 132px); line-height: 0.92; letter-spacing: -0.01em; margin: 0; max-width: 12ch">Хватит отвечать «есть ли размер?»</h1>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 28px; margin-top: 32px">
+<p style="font-size: clamp(18px, 1.5vw, 21px); line-height: 1.55; margin: 0; max-width: 48ch; color: #D6CDBB">На каждом товаре в вашем магазине уже висит бирка с размером и ценой. Мы переносим их в онлайн-каталог из таблицы вашей кассовой программы, вместе с наличием. Покупатель выбирает сам и присылает заказ в WhatsApp.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 14px">
+<a class="tg-btn" href="#start" style="text-decoration: none; background: #FF5A1F; color: #1A1206; font-weight: 700; font-size: 18px; padding: 19px 30px; border-radius: 8px">Создать каталог бесплатно</a>
+<a class="tg-btn" href="#demo" style="text-decoration: none; color: #F4EBDC; font-weight: 600; font-size: 18px; padding: 19px 26px; border-radius: 8px; border: 2px solid #E9D3AE">Посмотреть пример</a>
+</div>
+</div>
+</section>
+
+<section id="demo" aria-label="Пример каталога" style="max-width: 1280px; margin: 0 auto; padding: 72px 32px 40px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div role="group" aria-label="Фильтр по размеру" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<span style="font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.06em; font-size: 15px; color: #E9D3AE">Размер</span>
+<sc-for list="{{sizes}}" as="s" hint-placeholder-count="5">
+<button class="tg-pill" type="button" onClick="{{s.pick}}" aria-pressed="{{s.pressed}}" style="{{s.style}}">{{s.label}}</button>
+</sc-for>
+</div>
+<span style="font-size: 14px; color: #A9B8AE">Пример магазина «Айгерим Kids». Товары и цены вымышлены</span>
+</div>
+
+<div style="position: relative; margin-top: 28px; padding-top: 6px">
+<div aria-hidden="true" style="height: 10px; border-radius: 5px; background: linear-gradient(#C8CCC9, #8E9692); box-shadow: 0 6px 12px rgba(0,0,0,.35)"></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 28px 24px; padding: 0 12px">
+<sc-for list="{{visible}}" as="p" hint-placeholder-count="5">
+<div style="display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0 16px 18px rgba(0,0,0,.35))">
+<div aria-hidden="true" style="width: 2px; height: {{p.cord}}; background: #E9D3AE"></div>
+<article class="tg-tag" style="{{p.tagStyle}}">
+<div aria-hidden="true" style="width: 16px; height: 16px; border-radius: 50%; background: #12352A; margin: 0 auto 14px; box-shadow: inset 0 2px 3px rgba(0,0,0,.5)"></div>
+<div style="font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #6B5636; font-weight: 600">{{p.cat}}</div>
+<h3 style="margin: 6px 0 0; font-size: 18px; line-height: 1.25; font-weight: 600; color: #231A0D">{{p.name}}</h3>
+<div style="font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 34px; margin-top: 12px; color: #231A0D; font-variant-numeric: tabular-nums">{{p.price}}</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px">
+<sc-for list="{{p.sizes}}" as="z" hint-placeholder-count="4">
+<span style="{{z.style}}" title="{{z.title}}">{{z.label}}</span>
+</sc-for>
+</div>
+<div style="{{p.badgeStyle}}">{{p.badge}}</div>
+<div aria-hidden="true" style="display: flex; gap: 2px; height: 30px; margin-top: 16px; align-items: stretch">
+<sc-for list="{{bars}}" as="b" hint-placeholder-count="20">
+<span style="{{b}}"></span>
+</sc-for>
+</div>
+</article>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+<p style="margin: 28px 12px 0; font-size: 17px; color: #D6CDBB">На этот размер сейчас ничего нет. Покупатель видит это сразу и не пишет вам зря.</p>
+</sc-if>
+</div>
+</section>
+
+<section style="background: #E9D3AE; color: #231A0D; margin-top: 80px; padding: 88px 0 104px">
+<div style="max-width: 1280px; margin: 0 auto; padding: 0 32px">
+<h2 style="font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; font-size: clamp(36px, 5vw, 72px); line-height: 0.95; margin: 0; max-width: 16ch">Было: переписка до ночи. Стало: готовый заказ.</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 32px; margin-top: 48px; align-items: flex-start">
+<div style="flex: 1 1 400px; background: #FBF7EF; border-radius: 6px; padding: 32px; box-shadow: 0 14px 30px rgba(35,26,13,.18); transform: rotate(-1.2deg)">
+<div style="font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.06em; font-size: 15px; color: #8A6E45">Директ · 23:41</div>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px; font-size: 16px; line-height: 1.4">
+<div style="align-self: flex-start; background: #EFE5D2; padding: 12px 16px; border-radius: 16px 16px 16px 4px; max-width: 82%">Здравствуйте! Куртка синяя есть на 110?</div>
+<div style="align-self: flex-start; background: #EFE5D2; padding: 12px 16px; border-radius: 16px 16px 16px 4px; max-width: 82%">А сколько стоит? И шапка такая же есть?</div>
+<div style="align-self: flex-end; background: #DCE6DF; padding: 12px 16px; border-radius: 16px 16px 4px 16px; max-width: 82%">Сейчас уточню на складе…</div>
+<div style="align-self: flex-start; background: #EFE5D2; padding: 12px 16px; border-radius: 16px 16px 16px 4px; max-width: 82%">Ну что, есть?</div>
+<div style="color: #8A6E45; font-size: 14px; margin-top: 4px">Покупатель ушёл к соседям</div>
+</div>
+</div>
+<div style="flex: 1 1 400px; background: #12352A; color: #F4EBDC; border-radius: 6px; padding: 32px; box-shadow: 0 14px 30px rgba(18,53,42,.35); transform: rotate(0.8deg)">
+<div style="font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.06em; font-size: 15px; color: #E9D3AE">WhatsApp · 10:05</div>
+<div style="margin-top: 16px; background: #F4EBDC; color: #231A0D; border-radius: 16px 16px 4px 16px; padding: 20px 22px; font-size: 16px; line-height: 1.55; font-variant-numeric: tabular-nums">
+<div style="font-weight: 700">Заказ №128 с сайта «Айгерим Kids»</div>
+<div style="margin-top: 8px">1. Куртка демисезонная (110, синяя) × 1 — 18 900 ₸</div>
+<div>2. Шапка вязаная (52) × 1 — 4 200 ₸</div>
+<div style="margin-top: 8px; font-weight: 700">Итого: 23 100 ₸</div>
+</div>
+<p style="margin: 18px 0 0; font-size: 16px; line-height: 1.5; color: #D6CDBB">Размер и наличие покупатель увидел на бирке сам. Вам остаётся подтвердить.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="how" style="max-width: 1280px; margin: 0 auto; padding: 96px 32px 40px">
+<h2 style="font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; font-size: clamp(36px, 5vw, 72px); line-height: 0.95; margin: 0">Три шага до каталога</h2>
+<ol style="list-style: none; padding: 0; margin: 48px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0; border-top: 2px solid #E9D3AE">
+<li style="padding: 28px 28px 0 0">
+<div style="font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 96px; line-height: 0.9; color: #FF5A1F">1</div>
+<h3 style="font-size: 23px; margin: 16px 0 10px; font-weight: 600">Загрузите Excel</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.55; color: #D6CDBB; max-width: 34ch">Выгрузка из кассовой программы или 1С. Повторная загрузка обновит остатки и цены.</p>
+</li>
+<li style="padding: 28px 28px 0 0">
+<div style="font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 96px; line-height: 0.9; color: #FF5A1F">2</div>
+<h3 style="font-size: 23px; margin: 16px 0 10px; font-weight: 600">Добавьте фото</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.55; color: #D6CDBB; max-width: 34ch">С телефона, несколько снимков на товар. Каталог работает и без фото.</p>
+</li>
+<li style="padding: 28px 28px 0 0">
+<div style="font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 96px; line-height: 0.9; color: #FF5A1F">3</div>
+<h3 style="font-size: 23px; margin: 16px 0 10px; font-weight: 600">Поделитесь ссылкой</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.55; color: #D6CDBB; max-width: 34ch">В шапке Instagram, в WhatsApp, на кассе. Заказы приходят вам в WhatsApp.</p>
+</li>
+</ol>
+</section>
+
+<section id="faq" style="max-width: 1280px; margin: 0 auto; padding: 88px 32px 40px; display: flex; flex-wrap: wrap; gap: 48px">
+<h2 style="flex: 1 1 300px; font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; font-size: clamp(36px, 4.6vw, 64px); line-height: 0.95; margin: 0">Частые вопросы</h2>
+<dl style="flex: 2 1 560px; margin: 0">
+<div style="padding: 22px 0; border-bottom: 1px solid rgba(233,211,174,.35)"><dt style="font-weight: 600; font-size: 19px">Нужен сайт или программист?</dt><dd style="margin: 8px 0 0; font-size: 17px; line-height: 1.55; color: #C9C2B2">Нет. Каталог появляется на адресе вида vash-magazin.[сервис].kz сразу после загрузки таблицы.</dd></div>
+<div style="padding: 22px 0; border-bottom: 1px solid rgba(233,211,174,.35)"><dt style="font-weight: 600; font-size: 19px">Сколько стоит?</dt><dd style="margin: 8px 0 0; font-size: 17px; line-height: 1.55; color: #C9C2B2">Бесплатно на время пилота.</dd></div>
+<div style="padding: 22px 0; border-bottom: 1px solid rgba(233,211,174,.35)"><dt style="font-weight: 600; font-size: 19px">А если товар продали в магазине?</dt><dd style="margin: 8px 0 0; font-size: 17px; line-height: 1.55; color: #C9C2B2">Загрузите свежую выгрузку, и остатки обновятся. Каждый заказ вы подтверждаете сами, поэтому лишнего не продадите.</dd></div>
+<div style="padding: 22px 0"><dt style="font-weight: 600; font-size: 19px">Работает с моей программой учёта?</dt><dd style="margin: 8px 0 0; font-size: 17px; line-height: 1.55; color: #C9C2B2">Подойдёт любая, которая умеет сохранять товары в Excel. Прямые подключения появятся позже.</dd></div>
+</dl>
+</section>
+
+<section id="start" style="max-width: 1280px; margin: 0 auto; padding: 96px 32px 48px">
+<div style="background: #FF5A1F; color: #1A1206; border-radius: 10px; padding: clamp(32px, 5vw, 72px); display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 32px">
+<h2 style="font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; font-size: clamp(40px, 6vw, 92px); line-height: 0.92; margin: 0; max-width: 12ch">Пусть покупатели смотрят сами</h2>
+<div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+<a class="tg-btn" href="#start" style="text-decoration: none; background: #12352A; color: #F4EBDC; font-weight: 700; font-size: 20px; padding: 21px 32px; border-radius: 8px">Создать каталог бесплатно</a>
+<span style="font-size: 15px; color: #3A1D08">Понадобится только email и таблица товаров</span>
+</div>
+</div>
+<footer style="margin-top: 64px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 14px; color: #A9B8AE">
+<span>catalog·online — рабочее название</span>
+<span>Казахстан · [контакты]</span>
+</footer>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { size: 'all' };
+  }
+  renderVals() {
+    var size = this.state.size;
+    var self = this;
+    var sizeList = ['all', '104', '110', '116', '122'];
+    var sizes = sizeList.map(function (id) {
+      var on = id === size;
+      return {
+        label: id === 'all' ? 'Все' : id,
+        pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ size: id }); },
+        style: 'border: 0; border-radius: 4px; padding: 10px 16px; min-height: 44px; font: 600 15px Oswald, sans-serif; letter-spacing: .04em; ' + (on ? 'background: #FF5A1F; color: #1A1206;' : 'background: #F4EBDC; color: #231A0D;')
+      };
+    });
+    var widths = [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 2, 1, 3, 1, 1, 2, 3, 1, 2, 1, 3];
+    var bars = widths.map(function (w, i) {
+      return 'flex: 0 0 ' + w + 'px; background: ' + (i % 2 === 0 ? '#231A0D' : 'transparent');
+    });
+    var products = [
+      { cat: 'Верхняя одежда', name: 'Куртка демисезонная, синяя', price: '18 900 ₸', stock: { '104': 3, '110': 1, '116': 4, '122': 0 }, stockColor: '#E9D3AE' },
+      { cat: 'Платья', name: 'Платье трикотажное', price: '9 500 ₸', stock: { '104': 2, '110': 5, '116': 0, '122': 2 }, stockColor: '#FBF7EF' },
+      { cat: 'Обувь', name: 'Кроссовки на липучках', price: '14 200 ₸', stock: { '104': 0, '110': 2, '116': 1, '122': 3 }, stockColor: '#E9D3AE' },
+      { cat: 'Аксессуары', name: 'Шапка вязаная', price: '4 200 ₸', stock: { '104': 6, '110': 6, '116': 2, '122': 0 }, stockColor: '#FBF7EF' },
+      { cat: 'Верхняя одежда', name: 'Комбинезон зимний', price: '27 400 ₸', stock: { '104': 1, '110': 0, '116': 0, '122': 1 }, stockColor: '#E9D3AE' }
+    ];
+    var tilts = [-2.5, 1.8, -1.2, 2.6, -1.8];
+    var cords = ['34px', '56px', '42px', '64px', '38px'];
+    var visible = products.filter(function (p) {
+      return size === 'all' || (p.stock[size] || 0) > 0;
+    }).map(function (p, i) {
+      var total = 0;
+      for (var k in p.stock) total += p.stock[k];
+      var n = size === 'all' ? total : p.stock[size];
+      var few = n <= 2;
+      var zs = ['104', '110', '116', '122'].map(function (z) {
+        var has = p.stock[z] > 0;
+        var sel = z === size;
+        return {
+          label: z,
+          title: has ? 'Есть' : 'Нет в наличии',
+          style: 'font: 600 13px Golos Text, sans-serif; padding: 5px 8px; border-radius: 4px; font-variant-numeric: tabular-nums; ' + (has ? (sel ? 'background: #231A0D; color: #F4EBDC;' : 'border: 1.5px solid #231A0D; color: #231A0D;') : 'border: 1.5px dashed #A08A66; color: #8C7552; text-decoration: line-through;')
+        };
+      });
+      return {
+        cat: p.cat,
+        name: p.name,
+        price: p.price,
+        sizes: zs,
+        cord: cords[i % cords.length],
+        tagStyle: 'width: 100%; max-width: 230px; box-sizing: border-box; background: ' + p.stockColor + '; padding: 18px 20px 20px; border-radius: 6px; clip-path: polygon(18% 0, 82% 0, 100% 9%, 100% 100%, 0 100%, 0 9%); transform: rotate(' + tilts[i % tilts.length] + 'deg)',
+        badge: few ? 'Осталось мало' : 'В наличии',
+        badgeStyle: 'display: inline-block; margin-top: 14px; font: 700 13px Golos Text, sans-serif; padding: 6px 10px; border-radius: 3px; ' + (few ? 'background: #FF5A1F; color: #1A1206;' : 'background: #12352A; color: #F4EBDC;')
+      };
+    });
+    return { sizes: sizes, bars: bars, visible: visible, empty: visible.length === 0 };
+  }
+}
+</script>
+</body>
+</html>

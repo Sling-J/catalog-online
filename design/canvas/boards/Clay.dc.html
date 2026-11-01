@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Лендинг — Стекло и пластилин</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3F2FA}
+a{color:#3B2FD9}a:hover{color:#2419A8}
+::selection{background:#FFD23F;color:#17133D}
+@keyframes clDrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(80px,40px) scale(1.12)}}
+@keyframes clDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-90px,60px) scale(.92)}}
+@keyframes clFloat{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-18px) rotate(calc(var(--r,0deg) + 3deg))}}
+@keyframes clIn{from{opacity:0;transform:translateY(14px) scale(.98);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+.cl-b1{animation:clDrift1 18s ease-in-out infinite}
+.cl-b2{animation:clDrift2 22s ease-in-out infinite}
+.cl-f1{animation:clFloat 5.2s ease-in-out infinite}
+.cl-f2{animation:clFloat 6.4s ease-in-out infinite .7s}
+.cl-f3{animation:clFloat 5.8s ease-in-out infinite 1.4s}
+.cl-f4{animation:clFloat 7s ease-in-out infinite 2.1s}
+.cl-screen{animation:clIn .55s cubic-bezier(.16,1,.3,1) both}
+.cl-puffy{transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .2s}
+.cl-puffy:hover{transform:translateY(-3px)}
+.cl-puffy:active{transform:translateY(4px)}
+.cl-puffy:focus-visible,.cl-chip:focus-visible,.cl-tab:focus-visible{outline:3px solid #3B2FD9;outline-offset:3px}
+.cl-chip{cursor:pointer;transition:background-color .2s,color .2s,transform .2s cubic-bezier(.34,1.56,.64,1)}
+.cl-chip:active{transform:scale(.94)}
+.cl-tab{cursor:pointer;transition:background-color .3s,box-shadow .3s}
+@media (prefers-reduced-motion: reduce){.cl-b1,.cl-b2,.cl-f1,.cl-f2,.cl-f3,.cl-f4,.cl-screen{animation:none}}
+</style>
+</helmet>
+<div style="font-family: 'Geologica', system-ui, sans-serif; color: #17133D; background: #F3F2FA; width: 100%; min-height: 100vh; position: relative; overflow: hidden">
+
+<div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; overflow: hidden">
+<div class="cl-b1" style="position: absolute; left: -8%; top: -6%; width: 640px; height: 640px; border-radius: 50%; background: radial-gradient(circle, rgba(255,122,182,.5), rgba(255,122,182,0) 68%)"></div>
+<div class="cl-b2" style="position: absolute; right: -10%; top: 4%; width: 720px; height: 720px; border-radius: 50%; background: radial-gradient(circle, rgba(124,108,255,.5), rgba(124,108,255,0) 68%)"></div>
+<div class="cl-b1" style="position: absolute; left: 34%; top: 640px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(circle, rgba(255,210,63,.4), rgba(255,210,63,0) 68%)"></div>
+<div class="cl-b2" style="position: absolute; left: -12%; top: 1900px; width: 700px; height: 700px; border-radius: 50%; background: radial-gradient(circle, rgba(94,230,176,.4), rgba(94,230,176,0) 68%)"></div>
+<div class="cl-b1" style="position: absolute; right: -8%; top: 2500px; width: 640px; height: 640px; border-radius: 50%; background: radial-gradient(circle, rgba(124,108,255,.38), rgba(124,108,255,0) 68%)"></div>
+</div>
+
+<div style="position: relative">
+<header style="max-width: 1200px; margin: 20px auto 0; padding: 0 24px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 10px 10px 24px; border-radius: 999px; background: rgba(255,255,255,.55); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); border: 1px solid rgba(255,255,255,.8); box-shadow: 0 10px 40px rgba(40,30,110,.08)">
+<a href="#top" style="font-weight: 800; font-size: 19px; text-decoration: none; color: #17133D">catalog·online</a>
+<nav aria-label="Основное" style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; font-size: 15px; font-weight: 500">
+<a href="#story" style="text-decoration: none; color: #4A4570">Как это работает</a>
+<a href="#features" style="text-decoration: none; color: #4A4570">Возможности</a>
+<a href="#faq" style="text-decoration: none; color: #4A4570">Вопросы</a>
+<a class="cl-puffy" href="#start" style="text-decoration: none; background: #3B2FD9; color: #ffffff; font-weight: 600; padding: 12px 22px; border-radius: 999px; box-shadow: 0 5px 0 #2419A8, 0 12px 22px rgba(59,47,217,.28)">Создать каталог</a>
+</nav>
+</div>
+</header>
+
+<section id="top" style="max-width: 1200px; margin: 0 auto; padding: 88px 24px 0; text-align: center">
+<h1 style="font-weight: 800; font-size: clamp(42px, 6.6vw, 94px); line-height: 1.02; letter-spacing: -0.045em; margin: 0 auto; max-width: 14ch; text-wrap: balance">Хватит отвечать «есть ли размер?»</h1>
+<p style="font-size: clamp(18px, 1.6vw, 22px); line-height: 1.55; color: #4A4570; margin: 26px auto 0; max-width: 44ch; font-weight: 300">Каталог с наличием и размерами из вашей таблицы товаров. Покупатель выбирает сам, а заказ приходит вам в WhatsApp.</p>
+<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 36px">
+<a class="cl-puffy" href="#start" style="text-decoration: none; background: #FFD23F; color: #17133D; font-weight: 700; font-size: 18px; padding: 19px 32px; border-radius: 999px; box-shadow: 0 7px 0 #D1A300, 0 16px 28px rgba(209,163,0,.3)">Создать каталог бесплатно</a>
+<a class="cl-puffy" href="#story" style="text-decoration: none; background: rgba(255,255,255,.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #17133D; font-weight: 600; font-size: 18px; padding: 19px 30px; border-radius: 999px; border: 1px solid rgba(255,255,255,.9); box-shadow: 0 7px 0 #D9D5EE, 0 16px 28px rgba(40,30,110,.1)">Как это работает</a>
+</div>
+</section>
+
+<section id="story" aria-label="История одного заказа" style="max-width: 1200px; margin: 0 auto; padding: 72px 24px 0">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 48px">
+
+<div style="position: relative; flex: 0 0 auto; width: 560px; max-width: 100%; display: flex; justify-content: center; padding: 30px 0">
+
+<div aria-hidden="true" class="cl-f1" style="--r: -14deg; position: absolute; left: 0; top: 70px; width: 120px; height: 132px; border-radius: 26px 26px 34px 34px; background: radial-gradient(120% 90% at 30% 20%, #FFB39C, #FF7A59 55%, #D9532F); box-shadow: inset -10px -14px 22px rgba(120,30,0,.35), inset 9px 10px 18px rgba(255,255,255,.45), 0 30px 40px rgba(60,30,120,.25); z-index: 2">
+<div style="position: absolute; left: 50%; top: -38px; width: 62px; height: 62px; margin-left: -31px; border-radius: 50%; border: 11px solid #E96440; border-bottom-color: transparent; border-left-color: #E96440; box-sizing: border-box; transform: rotate(45deg)"></div>
+</div>
+
+<div aria-hidden="true" class="cl-f2" style="--r: 12deg; position: absolute; right: 6px; top: 40px; width: 104px; height: 138px; border-radius: 20px; background: radial-gradient(120% 90% at 30% 15%, #FFF0A8, #FFD23F 55%, #E3AE00); box-shadow: inset -10px -14px 22px rgba(130,90,0,.35), inset 8px 10px 16px rgba(255,255,255,.55), 0 30px 40px rgba(60,30,120,.25); z-index: 2">
+<div style="width: 20px; height: 20px; border-radius: 50%; margin: 16px auto 0; background: #F3F2FA; box-shadow: inset 3px 4px 7px rgba(29,27,75,.35)"></div>
+<div style="text-align: center; font-weight: 800; font-size: 24px; margin-top: 12px; color: #6B4E00">110</div>
+<div style="text-align: center; font-weight: 700; font-size: 13px; margin-top: 2px; color: #6B4E00">мало</div>
+</div>
+
+<div aria-hidden="true" class="cl-f3" style="--r: -8deg; position: absolute; right: -10px; bottom: 120px; padding: 14px 18px; border-radius: 24px 24px 24px 6px; background: radial-gradient(120% 120% at 25% 15%, #B8FFE1, #5EE6B0 55%, #26B985); box-shadow: inset -8px -12px 20px rgba(0,90,60,.3), inset 8px 10px 16px rgba(255,255,255,.5), 0 26px 36px rgba(60,30,120,.22); font-weight: 700; font-size: 15px; color: #0B4A33; z-index: 2; white-space: nowrap">Заказ №128 · 23 100 ₸</div>
+
+<div aria-hidden="true" class="cl-f4" style="--r: 10deg; position: absolute; left: 22px; bottom: 90px; width: 74px; height: 74px; border-radius: 50%; background: radial-gradient(120% 120% at 30% 25%, #FFC3DD, #FF7AB6 55%, #D9468A); box-shadow: inset -8px -10px 16px rgba(120,0,50,.3), inset 7px 8px 14px rgba(255,255,255,.5), 0 24px 32px rgba(60,30,120,.22); display: flex; align-items: center; justify-content: center; z-index: 2">
+<svg width="34" height="34" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.3 3 4.5 6.7 4.5c2.1 0 3.6 1.1 4.3 2.5.7-1.4 2.2-2.5 4.3-2.5 3.7 0 5.8 3.8 4.3 7.2C19.5 16.4 12 21 12 21z"></path></svg>
+</div>
+
+<div style="position: relative; z-index: 1; width: 340px; max-width: 100%; height: 700px; border-radius: 54px; padding: 13px; box-sizing: border-box; background: rgba(255,255,255,.38); backdrop-filter: blur(24px) saturate(170%); -webkit-backdrop-filter: blur(24px) saturate(170%); border: 1px solid rgba(255,255,255,.85); box-shadow: 0 40px 100px rgba(40,30,110,.24), inset 0 1px 0 rgba(255,255,255,.95)">
+<div style="height: 100%; border-radius: 42px; background: #FBFAFF; overflow: hidden; display: flex; flex-direction: column">
+
+<sc-if value="{{s0}}" hint-placeholder-val="{{ true }}">
+<div class="cl-screen" style="display: flex; flex-direction: column; height: 100%">
+<div style="padding: 22px 20px 14px; border-bottom: 1px solid #ECEAF6; display: flex; align-items: center; gap: 10px">
+<div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(140deg, #FF9CC8, #7C6CFF)"></div>
+<div><div style="font-weight: 600; font-size: 15px">aigerim.kids</div><div style="font-size: 12px; color: #8A85AD">Директ</div></div>
+</div>
+<div style="flex: 1; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.4">
+<div style="align-self: flex-start; background: #EEECF8; padding: 11px 14px; border-radius: 20px 20px 20px 6px; max-width: 85%">Здравствуйте! Куртка синяя есть на 110?</div>
+<div style="align-self: flex-start; background: #EEECF8; padding: 11px 14px; border-radius: 20px 20px 20px 6px; max-width: 85%">А цена? И шапка такая же?</div>
+<div style="align-self: flex-start; background: #EEECF8; padding: 11px 14px; border-radius: 20px 20px 20px 6px; max-width: 85%">Ау?</div>
+<div style="align-self: center; margin-top: auto; font-size: 13px; color: #8A85AD">23:41 · без ответа</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{s1}}" hint-placeholder-val="{{ false }}">
+<div class="cl-screen" style="display: flex; flex-direction: column; height: 100%; position: relative">
+<div style="padding: 20px 18px 0">
+<div style="display: flex; align-items: center; gap: 10px">
+<div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(140deg, #FF9CC8, #7C6CFF); color: #ffffff; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center">АK</div>
+<div style="flex: 1; min-width: 0"><div style="font-weight: 700; font-size: 16px">Айгерим Kids</div><div style="font-size: 12px; color: #8A85AD">Шымкент · ТЦ «Мега»</div></div>
+<div style="position: relative; width: 38px; height: 38px; border-radius: 50%; background: #EEECF8; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"></path><path d="M9 7a3 3 0 0 1 6 0"></path></svg>
+<span style="position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; border-radius: 999px; background: #FF7AB6; color: #ffffff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">2</span>
+</div>
+</div>
+<div style="margin-top: 14px; display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-radius: 14px; background: #EEECF8; color: #8A85AD; font-size: 14px">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A85AD" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+Поиск по каталогу
+</div>
+<div style="display: flex; gap: 6px; margin-top: 12px; overflow: hidden">
+<span style="font-size: 13px; font-weight: 600; padding: 7px 12px; border-radius: 999px; background: #17133D; color: #ffffff">Все</span>
+<span style="font-size: 13px; font-weight: 500; padding: 7px 12px; border-radius: 999px; background: #EEECF8">Куртки</span>
+<span style="font-size: 13px; font-weight: 500; padding: 7px 12px; border-radius: 999px; background: #EEECF8">Платья</span>
+<span style="font-size: 13px; font-weight: 500; padding: 7px 12px; border-radius: 999px; background: #EEECF8">Обувь</span>
+</div>
+<div role="group" aria-label="Рост" style="display: flex; align-items: center; gap: 6px; margin-top: 10px">
+<span style="font-size: 12px; color: #8A85AD; margin-right: 2px">Рост</span>
+<sc-for list="{{sizes}}" as="z" hint-placeholder-count="3">
+<button class="cl-chip" type="button" onClick="{{z.pick}}" aria-pressed="{{z.pressed}}" style="{{z.style}}">{{z.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="flex: 1; padding: 12px 14px 84px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-content: start; overflow: hidden">
+<sc-for list="{{cards}}" as="m" hint-placeholder-count="4">
+<div style="background: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 6px 18px rgba(40,30,110,.08)">
+<div style="{{m.sw}}" role="img" aria-label="{{m.alt}}">
+<span style="position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2"><path d="M12 20s-7-4.3-8.9-8.6C1.8 8.3 3.7 5 7 5c1.9 0 3.3 1 4 2.3C11.7 6 13.1 5 15 5c3.3 0 5.2 3.3 3.9 6.4C19 15.7 12 20 12 20z"></path></svg></span>
+</div>
+<div style="padding: 9px 11px 11px">
+<div style="font-weight: 500; font-size: 12px; line-height: 1.3; color: #4A4570">{{m.name}}</div>
+<div style="font-weight: 700; font-size: 14px; margin-top: 3px; font-variant-numeric: tabular-nums">{{m.price}}</div>
+<div style="display: flex; align-items: center; gap: 5px; margin-top: 5px; font-size: 11px; font-weight: 600; color: {{m.tone}}"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{m.tone}}"></span>{{m.badge}}</div>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 16px; border-radius: 999px; background: rgba(23,19,61,.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #ffffff">
+<div style="flex: 1; font-size: 13px; line-height: 1.25"><div style="opacity: .7">2 товара</div><div style="font-weight: 700; font-variant-numeric: tabular-nums">23 100 ₸</div></div>
+<div style="background: #5EE6B0; color: #0B3A28; font-weight: 700; font-size: 14px; padding: 11px 16px; border-radius: 999px; box-shadow: 0 3px 0 #26B985">В WhatsApp</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{s2}}" hint-placeholder-val="{{ false }}">
+<div class="cl-screen" style="display: flex; flex-direction: column; height: 100%">
+<div style="padding: 22px 20px 14px; border-bottom: 1px solid #ECEAF6; display: flex; align-items: center; gap: 10px">
+<div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(140deg, #B8FFE1, #26B985)"></div>
+<div><div style="font-weight: 600; font-size: 15px">Айгерим Kids</div><div style="font-size: 12px; color: #8A85AD">WhatsApp</div></div>
+</div>
+<div style="flex: 1; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.5; font-variant-numeric: tabular-nums">
+<div style="align-self: flex-end; background: #DCF5E3; padding: 14px 16px; border-radius: 20px 20px 6px 20px; max-width: 90%">
+<div style="font-weight: 700">Заказ №128 с сайта</div>
+<div style="margin-top: 6px">1. Куртка демисезонная (110) — 18 900 ₸</div>
+<div>2. Шапка вязаная (52) — 4 200 ₸</div>
+<div style="margin-top: 6px; font-weight: 700">Итого: 23 100 ₸</div>
+</div>
+<div style="align-self: flex-start; background: #EEECF8; padding: 11px 14px; border-radius: 20px 20px 20px 6px; max-width: 85%">Заказ подтверждён, ждём вас!</div>
+<div style="align-self: center; margin-top: auto; font-size: 13px; color: #8A85AD">10:05 · готовый заказ</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</div>
+
+<div style="flex: 1 1 340px; max-width: 460px; display: flex; flex-direction: column; gap: 12px; text-align: left">
+<sc-for list="{{steps}}" as="st" hint-placeholder-count="3">
+<button class="cl-tab" type="button" onClick="{{st.pick}}" aria-pressed="{{st.pressed}}" style="{{st.style}}">
+<span style="display: block; font-size: 14px; font-weight: 600; color: {{st.tone}}">{{st.when}}</span>
+<span style="display: block; font-size: 22px; font-weight: 700; margin-top: 6px; letter-spacing: -0.02em">{{st.title}}</span>
+<span style="display: block; font-size: 16px; line-height: 1.5; margin-top: 6px; font-weight: 300; color: {{st.tone}}">{{st.text}}</span>
+</button>
+</sc-for>
+<p style="margin: 6px 4px 0; font-size: 13px; color: #8A85AD">Пример магазина. Товары и цены вымышлены. Предметы вокруг — заглушки под 3D-иллюстрации</p>
+</div>
+
+</div>
+</section>
+
+<section id="features" style="max-width: 1200px; margin: 0 auto; padding: 130px 24px 0">
+<h2 style="font-weight: 800; font-size: clamp(32px, 4.4vw, 58px); line-height: 1.05; letter-spacing: -0.04em; margin: 0; max-width: 18ch">Всё, что спрашивают в директе, покупатель видит сам</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 48px">
+<div style="flex: 3 1 520px; padding: 36px; border-radius: 36px; background: rgba(255,255,255,.55); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,.85); box-shadow: 0 20px 60px rgba(40,30,110,.1)">
+<h3 style="margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.02em">Наличие по каждому размеру</h3>
+<p style="margin: 10px 0 0; font-size: 17px; line-height: 1.55; color: #4A4570; font-weight: 300; max-width: 44ch">«Есть», «мало» или точное число — как решите.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px">
+<span style="padding: 13px 20px; border-radius: 999px; background: #ffffff; font-weight: 600; box-shadow: 0 4px 0 #E2DEF5">104 · есть</span>
+<span style="padding: 13px 20px; border-radius: 999px; background: #FFE7A8; color: #6B4E00; font-weight: 600; box-shadow: 0 4px 0 #E8C25A">110 · мало</span>
+<span style="padding: 13px 20px; border-radius: 999px; background: rgba(255,255,255,.45); color: #8A85AD; font-weight: 600; text-decoration: line-through">116 · нет</span>
+</div>
+</div>
+<div style="flex: 2 1 340px; padding: 36px; border-radius: 36px; background: #17133D; color: #ffffff; box-shadow: 0 20px 60px rgba(23,19,61,.25)">
+<h3 style="margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.02em">Заказ — в WhatsApp</h3>
+<p style="margin: 10px 0 0; font-size: 17px; line-height: 1.55; color: #C8C3EE; font-weight: 300">Готовый список с размерами и суммой. Без оплаты на сайте.</p>
+</div>
+<div style="flex: 2 1 340px; padding: 36px; border-radius: 36px; background: rgba(255,255,255,.55); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,.85)">
+<h3 style="margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.02em">Из вашей таблицы</h3>
+<p style="margin: 10px 0 0; font-size: 17px; line-height: 1.55; color: #4A4570; font-weight: 300">Выгрузка из кассы или 1С. Загрузили заново — остатки обновились.</p>
+</div>
+<div style="flex: 3 1 520px; padding: 36px; border-radius: 36px; background: rgba(255,255,255,.55); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,.85)">
+<h3 style="margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.02em">Одна ссылка на всё</h3>
+<p style="margin: 10px 0 0; font-size: 17px; line-height: 1.55; color: #4A4570; font-weight: 300">Поставьте в шапку Instagram и отправляйте в WhatsApp.</p>
+<div style="margin-top: 22px; display: inline-flex; padding: 14px 20px; border-radius: 999px; background: #ffffff; font-weight: 600; font-size: 16px; box-shadow: 0 4px 0 #E2DEF5">aigerim-kids.[сервис].kz</div>
+</div>
+</div>
+</section>
+
+<section id="how" style="max-width: 1200px; margin: 0 auto; padding: 130px 24px 0">
+<h2 style="font-weight: 800; font-size: clamp(32px, 4.4vw, 58px); letter-spacing: -0.04em; margin: 0">Три шага — и готово</h2>
+<ol style="list-style: none; padding: 0; margin: 44px 0 0; display: flex; flex-wrap: wrap; gap: 20px">
+<li style="flex: 1 1 300px; border-radius: 36px; padding: 34px; background: rgba(255,210,63,.55); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 8px 0 rgba(209,163,0,.35)">
+<div style="font-weight: 800; font-size: 60px; line-height: 1; color: #6B4E00">1</div>
+<h3 style="font-weight: 700; font-size: 24px; margin: 14px 0 8px">Загрузите Excel</h3>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #4A3A00">Из кассовой программы или 1С. Новая загрузка — свежие остатки.</p>
+</li>
+<li style="flex: 1 1 300px; border-radius: 36px; padding: 34px; background: rgba(255,122,182,.45); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 8px 0 rgba(217,70,138,.3)">
+<div style="font-weight: 800; font-size: 60px; line-height: 1; color: #7A1A48">2</div>
+<h3 style="font-weight: 700; font-size: 24px; margin: 14px 0 8px">Добавьте фото</h3>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #5A1236">Прямо с телефона. Можно и без фото.</p>
+</li>
+<li style="flex: 1 1 300px; border-radius: 36px; padding: 34px; background: rgba(94,230,176,.5); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 8px 0 rgba(38,185,133,.35)">
+<div style="font-weight: 800; font-size: 60px; line-height: 1; color: #0B4A33">3</div>
+<h3 style="font-weight: 700; font-size: 24px; margin: 14px 0 8px">Поделитесь ссылкой</h3>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #0B3A28">В Instagram и WhatsApp. Заказы — вам в WhatsApp.</p>
+</li>
+</ol>
+</section>
+
+<section id="faq" style="max-width: 860px; margin: 0 auto; padding: 130px 24px 0">
+<h2 style="font-weight: 800; font-size: clamp(32px, 4vw, 52px); letter-spacing: -0.04em; margin: 0; text-align: center">Частые вопросы</h2>
+<dl style="margin: 40px 0 0; display: flex; flex-direction: column; gap: 12px">
+<div style="padding: 24px 28px; border-radius: 28px; background: rgba(255,255,255,.6); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,.85)"><dt style="font-weight: 700; font-size: 18px">Нужен сайт или программист?</dt><dd style="margin: 8px 0 0; font-size: 16px; line-height: 1.55; color: #4A4570; font-weight: 300">Нет. Каталог появляется сразу после загрузки таблицы.</dd></div>
+<div style="padding: 24px 28px; border-radius: 28px; background: rgba(255,255,255,.6); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,.85)"><dt style="font-weight: 700; font-size: 18px">Сколько стоит?</dt><dd style="margin: 8px 0 0; font-size: 16px; line-height: 1.55; color: #4A4570; font-weight: 300">Бесплатно на время пилота.</dd></div>
+<div style="padding: 24px 28px; border-radius: 28px; background: rgba(255,255,255,.6); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,.85)"><dt style="font-weight: 700; font-size: 18px">А если товар продали в магазине?</dt><dd style="margin: 8px 0 0; font-size: 16px; line-height: 1.55; color: #4A4570; font-weight: 300">Загрузите свежую выгрузку. Каждый заказ вы подтверждаете сами.</dd></div>
+</dl>
+</section>
+
+<section id="start" style="max-width: 1200px; margin: 0 auto; padding: 130px 24px 48px">
+<div style="position: relative; border-radius: 48px; padding: clamp(40px, 6vw, 88px) 32px; text-align: center; background: linear-gradient(135deg, rgba(59,47,217,.94), rgba(160,90,255,.9) 55%, rgba(255,122,182,.88)); color: #ffffff; box-shadow: 0 40px 100px rgba(59,47,217,.3); overflow: hidden">
+<div aria-hidden="true" class="cl-f2" style="--r: 14deg; position: absolute; left: 6%; top: 40px; width: 70px; height: 92px; border-radius: 16px; background: radial-gradient(120% 90% at 30% 15%, #FFF0A8, #FFD23F 55%, #E3AE00); box-shadow: inset -7px -10px 16px rgba(130,90,0,.35), inset 6px 8px 12px rgba(255,255,255,.55), 0 20px 30px rgba(20,10,80,.3)"></div>
+<div aria-hidden="true" class="cl-f3" style="--r: -10deg; position: absolute; right: 7%; bottom: 40px; width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(120% 120% at 25% 15%, #B8FFE1, #5EE6B0 55%, #26B985); box-shadow: inset -7px -10px 16px rgba(0,90,60,.3), inset 6px 8px 12px rgba(255,255,255,.5), 0 20px 30px rgba(20,10,80,.3)"></div>
+<h2 style="position: relative; font-weight: 800; font-size: clamp(36px, 5.4vw, 78px); line-height: 1.02; letter-spacing: -0.045em; margin: 0 auto; max-width: 14ch">Пусть покупатели смотрят сами</h2>
+<a class="cl-puffy" href="#start" style="position: relative; display: inline-block; margin-top: 36px; text-decoration: none; background: #FFD23F; color: #17133D; font-weight: 700; font-size: 19px; padding: 20px 36px; border-radius: 999px; box-shadow: 0 7px 0 #D1A300, 0 16px 28px rgba(20,10,80,.3)">Создать каталог бесплатно</a>
+<p style="position: relative; margin: 18px 0 0; font-size: 15px; color: rgba(255,255,255,.88)">Понадобится только email и таблица товаров</p>
+</div>
+<footer style="margin-top: 48px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 14px; color: #6E6993">
+<span>catalog·online — рабочее название</span>
+<span>Казахстан · [контакты]</span>
+</footer>
+</section>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3400}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 0, auto: true, size: '110' };
+  }
+  componentDidMount() {
+    var self = this;
+    this.timer = setInterval(function () {
+      if (self.state.auto) self.setState({ step: (self.state.step + 1) % 3 });
+    }, 3800);
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+  renderVals() {
+    var s = this.state;
+    var self = this;
+    var data = [
+      { when: 'Раньше, 23:41', title: 'Вопросы в директе до ночи', text: 'Каждый размер — отдельный вопрос и ваше время.' },
+      { when: 'Теперь', title: 'Покупатель смотрит сам', text: 'Размеры, наличие и цены. Попробуйте переключить рост в телефоне.' },
+      { when: 'Утром, 10:05', title: 'Готовый заказ в WhatsApp', text: 'Состав, размеры и сумма. Осталось подтвердить.' }
+    ];
+    var steps = data.map(function (d, i) {
+      var on = i === s.step;
+      return {
+        when: d.when, title: d.title, text: d.text,
+        pressed: on ? 'true' : 'false',
+        tone: on ? '#4A4570' : '#8A85AD',
+        pick: function () { self.setState({ step: i, auto: false }); },
+        style: 'text-align: left; border-radius: 28px; padding: 22px 26px; font-family: Geologica, sans-serif; color: #17133D; ' + (on ? 'background: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.95); box-shadow: 0 6px 0 #E2DEF5, 0 18px 40px rgba(40,30,110,.12); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);' : 'background: transparent; border: 1px solid transparent;')
+      };
+    });
+    var sizes = ['104', '110', '116'].map(function (id) {
+      var on = id === s.size;
+      return {
+        label: id, pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ size: id, auto: false, step: 1 }); },
+        style: 'border: 0; border-radius: 999px; padding: 6px 12px; min-height: 30px; font: 600 12px Geologica, sans-serif; ' + (on ? 'background: #3B2FD9; color: #ffffff; box-shadow: 0 3px 0 #2419A8;' : 'background: #EEECF8; color: #17133D;')
+      };
+    });
+    var products = [
+      { name: 'Куртка демисезонная', price: '18 900 ₸', c1: '#9C90FF', c2: '#3B2FD9', stock: { '104': 3, '110': 1, '116': 4 } },
+      { name: 'Платье трикотажное', price: '9 500 ₸', c1: '#FFC3DD', c2: '#E2508F', stock: { '104': 2, '110': 5, '116': 0 } },
+      { name: 'Кроссовки', price: '14 200 ₸', c1: '#FFE19A', c2: '#F0A22C', stock: { '104': 0, '110': 2, '116': 1 } },
+      { name: 'Шапка вязаная', price: '4 200 ₸', c1: '#B8FFE1', c2: '#26B985', stock: { '104': 6, '110': 6, '116': 2 } },
+      { name: 'Комбинезон', price: '27 400 ₸', c1: '#C9B8FF', c2: '#5B3FB8', stock: { '104': 1, '110': 0, '116': 0 } }
+    ];
+    var cards = products.filter(function (p) { return p.stock[s.size] > 0; }).slice(0, 4).map(function (p) {
+      var few = p.stock[s.size] <= 2;
+      return {
+        name: p.name, price: p.price, alt: 'Фото товара: ' + p.name,
+        sw: 'position: relative; height: 104px; background: radial-gradient(120% 120% at 30% 20%, ' + p.c1 + ', ' + p.c2 + ')',
+        badge: few ? 'Осталось мало' : 'В наличии',
+        tone: few ? '#C2700A' : '#1E9E6A'
+      };
+    });
+    return { s0: s.step === 0, s1: s.step === 1, s2: s.step === 2, steps: steps, sizes: sizes, cards: cards };
+  }
+}
+</script>
+</body>
+</html>

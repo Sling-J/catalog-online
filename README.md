@@ -8,7 +8,7 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 - Карта и порядок чтения: [docs/README.md](docs/README.md)
 - Требования: [docs/01-product/](docs/01-product/)
 - Архитектура, стек, модель данных, API: [docs/02-architecture/](docs/02-architecture/)
-- Дизайн: [DESIGN.md](DESIGN.md), [docs/04-design/](docs/04-design/)
+- Дизайн: [DESIGN.md](DESIGN.md), [docs/04-design/](docs/04-design/), макеты — [design/canvas/](design/canvas/README.md)
 - План и задачи: [docs/05-tasks/backlog.md](docs/05-tasks/backlog.md)
 
 ## Устройство репозитория
