@@ -4,12 +4,12 @@ description: Онлайн-каталог для малых магазинов �
 colors:
   lilac-field: "#C9BBFF"
   lilac-mist: "#E4DCFF"
-  ink-night: "#1D1B4B"
+  ink-night: "#17133D"
   ink-underside: "#0B0A26"
   ink-soft: "#3A3672"
   ink-quiet: "#4A4580"
   ink-muted: "#6B6694"
-  paper: "#FCFBFF"
+  paper: "#FBFAFF"
   white: "#FFFFFF"
   chip-haze: "#EEECF8"
   glass: "rgba(255, 255, 255, 0.55)"
@@ -205,6 +205,8 @@ components:
 - **Дымка чипов** (chip-haze): фон невыбранных чипов и неактивных кнопок.
 - **Стекло и кромка стекла** (glass, glass-edge): панели, навигация, вопросы.
 - **Чернила мягкие, тихие, приглушённые** (ink-soft, ink-quiet, ink-muted): вторичный текст на поле, подписи на поле, подписи на бумаге.
+
+> Примечание (2026-11-01, решение основателя): ink-night — `#17133D`, paper — `#FBFAFF`, как в утверждённых макетах витрины и админки (было `#1D1B4B` и `#FCFBFF`; эти значения остались только в макетах лендинга и на листе дизайн-системы).
 
 ### Status
 - **Есть** (stock-in), **мало** (stock-low), **нет** (stock-out): только для наличия, текстом и точкой рядом.

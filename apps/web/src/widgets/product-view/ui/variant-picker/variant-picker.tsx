@@ -1,5 +1,5 @@
 import type { StorefrontProduct } from '@catalog/contract';
-import { Chip, cx } from '@catalog/ui';
+import { SizeChip } from '@catalog/ui';
 import { Trans } from '@lingui/react/macro';
 
 import { getValueState, toggleSelection, type Selection } from '@/entities/product';
@@ -20,7 +20,7 @@ export function VariantPicker({
   return (
     <>
       {product.attributes.map((attribute, position) => (
-        <section key={attribute.id} className="mt-5">
+        <section key={attribute.id} className="mt-5 lg:first:mt-6">
           <div className="flex items-baseline justify-between">
             <h2 className="text-[15px] font-bold">{attribute.name}</h2>
             {position === 0 && (
@@ -34,9 +34,10 @@ export function VariantPicker({
               const state = getValueState(product, selection, attribute.id, value.id);
               const selected = selection[attribute.id] === value.id;
               return (
-                <Chip
+                <SizeChip
                   key={value.id}
                   selected={selected}
+                  out={state === 'out' && !selected}
                   // закончившийся вариант выбрать нельзя, но снять уже выбранный (если он стал таким) можно
                   disabled={state === 'impossible' && !selected}
                   aria-disabled={state === 'out' && !selected ? true : undefined}
@@ -44,14 +45,10 @@ export function VariantPicker({
                     if (state === 'out' && !selected) return;
                     onChange(toggleSelection(selection, attribute.id, value.id));
                   }}
-                  className={cx(
-                    'min-w-[46px] justify-center',
-                    state === 'impossible' && !selected && 'opacity-40',
-                    state === 'out' && !selected && 'text-ink-muted line-through decoration-dashed',
-                  )}
+                  className={state === 'impossible' && !selected ? 'opacity-40' : undefined}
                 >
                   {value.value}
-                </Chip>
+                </SizeChip>
               );
             })}
           </div>

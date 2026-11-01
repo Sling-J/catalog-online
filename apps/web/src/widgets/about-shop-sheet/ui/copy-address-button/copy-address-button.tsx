@@ -1,10 +1,9 @@
 import { Trans } from '@lingui/react/macro';
+import { cx } from '@catalog/ui';
 import { useEffect, useState } from 'react';
 
-import { Icon } from '@/shared/ui';
-
 /** «Скопировать адрес»: на секунду меняется на «Скопировано». Без доступа к буферу не делает ничего. */
-export function CopyAddressButton({ address }: { address: string }) {
+export function CopyAddressButton({ address, className }: { address: string; className?: string }) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -26,9 +25,8 @@ export function CopyAddressButton({ address }: { address: string }) {
     <button
       type="button"
       onClick={copy}
-      className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-[14px] bg-white text-[14px] font-semibold"
+      className={cx('flex flex-1 items-center justify-center rounded-[14px] text-[14px] font-semibold', className)}
     >
-      <Icon name={copied ? 'check' : 'copy'} size={16} />
       {copied ? <Trans>Скопировано</Trans> : <Trans>Скопировать адрес</Trans>}
     </button>
   );

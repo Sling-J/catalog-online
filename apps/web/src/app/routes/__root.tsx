@@ -1,9 +1,21 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { createRootRouteWithContext, HeadContent, notFound, Outlet, Scripts } from '@tanstack/react-router';
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  notFound,
+  Outlet,
+  Scripts,
+  useRouter,
+  type ErrorComponentProps,
+  type NotFoundRouteProps,
+} from '@tanstack/react-router';
 import { useEffect, type ReactNode } from 'react';
 
 import { cartMounted } from '@/entities/cart';
+import { ErrorPage } from '@/pages/error';
 import { NotFoundPage } from '@/pages/not-found';
+import { ShopUnavailablePage } from '@/pages/shop-unavailable';
+import { isNotFoundData } from '@/shared/api';
 import { CartSheet } from '@/widgets/cart-sheet';
 
 import { getTenant } from '../lib';
@@ -21,9 +33,33 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     return { tenant };
   },
   component: Root,
-  notFoundComponent: NotFoundPage,
+  notFoundComponent: RootNotFound,
+  errorComponent: RootError,
   shellComponent: RootDocument,
 });
+
+// Причину «не найдено» кладёт загрузчик маршрута: скрытый магазин, нет товара или просто чужой адрес.
+function RootNotFound({ data }: NotFoundRouteProps) {
+  if (isNotFoundData(data)) {
+    if (data.reason === 'shop_gone') return <ShopUnavailablePage shop={data.shop} />;
+    return <NotFoundPage product />;
+  }
+  return <NotFoundPage />;
+}
+
+function RootError({ reset }: ErrorComponentProps) {
+  const router = useRouter();
+  const tenant = getTenant();
+  return (
+    <ErrorPage
+      subdomain={tenant.kind === 'shop' ? tenant.subdomain : undefined}
+      onRetry={() => {
+        reset();
+        void router.invalidate();
+      }}
+    />
+  );
+}
 
 function Root() {
   const { tenant } = Route.useRouteContext();

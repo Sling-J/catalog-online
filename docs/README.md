@@ -9,6 +9,7 @@
 3. [00-vision/idea-evaluation.md](00-vision/idea-evaluation.md): риски и корректировки идеи.
 4. [06-process/workflow.md](06-process/workflow.md): как мы работаем, стадии.
 5. [open-questions.md](open-questions.md): что ещё не решено.
+   [ideas.md](ideas.md): идеи и доработки интерфейса, которых нет в макетах (сначала макет, потом код).
 6. [glossary.md](glossary.md): термины (SKU, вариант, адаптер и т.д.).
 7. Корень репозитория: [PRODUCT.md](../PRODUCT.md) (контекст продукта для дизайна), [DESIGN.md](../DESIGN.md) (дизайн-система), [README.md](../README.md) (устройство кода и команды).
 

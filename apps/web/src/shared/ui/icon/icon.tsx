@@ -11,16 +11,17 @@ export type IconName =
   | 'sliders'
   | 'close'
   | 'share'
-  | 'cart';
+  | 'bag'
+  | 'chevron-down';
 
 // Контурные иконки 24×24, штрих берут от `currentColor`.
 const glyphs: Record<IconName, ReactNode> = {
   'chevron-right': <path d="M9 6l6 6-6 6" />,
-  cart: (
+  'chevron-down': <path d="M7 10l5 5 5-5" />,
+  bag: (
     <>
-      <path d="M3 4h2.5l2 11h10l2-8H7" />
-      <circle cx="9" cy="19.5" r="1.5" />
-      <circle cx="17" cy="19.5" r="1.5" />
+      <path d="M5 8h14l-1.2 11H6.2z" />
+      <path d="M9 8a3 3 0 0 1 6 0" />
     </>
   ),
   pin: (
@@ -60,7 +61,18 @@ const glyphs: Record<IconName, ReactNode> = {
   share: <path d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6" />,
 };
 
-export function Icon({ name, size = 20, className }: { name: IconName; size?: number; className?: string }) {
+export function Icon({
+  name,
+  size = 20,
+  strokeWidth = 2,
+  className,
+}: {
+  name: IconName;
+  size?: number;
+  /** Стрелки и крестики в макетах толще — 2.4. */
+  strokeWidth?: number;
+  className?: string;
+}) {
   return (
     <svg
       aria-hidden="true"
@@ -69,7 +81,7 @@ export function Icon({ name, size = 20, className }: { name: IconName; size?: nu
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}

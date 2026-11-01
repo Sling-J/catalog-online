@@ -1,5 +1,4 @@
 import type { StorefrontFacets } from '@catalog/contract';
-import { Chip } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
 
 import { formatPrice } from '@/shared/lib';
@@ -8,7 +7,7 @@ import { Icon } from '@/shared/ui';
 import { getActiveValueFilters, toggleValue } from '@/features/product-filters/lib';
 import type { FilterState } from '@/features/product-filters/types';
 
-/** Выбранные фильтры чипами с крестиком — снять можно, не открывая шторку. */
+/** Выбранные фильтры сиреневыми чипами с крестиком — снять можно, не открывая шторку. Только на телефоне. */
 export function ActiveFilters({
   all,
   state,
@@ -32,7 +31,7 @@ export function ActiveFilters({
         : t`до ${formatPrice(priceMax ?? 0)}`;
 
   return (
-    <div className="flex gap-2 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="flex gap-2 overflow-x-auto px-4 pb-3 lg:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {values.map((filter) => (
         <RemovableChip
           key={filter.id}
@@ -54,9 +53,14 @@ export function ActiveFilters({
 
 function RemovableChip({ label, removeLabel, onRemove }: { label: string; removeLabel: string; onRemove: () => void }) {
   return (
-    <Chip selected onClick={onRemove} aria-label={removeLabel} className="h-8 gap-1.5 pr-2.5 pl-3.5 text-[13px]">
+    <button
+      type="button"
+      onClick={onRemove}
+      aria-label={removeLabel}
+      className="inline-flex h-8 shrink-0 items-center gap-2 rounded-pill bg-[#e9e5ff] px-3 text-[13px] font-semibold text-iris focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris"
+    >
       {label}
-      <Icon name="close" size={14} />
-    </Chip>
+      <Icon name="close" size={12} strokeWidth={3} />
+    </button>
   );
 }

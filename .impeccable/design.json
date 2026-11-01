@@ -5,7 +5,7 @@
   "extensions": {
     "colorMeta": {
       "lilac-field": { "role": "neutral", "displayName": "Сиреневое поле", "tonalRamp": ["#2A2259", "#3F3584", "#5848B5", "#7564DE", "#9A88F5", "#C9BBFF", "#E4DCFF", "#F5F1FF"] },
-      "ink-night": { "role": "primary", "displayName": "Чернила-ночь", "tonalRamp": ["#0B0A26", "#1D1B4B", "#2E2B69", "#3A3672", "#4A4580", "#6B6694", "#9A95B8", "#D6D3E8"] },
+      "ink-night": { "role": "primary", "displayName": "Чернила-ночь", "tonalRamp": ["#0B0A26", "#17133D", "#2E2B69", "#3A3672", "#4A4580", "#6B6694", "#9A95B8", "#D6D3E8"] },
       "sun": { "role": "primary", "displayName": "Солнечный жёлтый", "tonalRamp": ["#4A3A00", "#7A5E00", "#A37E00", "#C79A00", "#E8B800", "#FFD23F", "#FFE48A", "#FFF4CC"] },
       "mint": { "role": "secondary", "displayName": "Мята", "tonalRamp": ["#0B3A28", "#105C3F", "#157A52", "#1E9E6A", "#26B985", "#5EE6B0", "#A8F3D4", "#E1FBF0"] },
       "coral": { "role": "tertiary", "displayName": "Коралл", "tonalRamp": ["#2A0A00", "#5C1C08", "#9A3418", "#D9532F", "#F06F49", "#FF8F6B", "#FFC1AC", "#FFEAE2"] },

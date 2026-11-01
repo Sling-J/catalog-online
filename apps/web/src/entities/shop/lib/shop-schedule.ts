@@ -9,9 +9,9 @@ const sameHours = (a: DayHours, b: DayHours) => a === b || (!!a && !!b && a.open
 
 /**
  * Дни подряд с одинаковым временем сворачиваются в одну строку («Пн–Пт»);
- * сегодняшний день всегда отдельной строкой, чтобы его можно было выделить.
+ * сегодняшний день всегда отдельной строкой, чтобы его можно было выделить; без `today` дни не выделяются.
  */
-export function groupSchedule(schedule: Schedule, today: WeekdayKey): ScheduleGroup[] {
+export function groupSchedule(schedule: Schedule, today?: WeekdayKey): ScheduleGroup[] {
   const groups: ScheduleGroup[] = [];
   for (const day of WEEKDAYS) {
     const hours = schedule[day];

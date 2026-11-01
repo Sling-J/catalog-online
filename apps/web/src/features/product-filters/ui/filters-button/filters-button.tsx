@@ -14,7 +14,7 @@ export function FiltersButton({ count, onClick }: { count: number; onClick: () =
     >
       <Icon name="sliders" />
       {count > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-pill bg-[#3b2fd9] px-1 text-[11px] font-bold text-white">
+        <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-pill bg-iris px-[5px] text-[11px] font-bold text-white">
           {count}
         </span>
       )}

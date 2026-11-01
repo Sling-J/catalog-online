@@ -15,14 +15,11 @@ import { formatPrice } from '@/shared/lib';
 export function AddToCartButton({
   product,
   variant,
-  missingAttribute,
   onOpenCart,
 }: {
   product: StorefrontProduct;
   /** Выбранный вариант; `undefined`, пока выбрано не всё. */
   variant: StorefrontProduct['variants'][number] | undefined;
-  /** Название свойства, которое ещё не выбрано, — для подсказки на неактивной кнопке. */
-  missingAttribute: string | undefined;
   onOpenCart: () => void;
 }) {
   const items = useUnit($items);
@@ -30,27 +27,27 @@ export function AddToCartButton({
 
   if (!variant) {
     return (
-      <Button block disabled>
-        {missingAttribute ? <Trans>Выберите {missingAttribute.toLowerCase()}</Trans> : <Trans>Нет в наличии</Trans>}
+      <Button block size="cta" disabled>
+        <Trans>Выберите размер</Trans>
       </Button>
     );
   }
   if (!isInStock(variant)) {
     return (
-      <Button block disabled>
+      <Button block size="cta" disabled>
         <Trans>Нет в наличии</Trans>
       </Button>
     );
   }
   if (items.some((item) => item.variantId === variant.id)) {
     return (
-      <Button block variant="confirm" onClick={onOpenCart}>
+      <Button block size="cta" variant="confirm" onClick={onOpenCart}>
         <Trans>В корзине · открыть</Trans>
       </Button>
     );
   }
   return (
-    <Button block variant="primary" onClick={() => add(buildCartItem(product, variant))}>
+    <Button block size="cta" variant="primary" onClick={() => add(buildCartItem(product, variant))}>
       <Trans>В корзину · {formatPrice(variant.price)}</Trans>
     </Button>
   );

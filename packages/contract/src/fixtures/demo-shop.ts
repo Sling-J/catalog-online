@@ -47,6 +47,9 @@ export const demoShop: StorefrontShop = {
 
 export const LOW_STOCK = 2;
 
+/** Поддомен демо-магазина со скрытым каталогом: витрина отвечает 410 и показывает «Каталог сейчас обновляется». */
+export const HIDDEN_DEMO_SUBDOMAIN = 'skrytyj-magazin';
+
 type CategoryKey = 'outer' | 'dress' | 'tops' | 'shoes' | 'acc';
 
 const categoryDefs: Record<CategoryKey, { id: string; name: string }> = {
@@ -204,8 +207,12 @@ const rows: Row[] = [
 
 const shortIdOf = (key: number): string => `d${key.toString(36).padStart(4, '0')}`;
 
+/** Ключ товара, который раскупили целиком: по старой ссылке открывается экран «Закончился». */
+const SOLD_OUT_KEY = 11;
+
 /** Остаток варианта: часть размеров закончилась, часть — «мало». */
 const stockOf = (rowKey: number, index: number): number => {
+  if (rowKey === SOLD_OUT_KEY) return 0;
   if ((rowKey + index) % 4 === 0) return 0;
   if ((rowKey + index) % 5 === 1) return 1;
   return 3 + ((rowKey * 7 + index) % 6);

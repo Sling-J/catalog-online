@@ -3,13 +3,14 @@ import { Plural, Trans } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
 
 import { formatPrice } from '@/shared/lib';
-import { Icon } from '@/shared/ui';
+import { ClayBubble } from '@/shared/ui';
 
 import type { SentOrder } from '@/features/order-via-whatsapp/types';
 
 /**
  * «Отправлено ✓»: заявка ушла в WhatsApp, номера заказа нет — заказы не храним (D14).
- * Можно открыть WhatsApp ещё раз; на компьютере — скопировать текст, чтобы отправить его с телефона (S11).
+ * Телефон: кнопка «Вернуться в каталог» и ссылка «Открыть WhatsApp ещё раз» под ней; компьютер: кнопки в ряд
+ * и «Скопировать текст», чтобы отправить заказ с телефона (S11).
  */
 export function OrderSent({ order, onClose }: { order: SentOrder; onClose: () => void }) {
   const [copied, setCopied] = useState(false);
@@ -29,50 +30,63 @@ export function OrderSent({ order, onClose }: { order: SentOrder; onClose: () =>
     }
   };
 
+  const count = <Plural value={order.count} one="# товар" few="# товара" many="# товаров" other="# товара" />;
+  const thumbs = order.photos.slice(0, 4).map((photo, index) => (
+    <li key={index} className="size-[52px] overflow-hidden rounded-[14px] bg-chip-haze lg:size-12 lg:rounded-xl">
+      {photo && <img src={photo} alt="" className="size-full object-cover" />}
+    </li>
+  ));
+
   return (
-    <div className="py-2 text-center">
-      <div className="inline-block -rotate-3 rounded-[26px] bg-mint px-[22px] py-3.5 text-[22px] font-extrabold text-mint-ink shadow-[0_6px_0_var(--color-mint-underside)]">
+    <div className="pt-2 text-center lg:pt-0">
+      <ClayBubble>
         <Trans>Отправлено ✓</Trans>
-      </div>
-      <p className="mt-[22px] text-[20px] font-extrabold">
+      </ClayBubble>
+      <p className="mt-6 text-[21px] font-extrabold tracking-[-0.01em] lg:mt-[26px] lg:text-[28px] lg:tracking-[-0.02em]">
         <Trans>Заявка ушла в WhatsApp</Trans>
       </p>
-      <p className="mt-1.5 text-[15px] leading-normal text-ink-soft">
-        <Trans>Магазин проверит наличие и ответит вам в чате</Trans>
+      <p className="mx-auto mt-2 max-w-[300px] text-[15px] leading-normal text-ink-soft lg:mt-2.5 lg:max-w-[460px] lg:text-[16px] lg:leading-[1.55]">
+        <Trans>Магазин проверит наличие и ответит вам в чате.</Trans>{' '}
+        <span className="lg:hidden">
+          <Trans>Если WhatsApp не открылся — нажмите «Открыть ещё раз».</Trans>
+        </span>
+        <span className="hidden lg:inline">
+          <Trans>Если WhatsApp не открылся — откройте ещё раз или скопируйте текст заказа и отправьте сами.</Trans>
+        </span>
       </p>
 
-      <div className="mx-auto mt-4 flex max-w-[320px] items-center justify-center gap-2.5 rounded-row bg-[#f1effa] px-3.5 py-2.5">
-        <ul className="flex -space-x-2">
-          {order.photos.slice(0, 4).map((photo, index) => (
-            <li key={index} className="size-9 overflow-hidden rounded-full bg-chip-haze ring-2 ring-[#f1effa]">
-              {photo && <img src={photo} alt="" className="size-full object-cover" />}
-            </li>
-          ))}
-        </ul>
-        <p className="text-[14px] text-ink-soft">
-          <Plural value={order.count} one="# товар" few="# товара" many="# товаров" other="# товара" /> ·{' '}
-          <span className="font-bold text-ink-night tabular-nums">{formatPrice(order.total)}</span>
-        </p>
+      {/* телефон: белая карточка, сверху число и сумма, ниже миниатюры */}
+      <div className="mx-auto mt-[26px] max-w-[320px] rounded-row border border-[#eceaf5] bg-white p-4 text-left lg:hidden">
+        <div className="flex justify-between text-[14px] text-ink-quiet">
+          <span>{count}</span>
+          <span className="text-[16px] font-extrabold text-ink-night tabular-nums">{formatPrice(order.total)}</span>
+        </div>
+        <ul className="mt-3 flex gap-2">{thumbs}</ul>
+      </div>
+      {/* компьютер: одна строка — миниатюры, число, сумма */}
+      <div className="mx-auto mt-[22px] hidden max-w-[420px] items-center gap-3 rounded-[20px] bg-[#f6f5fb] px-4 py-3.5 text-left lg:flex">
+        <ul className="flex gap-3">{thumbs}</ul>
+        <span className="flex-1 text-[14px] text-ink-quiet">{count}</span>
+        <span className="text-[17px] font-extrabold tabular-nums">{formatPrice(order.total)}</span>
       </div>
 
-      <div className="mt-5 flex flex-col gap-2.5">
-        <Button block onClick={onClose}>
+      <div className="mt-[22px] flex flex-col items-center gap-1.5 lg:mt-[26px] lg:flex-row lg:justify-center lg:gap-2.5">
+        <Button size="state" onClick={onClose}>
           <Trans>Вернуться в каталог</Trans>
         </Button>
         <a
           href={order.url}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex h-11 items-center justify-center rounded-pill bg-white text-[15px] font-semibold text-ink-night ring-[1.5px] ring-inset ring-[#dad6ec]"
+          className="inline-flex h-11 items-center justify-center rounded-pill px-4 text-[15px] font-semibold text-iris lg:h-[52px] lg:bg-chip-haze lg:px-[22px] lg:text-ink-night"
         >
           <Trans>Открыть WhatsApp ещё раз</Trans>
         </a>
         <button
           type="button"
           onClick={copy}
-          className="hidden h-11 items-center justify-center gap-1.5 rounded-pill text-[15px] font-semibold text-ink-quiet lg:inline-flex"
+          className="hidden h-[52px] items-center justify-center rounded-pill bg-chip-haze px-[22px] text-[15px] font-semibold text-ink-night lg:inline-flex"
         >
-          <Icon name={copied ? 'check' : 'copy'} size={16} />
           {copied ? <Trans>Скопировано</Trans> : <Trans>Скопировать текст</Trans>}
         </button>
       </div>

@@ -4,6 +4,7 @@ import { useUnit } from 'effector-react';
 
 import { cartOpened } from '@/entities/cart';
 import {
+  isInStock,
   productPath,
   productQueryOptions,
   productsQueryOptions,
@@ -56,6 +57,17 @@ export function ProductPage({
   const prev = neighbour(-1);
   const next = neighbour(1);
 
+  // под закончившимся товаром — «Ещё в этой категории» (S3)
+  const soldOut = !product.variants.some(isInStock);
+  const categoryId = product.category?.id;
+  const { data: sameCategory } = useInfiniteQuery({
+    ...productsQueryOptions(subdomain, { categoryId }),
+    enabled: soldOut && !!categoryId,
+  });
+  const related = (sameCategory?.pages.flatMap((page) => page.items) ?? [])
+    .filter((card) => card.shortId !== shortId && card.stockLevel !== 'out')
+    .slice(0, 6);
+
   return (
     <ProductView
       product={product}
@@ -64,6 +76,7 @@ export function ProductPage({
       onOpenCart={() => openCart(subdomain)}
       onPrev={prev ? () => goTo(prev) : undefined}
       onNext={next ? () => goTo(next) : undefined}
+      related={related}
     />
   );
 }

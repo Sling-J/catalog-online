@@ -1,3 +1,3 @@
-export { countActiveFilters } from './lib';
+export { countActiveFilters, getActiveValueFilters } from './lib';
 export type { FilterState } from './types';
-export { ActiveFilters, FiltersButton, FiltersSheet } from './ui';
+export { ActiveFilters, FiltersButton, FiltersPanel, FiltersSheet, FiltersToggle } from './ui';

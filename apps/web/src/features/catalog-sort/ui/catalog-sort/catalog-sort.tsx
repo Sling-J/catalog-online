@@ -1,3 +1,4 @@
+import { cx } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
 
 import type { ProductSort } from '@/entities/product';
@@ -5,16 +6,32 @@ import type { ProductSort } from '@/entities/product';
 const SORTS: ProductSort[] = ['new', 'price_asc', 'price_desc'];
 
 /** Сортировка сетки: новые, дешевле, дороже. Выбор — нативный список, на телефоне это системное окно выбора. */
-export function CatalogSort({ value, onChange }: { value: ProductSort; onChange: (sort: ProductSort) => void }) {
+export function CatalogSort({
+  value,
+  onChange,
+  pill,
+}: {
+  value: ProductSort;
+  onChange: (sort: ProductSort) => void;
+  /** Рамка-«пилюля» — в строке категорий на компьютере; без неё — текст над сеткой на телефоне. */
+  pill?: boolean;
+}) {
   const { t } = useLingui();
   const labels: Record<ProductSort, string> = {
-    new: t`Новые`,
-    price_asc: t`Дешевле`,
-    price_desc: t`Дороже`,
+    new: t`Сначала новые`,
+    price_asc: t`Сначала дешевле`,
+    price_desc: t`Сначала дороже`,
   };
 
   return (
-    <label className="relative flex items-center gap-1 py-1.5 text-[13px] font-semibold">
+    <label
+      className={cx(
+        'relative flex items-center font-semibold',
+        pill
+          ? 'h-10 gap-1.5 rounded-pill border-[1.5px] border-[#dad6ec] bg-white px-4 text-[14px]'
+          : 'gap-1 py-1.5 text-[13px]',
+      )}
+    >
       <span>{labels[value]}</span>
       <svg
         aria-hidden="true"

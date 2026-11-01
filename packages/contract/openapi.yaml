@@ -58,10 +58,10 @@ paths:
               schema: { $ref: '#/components/schemas/StorefrontShop' }
         '404': { $ref: '#/components/responses/NotFound' }
         '410':
-          description: Каталог скрыт или магазин заблокирован — витрина показывает заглушку
+          description: Каталог скрыт или магазин заблокирован — витрина показывает заглушку с контактами из тела ответа
           content:
             application/problem+json:
-              schema: { $ref: '#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/StorefrontShopGone' }
 
   /v1/storefront/{subdomain}/categories:
     get:
@@ -1472,6 +1472,25 @@ components:
         timezone: { type: string, example: Asia/Almaty }
         stockDisplay: { $ref: '#/components/schemas/StockDisplay' }
         isPreview: { type: boolean, description: 'Открыто по preview-токену — витрина показывает плашку «Черновик»' }
+    StorefrontShopGone:
+      description: |
+        Ответ 410: каталог скрыт (`shop_hidden`) или магазин заблокирован (`shop_blocked`). Кроме Problem — контакты
+        для экрана «Каталог сейчас обновляется»: логотип, WhatsApp, адрес и график
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          required: [shop]
+          properties:
+            shop:
+              type: object
+              required: [name, logo, whatsapp, schedule, timezone]
+              properties:
+                name: { type: string }
+                logo: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+                address: { type: [string, 'null'] }
+                whatsapp: { type: string, description: 'E.164, +77000000000' }
+                schedule: { $ref: '#/components/schemas/Schedule' }
+                timezone: { type: string, example: Asia/Almaty }
     StorefrontCategory:
       type: object
       required: [id, name, productCount, children]

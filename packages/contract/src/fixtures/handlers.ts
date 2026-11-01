@@ -12,8 +12,8 @@ import {
   handleTrackStorefrontEvent,
   type RequestHandlerOptions,
 } from '../gen/msw.gen.js';
-import type { Problem } from '../gen/types.gen.js';
-import { createDemoShopData, demoShop, LOW_STOCK } from './demo-shop.js';
+import type { Problem, StorefrontShopGone } from '../gen/types.gen.js';
+import { createDemoShopData, demoShop, HIDDEN_DEMO_SUBDOMAIN, LOW_STOCK } from './demo-shop.js';
 import { computeFacets, readFilters, selectCards } from './filtering.js';
 
 export type DemoHandlersOptions = RequestHandlerOptions & {
@@ -35,11 +35,26 @@ const notFound = (): Response =>
 
 const isDemo = (subdomain: string | readonly string[] | undefined): boolean => subdomain === demoShop.subdomain;
 
+// Скрытый магазин: 410 с контактами для заглушки (то же лицо, что у демо-магазина)
+const gone = (): Response => {
+  const { name, logo, address, whatsapp, schedule, timezone } = demoShop;
+  return HttpResponse.json<StorefrontShopGone>(
+    {
+      type: 'about:blank',
+      title: 'Gone',
+      status: 410,
+      code: 'shop_hidden',
+      shop: { name, logo, address, whatsapp, schedule, timezone },
+    },
+    { status: 410, headers: { 'Content-Type': 'application/problem+json' } },
+  );
+};
+
 export const demoStorefrontHandlers = ({ assetBase, ...options }: DemoHandlersOptions = {}): HttpHandler[] => [
-  handleGetStorefrontShop(
-    ({ params }) => (isDemo(params.subdomain) ? HttpResponse.json(demoShop) : notFound()),
-    options,
-  ),
+  handleGetStorefrontShop(({ params }) => {
+    if (params.subdomain === HIDDEN_DEMO_SUBDOMAIN) return gone();
+    return isDemo(params.subdomain) ? HttpResponse.json(demoShop) : notFound();
+  }, options),
   handleListStorefrontCategories(
     ({ params, request }) =>
       isDemo(params.subdomain) ? HttpResponse.json(dataFor(request, assetBase).categories) : notFound(),

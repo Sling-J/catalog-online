@@ -6,10 +6,20 @@ import { useState } from 'react';
  * Галерея: фото листаются свайпом (прокрутка с «прилипанием»), точки показывают текущее.
  * На телефоне 4:5 на всю ширину, на компьютере заполняет всю высоту окна товара.
  */
-export function ProductGallery({ photos, name }: { photos: Image[]; name: string }) {
+export function ProductGallery({
+  photos,
+  name,
+  short,
+}: {
+  photos: Image[];
+  name: string;
+  /** Ниже обычного (380 px на телефоне) — у закончившегося товара, чтобы под ним поместилась подборка. */
+  short?: boolean;
+}) {
+  const ratio = short ? 'h-[380px] lg:h-full' : 'aspect-[4/5] lg:aspect-auto lg:h-full';
   const [index, setIndex] = useState(0);
 
-  if (photos.length === 0) return <div aria-hidden="true" className="aspect-[4/5] w-full bg-chip-haze lg:h-full" />;
+  if (photos.length === 0) return <div aria-hidden="true" className={cx('w-full bg-chip-haze', ratio)} />;
 
   return (
     <div className="relative lg:h-full">
@@ -31,7 +41,7 @@ export function ProductGallery({ photos, name }: { photos: Image[]; name: string
               alt={photos.length > 1 ? `${name} (${position + 1}/${photos.length})` : name}
               loading={position === 0 ? 'eager' : 'lazy'}
               fetchPriority={position === 0 ? 'high' : 'auto'}
-              className="block aspect-[4/5] w-full bg-chip-haze object-cover lg:aspect-auto lg:h-full"
+              className={cx('block w-full bg-chip-haze object-cover', ratio)}
             />
           </li>
         ))}
@@ -45,8 +55,8 @@ export function ProductGallery({ photos, name }: { photos: Image[]; name: string
             <span
               key={photo.sizes[1280]}
               className={cx(
-                'h-1.5 rounded-pill bg-white shadow-sm transition-all',
-                position === index ? 'w-4' : 'w-1.5 opacity-70',
+                'h-[7px] rounded-pill shadow-[0_1px_3px_rgb(0_0_0/0.2)] transition-all',
+                position === index ? 'w-[18px] bg-white' : 'w-[7px] bg-white/60',
               )}
             />
           ))}

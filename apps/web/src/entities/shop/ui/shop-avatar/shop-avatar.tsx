@@ -3,7 +3,7 @@ import { cx } from '@catalog/ui';
 
 import { getInitials } from '@/entities/shop/lib';
 
-const sizes = { md: 'size-11 text-[15px]', lg: 'size-14 text-[19px]' } as const;
+const sizes = { md: 'size-11 text-[15px]', lg: 'size-14 text-[19px]', xl: 'size-[72px] text-[24px]' } as const;
 
 /** Логотип магазина или, если его нет, буквы названия на градиенте. */
 export function ShopAvatar({

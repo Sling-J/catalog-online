@@ -120,16 +120,16 @@ ui/
 - **Фильтры, категории, сортировка** — search params роутера, не Effector (ADR 0001, FR-V4). В срезе `product-filters` лежат разбор и сборка параметров (`lib/`) и UI.
 - **SSR:** глобальных сторов на сервере нет — либо только клиент, либо `fork`-scope на запрос (ADR 0001).
 
-## 8. Разметка слоёв витрины (по состоянию на T-109)
+## 8. Разметка слоёв витрины (по состоянию на T-110)
 
 Ориентир, не жёсткая схема; новые срезы добавляем по ходу работы и обновляем таблицу.
 
 | Слой | Срезы |
 |---|---|
 | `entities` | `shop` (магазин, «открыто до…», график, ссылки WhatsApp/2ГИС), `category` (дерево, путь до категории), `product` (плитка в сетке, цена, выбор варианта, адрес товара, разбор адреса каталога), `cart` (позиции, хранение на устройстве, перепроверка) |
-| `features` | `product-search`, `product-filters`, `catalog-sort`, `add-to-cart`, `order-via-whatsapp` |
+| `features` | `product-search`, `product-filters`, `catalog-sort`, `add-to-cart`, `order-via-whatsapp`, `ask-in-whatsapp` (ссылка на чат с готовым текстом, S9) |
 | `widgets` | `shop-header`, `about-shop-sheet`, `category-bar`, `catalog-grid`, `product-view`, `cart-pill`, `cart-sheet` |
-| `pages` | `catalog`, `product`, `landing`, `not-found` |
+| `pages` | `catalog`, `product`, `landing`, `not-found`, `error`, `shop-unavailable` |
 
 ## 9. Проверка правил
 

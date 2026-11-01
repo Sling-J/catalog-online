@@ -1,1 +1,1 @@
-export { CatalogGrid } from './ui';
+export { CatalogGrid, GridSkeleton } from './ui';

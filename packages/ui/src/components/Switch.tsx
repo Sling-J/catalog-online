@@ -18,7 +18,7 @@ export function Switch({ checked, onCheckedChange, label, className, ...rest }: 
       onClick={() => onCheckedChange(!checked)}
       className={cx(
         'inline-flex w-full items-center justify-between gap-3 font-sans text-label text-ink-night',
-        'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-violet',
+        'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris',
         className,
       )}
       {...rest}

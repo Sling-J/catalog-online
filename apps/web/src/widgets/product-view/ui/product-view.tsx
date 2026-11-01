@@ -1,10 +1,11 @@
-import type { StorefrontProduct, StorefrontShop } from '@catalog/contract';
-import { StockPill } from '@catalog/ui';
+import type { StorefrontProduct, StorefrontProductCard, StorefrontShop } from '@catalog/contract';
+import { cx } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
 
-import { findVariant, getPriceRange, type Selection } from '@/entities/product';
+import { findVariant, getPriceRange, isInStock, ProductTile, type Selection } from '@/entities/product';
 import { AddToCartButton } from '@/features/add-to-cart';
+import { AskInWhatsApp } from '@/features/ask-in-whatsapp';
 import { useIsDesktop } from '@/shared/hooks';
 import { formatPrice } from '@/shared/lib';
 import { Icon } from '@/shared/ui';
@@ -14,10 +15,10 @@ import { ShareButton } from './share-button';
 import { VariantPicker } from './variant-picker';
 
 const roundButton =
-  'flex size-11 items-center justify-center rounded-full bg-white/90 text-ink-night shadow-[0_4px_14px_rgb(23_19_61/0.12)] backdrop-blur-md';
+  'flex size-11 items-center justify-center rounded-full bg-white/88 text-ink-night shadow-[0_4px_14px_rgb(23_19_61/0.12)] backdrop-blur-[10px]';
 
 const arrowButton =
-  'fixed top-1/2 z-40 hidden size-[52px] -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-ink-night shadow-[0_8px_24px_rgb(23_19_61/0.25)] lg:flex';
+  'fixed top-1/2 z-40 hidden size-[52px] -translate-y-1/2 items-center justify-center rounded-full bg-white/92 text-ink-night lg:flex';
 
 /**
  * Карточка товара. Телефон: отдельный экран с кнопкой «Назад», кнопка закреплена внизу (S6).
@@ -32,9 +33,12 @@ export function ProductView({
   onOpenCart,
   onPrev,
   onNext,
+  related = [],
 }: {
   product: StorefrontProduct;
   shop: StorefrontShop;
+  /** Другие товары категории — показываются под закончившимся товаром («Ещё в этой категории»). */
+  related?: StorefrontProductCard[];
   onBack: () => void;
   onOpenCart: () => void;
   /** Соседние товары каталога; `undefined`, если соседа нет или каталог не загружен. */
@@ -45,8 +49,9 @@ export function ProductView({
   const desktop = useIsDesktop();
   const [selection, setSelection] = useState<Selection>({});
   const variant = findVariant(product, selection);
-  const missingAttribute = product.attributes.find((attribute) => !selection[attribute.id])?.name;
   const range = getPriceRange(product);
+  // все варианты закончились — купить нельзя, можно спросить о поступлении (старая ссылка на товар)
+  const soldOut = !product.variants.some(isInStock);
 
   // окно поверх каталога: страница под ним не прокручивается, закрывается по Esc, листается стрелками
   useEffect(() => {
@@ -71,6 +76,19 @@ export function ProductView({
       ? formatPrice(range.min)
       : t`от ${formatPrice(range.min)}`;
 
+  // наличие выбранного варианта — строкой текста под размерами (макет V6)
+  const stock = !variant
+    ? { text: t`Выберите размер, чтобы увидеть наличие`, tone: 'text-ink-quiet' }
+    : variant.stock.level === 'out'
+      ? { text: t`Нет в наличии`, tone: 'text-stock-out' }
+      : variant.stock.level === 'low'
+        ? {
+            text:
+              typeof variant.stock.quantity === 'number' ? t`Осталось ${variant.stock.quantity} шт.` : t`Осталось мало`,
+            tone: 'text-stock-low',
+          }
+        : { text: t`В наличии`, tone: 'text-stock-in' };
+
   return (
     <div
       onClick={(event) => {
@@ -82,62 +100,118 @@ export function ProductView({
         role={desktop ? 'dialog' : undefined}
         aria-modal={desktop || undefined}
         aria-label={desktop ? product.name : undefined}
-        className="lg:relative lg:flex lg:h-[min(720px,calc(100dvh-64px))] lg:w-[min(1040px,100%)] lg:overflow-hidden lg:rounded-panel lg:bg-white lg:shadow-device"
+        className="lg:relative lg:flex lg:h-[min(720px,calc(100dvh-64px))] lg:w-[min(1040px,100%)] lg:overflow-hidden lg:rounded-panel lg:bg-white lg:shadow-[0_40px_100px_rgb(11_10_38/0.35)]"
       >
-        <div className="relative lg:w-[55%] lg:flex-none">
-          <ProductGallery photos={product.photos} name={product.name} />
+        <div className="relative lg:w-[576px] lg:flex-none">
+          {/* закончившийся товар: серое фото с плашкой «Закончился» */}
+          <div className={cx('lg:h-full', soldOut && 'grayscale-[.85] brightness-105')}>
+            <ProductGallery photos={product.photos} name={product.name} short={soldOut} />
+          </div>
+          {soldOut && (
+            <span className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[4deg] rounded-pill bg-ink-night px-[18px] py-2.5 text-[16px] font-extrabold text-white lg:px-[22px] lg:py-3 lg:text-[20px]">
+              <Trans>Закончился</Trans>
+            </span>
+          )}
           <button
             type="button"
             onClick={onBack}
             aria-label={t`Назад к каталогу`}
             className={`${roundButton} absolute top-3.5 left-3.5 lg:hidden`}
           >
-            <Icon name="chevron-left" />
+            <Icon name="chevron-left" strokeWidth={2.4} />
           </button>
-          <ShareButton title={product.name} className={`${roundButton} absolute top-3.5 right-3.5`} />
+          {/* на компьютере и у закончившегося товара «Поделиться» в макете нет */}
+          {!soldOut && (
+            <ShareButton title={product.name} className={`${roundButton} absolute top-3.5 right-3.5 lg:hidden`} />
+          )}
         </div>
 
         <div className="lg:flex lg:min-w-0 lg:flex-1 lg:flex-col lg:overflow-y-auto">
-          <div className="px-4 pt-[18px] lg:flex-1 lg:px-7 lg:pt-8 lg:pr-[72px]">
-            {product.category && <p className="text-caption text-ink-quiet">{product.category.name}</p>}
-            <h1 className="mt-1 text-[24px] leading-[1.15] font-extrabold tracking-[-0.02em]">{product.name}</h1>
-            <p className="mt-2 text-[26px] font-extrabold tabular-nums">{price}</p>
-
-            <VariantPicker product={product} selection={selection} onChange={setSelection} />
-
-            <div className="mt-3 min-h-[26px] text-[14px] font-semibold">
-              {variant ? (
-                <StockPill level={variant.stock.level} quantity={variant.stock.quantity} />
-              ) : missingAttribute ? (
-                <span className="text-ink-quiet">
-                  <Trans>Выберите {missingAttribute.toLowerCase()}, чтобы увидеть наличие</Trans>
-                </span>
-              ) : null}
-            </div>
-
-            {product.description && (
-              <p className="mt-4 text-[15px] leading-[1.55] text-ink-soft">{product.description}</p>
+          <div className="px-4 pt-[18px] lg:flex-1 lg:px-8 lg:pt-[30px]">
+            {product.category && <p className="text-[13px] text-ink-quiet lg:text-[14px]">{product.category.name}</p>}
+            {soldOut ? (
+              // телефон: название и серая цена в одну строку; компьютер: столбиком, как у обычного товара
+              <div className="mt-1 flex items-baseline justify-between gap-3 lg:mt-1.5 lg:mr-14 lg:block">
+                <h1 className="text-[22px] leading-[1.15] font-extrabold tracking-[-0.02em] lg:text-[30px] lg:leading-[1.1] lg:tracking-[-0.03em]">
+                  {product.name}
+                </h1>
+                <p className="flex-none text-[20px] font-extrabold text-stock-out tabular-nums lg:mt-2.5 lg:text-[28px]">
+                  {price}
+                </p>
+              </div>
+            ) : (
+              <>
+                <h1 className="mt-1 text-[24px] leading-[1.15] font-extrabold tracking-[-0.02em] lg:mt-1.5 lg:mr-14 lg:text-[30px] lg:leading-[1.1] lg:tracking-[-0.03em]">
+                  {product.name}
+                </h1>
+                <p className="mt-2 text-[26px] font-extrabold tabular-nums lg:mt-2.5 lg:text-[28px]">{price}</p>
+              </>
             )}
 
-            {shop.address && (
-              <p className="mt-[18px] rounded-thumb bg-[#f1effa] px-4 py-3.5 text-[14px] leading-normal text-ink-soft">
-                <Trans>
-                  Можно примерить в магазине: {shop.address}. После заказа магазин подтвердит наличие в WhatsApp.
-                </Trans>
-              </p>
+            {soldOut ? (
+              <>
+                <p className="mt-2.5 text-[15px] leading-normal text-ink-soft lg:mt-4 lg:leading-[1.55]">
+                  <Trans>Этот товар раскупили. Магазин может привезти ещё — спросите о поступлении</Trans>
+                  <span className="hidden lg:inline">
+                    <Trans>, название товара уже будет в сообщении</Trans>
+                  </span>
+                  .
+                </p>
+                <div className="mt-3.5 lg:mt-[18px]">
+                  <AskInWhatsApp
+                    block
+                    phone={shop.whatsapp}
+                    message={t`Здравствуйте! Подскажите, будет ли поступление: ${product.name}?`}
+                  >
+                    <Trans>Спросить о поступлении</Trans>
+                  </AskInWhatsApp>
+                </div>
+                {related.length > 0 && (
+                  <section className="mt-6 lg:mt-[30px]">
+                    <h2 className="text-[15px] font-bold">
+                      <Trans>Ещё в этой категории</Trans>
+                    </h2>
+                    {/* телефон: до шести плиток во всю ширину; компьютер: три в ряд внутри окна */}
+                    <ul className="-mx-4 mt-2.5 grid grid-cols-3 gap-0.5 lg:mx-0 lg:mt-3 lg:gap-2">
+                      {related.slice(0, desktop ? 3 : 6).map((card) => (
+                        <li key={card.id}>
+                          <ProductTile card={card} />
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              </>
+            ) : (
+              <>
+                <VariantPicker product={product} selection={selection} onChange={setSelection} />
+
+                <p className={cx('mt-3 text-[14px] font-semibold', stock.tone)}>{stock.text}</p>
+
+                {product.description && (
+                  <p className="mt-4 text-[15px] leading-[1.55] text-ink-soft">{product.description}</p>
+                )}
+
+                {shop.address && (
+                  <p className="mt-[18px] rounded-thumb bg-[#f1effa] px-4 py-3.5 text-[14px] leading-normal text-ink-soft lg:mt-4">
+                    <Trans>Можно примерить в магазине: {shop.address}.</Trans>
+                    <span className="lg:hidden">
+                      {' '}
+                      <Trans>После заказа магазин подтвердит наличие в WhatsApp.</Trans>
+                    </span>
+                  </p>
+                )}
+              </>
             )}
           </div>
 
-          <div className="fixed inset-x-0 bottom-0 z-10 bg-linear-to-t from-paper from-70% to-transparent px-4 pt-3 pb-[22px] lg:sticky lg:inset-x-auto lg:bottom-0 lg:bg-none lg:bg-white lg:px-7 lg:pb-7">
-            <div className="mx-auto max-w-[640px] lg:max-w-none">
-              <AddToCartButton
-                product={product}
-                variant={variant}
-                missingAttribute={missingAttribute}
-                onOpenCart={onOpenCart}
-              />
+          {!soldOut && (
+            <div className="fixed inset-x-0 bottom-0 z-10 bg-linear-to-t from-paper from-70% to-transparent px-4 pt-3 pb-[22px] lg:sticky lg:inset-x-auto lg:bottom-0 lg:bg-none lg:bg-white lg:px-8 lg:pt-[18px] lg:pb-7">
+              <div className="mx-auto max-w-[640px] lg:max-w-none">
+                <AddToCartButton product={product} variant={variant} onOpenCart={onOpenCart} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <button
@@ -146,7 +220,7 @@ export function ProductView({
           aria-label={t`Закрыть`}
           className="absolute top-5 right-5 hidden size-11 items-center justify-center rounded-full bg-[#f1effa] text-ink-night lg:flex"
         >
-          <Icon name="close" />
+          <Icon name="close" size={18} strokeWidth={2.4} />
         </button>
       </div>
 
@@ -155,9 +229,9 @@ export function ProductView({
           type="button"
           onClick={onPrev}
           aria-label={t`Предыдущий товар`}
-          className={`${arrowButton} left-[max(16px,calc(50%-596px))]`}
+          className={`${arrowButton} left-[max(16px,calc(50%-644px))]`}
         >
-          <Icon name="chevron-left" size={24} />
+          <Icon name="chevron-left" size={22} strokeWidth={2.4} />
         </button>
       )}
       {onNext && (
@@ -165,9 +239,9 @@ export function ProductView({
           type="button"
           onClick={onNext}
           aria-label={t`Следующий товар`}
-          className={`${arrowButton} right-[max(16px,calc(50%-596px))]`}
+          className={`${arrowButton} right-[max(16px,calc(50%-644px))]`}
         >
-          <Icon name="chevron-right" size={24} />
+          <Icon name="chevron-right" size={22} strokeWidth={2.4} />
         </button>
       )}
     </div>

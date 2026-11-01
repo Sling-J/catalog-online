@@ -1,7 +1,12 @@
 import { setupServer } from 'msw/node';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import type { StorefrontFacets, StorefrontProduct, StorefrontProductCard } from '../gen/types.gen.js';
+import type {
+  StorefrontFacets,
+  StorefrontProduct,
+  StorefrontProductCard,
+  StorefrontShopGone,
+} from '../gen/types.gen.js';
 import { LOW_STOCK } from './demo-shop.js';
 import { demoStorefrontHandlers } from './handlers.js';
 
@@ -130,5 +135,23 @@ describe('моки витрины: перепроверка корзины', () 
     ]);
     expect(items[0]).toMatchObject({ status: 'out_of_stock', quantity: 0 });
     expect(items[1]).toMatchObject({ status: 'unavailable', quantity: 0 });
+  });
+});
+
+describe('моки витрины: служебные состояния', () => {
+  it('скрытый каталог — 410 с контактами магазина', async () => {
+    const response = await fetch('http://api.test/v1/storefront/skrytyj-magazin');
+    expect(response.status).toBe(410);
+    const body = (await response.json()) as StorefrontShopGone;
+    expect(body).toMatchObject({ status: 410, code: 'shop_hidden', shop: { name: 'Айгерим Kids' } });
+    expect(body.shop.whatsapp).toMatch(/^\+7/);
+  });
+
+  it('есть товар, раскупленный целиком — для экрана «Закончился»', async () => {
+    const { items } = await getJson<Page>('/products');
+    const soldOut = items.filter((card) => card.stockLevel === 'out');
+    expect(soldOut).toHaveLength(1);
+    const product = await getJson<StorefrontProduct>(`/products/${soldOut[0]!.shortId}`);
+    expect(product.variants.every((variant) => variant.stock.level === 'out')).toBe(true);
   });
 });

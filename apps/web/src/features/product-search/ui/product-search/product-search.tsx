@@ -1,3 +1,4 @@
+import { cx } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect, useRef, useState } from 'react';
 
@@ -43,7 +44,11 @@ export function ProductSearch({ value, onChange }: { value: string; onChange: (q
         event.preventDefault();
         commit(text);
       }}
-      className="flex h-[46px] min-w-0 flex-1 items-center gap-2 rounded-field bg-chip-haze px-3.5 text-ink-muted"
+      className={cx(
+        'flex h-[46px] min-w-0 flex-1 items-center gap-2 rounded-field bg-chip-haze pr-3 pl-3.5 text-ink-muted lg:h-12 lg:gap-2.5 lg:pr-3.5 lg:pl-4',
+        // на компьютере поле с запросом белое с рамкой (макет «Поиск: ничего не нашлось»)
+        text && 'lg:bg-white lg:shadow-[inset_0_0_0_2px_var(--color-iris)]',
+      )}
     >
       <Icon name="search" size={18} className="flex-none" />
       <input
@@ -64,9 +69,9 @@ export function ProductSearch({ value, onChange }: { value: string; onChange: (q
             setText('');
             commit('');
           }}
-          className="flex size-6 flex-none items-center justify-center rounded-full text-ink-quiet"
+          className="flex size-[22px] flex-none items-center justify-center rounded-full bg-[#dcd8ee] text-ink-night lg:size-6"
         >
-          <Icon name="close" size={16} />
+          <Icon name="close" size={12} strokeWidth={3} />
         </button>
       )}
     </form>

@@ -32,6 +32,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 | Модель данных, соглашения API | `docs/02-architecture/data-model.md`, `api.md`; контракт — `packages/contract/openapi.yaml` |
 | План и задачи | `docs/05-tasks/roadmap.md`, `backlog.md` |
 | Нерешённое | `docs/open-questions.md` |
+| Идеи по интерфейсу, которых нет в макетах (сначала макет, потом код) | `docs/ideas.md` |
 | Устройство кода и команды | `README.md`, раздел «Команды» ниже |
 
 Правила:

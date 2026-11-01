@@ -6,16 +6,22 @@ import { isBlocked, MAX_ITEM_QUANTITY, type CartItem, type CartNotice } from '@/
 import { productPath } from '@/entities/product';
 import { formatPrice } from '@/shared/lib';
 
-/** Строка корзины: миниатюра, название, вариант, цена, количество «− N +» и плашки изменений. */
+/**
+ * Строка корзины: миниатюра, название, вариант, сумма и плашки изменений под строкой.
+ * Телефон: количество «− N +», на единице «−» убирает позицию. Компьютер (`compact`): как в макете выпадающей
+ * панели — «вариант · N шт.» и сумма справа, без изменения количества.
+ */
 export function CartLine({
   item,
   notices,
+  compact,
   onQuantity,
   onRemove,
   onNavigate,
 }: {
   item: CartItem;
   notices: CartNotice[] | undefined;
+  compact?: boolean;
   onQuantity: (quantity: number) => void;
   onRemove: () => void;
   /** Переход на карточку товара: корзину при этом закрываем. */
@@ -24,80 +30,142 @@ export function CartLine({
   const { t } = useLingui();
   const blocked = isBlocked(notices);
   const limit = Math.min(item.maxQuantity ?? MAX_ITEM_QUANTITY, MAX_ITEM_QUANTITY);
+  const sum = formatPrice(item.price * item.quantity);
 
   return (
-    <li className={cx('flex items-center gap-3', blocked && 'opacity-60')}>
-      <Link
-        to="/$product"
-        params={{ product: productPath({ slug: item.slug, shortId: item.productShortId }) }}
-        onClick={onNavigate}
-        aria-label={item.name}
-        className="size-16 flex-none overflow-hidden rounded-thumb bg-chip-haze"
-      >
-        {item.photo && <img src={item.photo} alt="" className={cx('size-full object-cover', blocked && 'grayscale')} />}
-      </Link>
+    <li className="flex flex-col gap-2">
+      <div className={cx('flex items-center gap-3', blocked && 'opacity-55')}>
+        <Link
+          to="/$product"
+          params={{ product: productPath({ slug: item.slug, shortId: item.productShortId }) }}
+          onClick={onNavigate}
+          aria-label={item.name}
+          className={cx(
+            'flex-none overflow-hidden bg-chip-haze',
+            compact ? 'size-14 rounded-[14px]' : 'size-16 rounded-field',
+          )}
+        >
+          {item.photo && (
+            <img src={item.photo} alt="" className={cx('size-full object-cover', blocked && 'grayscale')} />
+          )}
+        </Link>
 
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[15px] font-semibold">{item.name}</p>
-        {item.variantLabel && <p className="text-caption text-ink-quiet">{item.variantLabel}</p>}
-        <p className="mt-0.5 text-[15px] font-extrabold tabular-nums">{formatPrice(item.price)}</p>
-        <Notices notices={notices} />
-        <button type="button" onClick={onRemove} className="mt-1 text-[13px] font-semibold text-ink-quiet underline">
-          <Trans>Убрать</Trans>
-        </button>
-      </div>
-
-      {!blocked && (
-        <div className="flex flex-none items-center gap-0.5 rounded-pill bg-[#f1effa] p-[3px]">
-          <button
-            type="button"
-            aria-label={t`Меньше`}
-            disabled={item.quantity <= 1}
-            onClick={() => onQuantity(item.quantity - 1)}
-            className="size-[34px] rounded-full bg-white text-[17px] font-bold disabled:opacity-40"
-          >
-            −
-          </button>
-          <span aria-live="polite" className="min-w-6 text-center text-[15px] font-bold tabular-nums">
-            {item.quantity}
-          </span>
-          <button
-            type="button"
-            aria-label={t`Больше`}
-            disabled={item.quantity >= limit}
-            onClick={() => onQuantity(item.quantity + 1)}
-            className="size-[34px] rounded-full bg-white text-[17px] font-bold disabled:opacity-40"
-          >
-            +
-          </button>
+        <div className="min-w-0 flex-1">
+          <p className={cx('truncate font-semibold', compact ? 'text-[14px]' : 'text-[15px]')}>{item.name}</p>
+          <p className="text-[13px] text-ink-quiet">
+            {compact && !blocked ? (
+              item.variantLabel ? (
+                <Trans>
+                  {item.variantLabel} · {item.quantity} шт.
+                </Trans>
+              ) : (
+                <Trans>{item.quantity} шт.</Trans>
+              )
+            ) : (
+              item.variantLabel
+            )}
+          </p>
+          {!compact && <p className="mt-0.5 text-[15px] font-extrabold tabular-nums">{sum}</p>}
         </div>
-      )}
+
+        {compact ? (
+          <p className="flex-none text-[14px] font-extrabold tabular-nums">{sum}</p>
+        ) : (
+          !blocked && (
+            <div className="flex flex-none items-center gap-0.5 rounded-pill bg-[#f1effa] p-[3px]">
+              <button
+                type="button"
+                aria-label={item.quantity > 1 ? t`Меньше` : t`Убрать из корзины`}
+                onClick={() => (item.quantity > 1 ? onQuantity(item.quantity - 1) : onRemove())}
+                className="size-[34px] rounded-full bg-white text-[17px] font-bold"
+              >
+                −
+              </button>
+              <span aria-live="polite" className="min-w-6 text-center text-[15px] font-bold tabular-nums">
+                {item.quantity}
+              </span>
+              <button
+                type="button"
+                aria-label={t`Больше`}
+                disabled={item.quantity >= limit}
+                onClick={() => onQuantity(item.quantity + 1)}
+                className="size-[34px] rounded-full bg-white text-[17px] font-bold disabled:opacity-40"
+              >
+                +
+              </button>
+            </div>
+          )
+        )}
+      </div>
+      <Notices item={item} notices={notices} compact={compact} onRemove={onRemove} />
     </li>
   );
 }
 
-function Notices({ notices }: { notices: CartNotice[] | undefined }) {
+const tones = {
+  good: 'bg-[#e6fbf2] text-mint-ink',
+  warn: 'bg-[#fff1d6] text-[#7a4300]',
+  gone: 'bg-[#f1effa] text-ink-quiet',
+};
+
+/** Плашки под строкой: цена снизилась (мятная), выросла или уменьшено количество (жёлтая), закончился (серая). */
+function Notices({
+  item,
+  notices,
+  compact,
+  onRemove,
+}: {
+  item: CartItem;
+  notices: CartNotice[] | undefined;
+  compact?: boolean;
+  onRemove: () => void;
+}) {
   if (!notices || notices.length === 0) return null;
+  const remove = (
+    <button type="button" onClick={onRemove} className="underline">
+      <Trans>Убрать</Trans>
+    </button>
+  );
   return (
-    <ul className="mt-1.5 flex flex-col items-start gap-1">
-      {notices.map((notice) => (
-        <li
-          key={notice.kind}
-          className="rounded-pill bg-[#fff1d6] px-2.5 py-0.5 text-[12px] font-semibold text-stock-low"
-        >
-          {notice.kind === 'price_changed' ? (
-            <Trans>
-              Цена изменилась: было {formatPrice(notice.from)}, стало {formatPrice(notice.to)}
-            </Trans>
-          ) : notice.kind === 'quantity_reduced' ? (
-            <Trans>Осталось {notice.to} шт., количество уменьшено</Trans>
-          ) : notice.kind === 'out_of_stock' ? (
-            <Trans>Закончился</Trans>
-          ) : (
-            <Trans>Товар больше недоступен</Trans>
-          )}
-        </li>
-      ))}
+    <ul className={cx('flex flex-col gap-2', compact ? 'ml-[68px]' : 'ml-[76px]')}>
+      {notices.map((notice) => {
+        const tone =
+          notice.kind === 'price_changed'
+            ? notice.to < notice.from
+              ? tones.good
+              : tones.warn
+            : notice.kind === 'quantity_reduced'
+              ? tones.warn
+              : tones.gone;
+        return (
+          <li
+            key={notice.kind}
+            className={cx('rounded-xl px-3 py-2 text-[13px] leading-[1.4] font-semibold tabular-nums', tone)}
+          >
+            {notice.kind === 'price_changed' ? (
+              notice.to < notice.from ? (
+                <Trans>Цена снизилась: было {formatPrice(notice.from)}</Trans>
+              ) : (
+                <Trans>Цена выросла: было {formatPrice(notice.from)}</Trans>
+              )
+            ) : notice.kind === 'quantity_reduced' ? (
+              <Trans>Осталось {notice.to} шт. — количество уменьшили</Trans>
+            ) : notice.kind === 'out_of_stock' ? (
+              <>
+                {item.variantLabel ? <Trans>{item.variantLabel} закончился</Trans> : <Trans>Закончился</Trans>}
+                {' · '}
+                {remove}
+              </>
+            ) : (
+              <>
+                <Trans>Товар больше недоступен</Trans>
+                {' · '}
+                {remove}
+              </>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }

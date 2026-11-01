@@ -1,4 +1,4 @@
-import { Button, Sheet } from '@catalog/ui';
+import { Sheet } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useQuery } from '@tanstack/react-query';
 import { useUnit } from 'effector-react';
@@ -19,20 +19,20 @@ import {
 } from '@/entities/cart';
 import { shopQueryOptions } from '@/entities/shop';
 import { $sentOrder, OrderButton, OrderSent } from '@/features/order-via-whatsapp';
-import { useSheetPlacement } from '@/shared/hooks';
+import { useIsDesktop } from '@/shared/hooks';
 import { formatPrice } from '@/shared/lib';
 
 import { CartLine } from './cart-line';
 
 /**
- * Корзина шторкой снизу (окно на компьютере). При открытии цены и наличие перепроверяются:
- * общая плашка «магазин кое-что обновил» и плашка у каждой изменённой строки (FR-V7, S3, S10).
- * После «Заказать через WhatsApp» вместо корзины — экран «Отправлено ✓» (FR-V8).
+ * Корзина шторкой снизу на телефоне, выпадающей панелью под кнопкой корзины на компьютере. При открытии цены
+ * и наличие перепроверяются: общая плашка «магазин кое-что обновил» и плашка у каждой изменённой строки
+ * (FR-V7, S3, S10). После «Заказать через WhatsApp» вместо корзины — «Отправлено ✓» (FR-V8), на компьютере
+ * окном по центру.
  */
 export function CartSheet({ subdomain }: { subdomain: string }) {
   const { t } = useLingui();
-  // на компьютере — панель под кнопкой корзины в шапке справа (S8)
-  const placement = useSheetPlacement('dropdown-right');
+  const desktop = useIsDesktop();
   const { data: shop } = useQuery(shopQueryOptions(subdomain));
   const { open, items, payable, notices, checkState, total, comment, sentOrder } = useUnit({
     open: $open,
@@ -51,41 +51,33 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
     setComment: commentChanged,
   });
   const hasChanges = Object.keys(notices).length > 0;
+  const placement = !desktop ? 'bottom' : sentOrder ? 'center' : 'dropdown-right';
 
   return (
-    <Sheet open={open} onClose={close} placement={placement} title={sentOrder ? t`Заказ отправлен` : t`Корзина`}>
+    <Sheet
+      open={open}
+      onClose={close}
+      placement={placement}
+      hideTitle={!!sentOrder}
+      title={sentOrder ? t`Заказ отправлен` : t`Корзина`}
+    >
       {sentOrder ? (
         <OrderSent order={sentOrder} onClose={close} />
       ) : (
         <>
-          {checkState === 'loading' && (
-            <p role="status" className="mb-3 text-caption text-ink-quiet">
-              <Trans>Проверяем цены и наличие…</Trans>
-            </p>
-          )}
-          {checkState === 'failed' && (
-            <p role="status" className="mb-3 rounded-thumb bg-chip-haze px-3.5 py-2.5 text-[13px] text-ink-soft">
-              <Trans>Не удалось проверить цены и наличие — показываем сохранённую корзину.</Trans>
-            </p>
-          )}
           {hasChanges && (
             <p
               role="status"
-              className="mb-3 rounded-thumb bg-[#fff1d6] px-3.5 py-2.5 text-[13px] font-semibold text-stock-low"
+              className="mb-3.5 rounded-field bg-[#fff4d6] px-3.5 py-3 text-[14px] leading-[1.45] text-[#5a3e00]"
             >
-              <Trans>Магазин кое-что обновил — проверьте корзину.</Trans>
+              <Trans>Пока товары лежали в корзине, магазин кое-что обновил. Проверьте перед заказом.</Trans>
             </p>
           )}
 
           {items.length === 0 ? (
-            <div className="py-8 text-center">
-              <p className="text-[18px] font-extrabold">
-                <Trans>В корзине пока пусто</Trans>
-              </p>
-              <Button className="mt-4" onClick={close}>
-                <Trans>Вернуться в каталог</Trans>
-              </Button>
-            </div>
+            <p className="text-[14px] text-ink-quiet">
+              <Trans>Пока пусто. Откройте товар и выберите размер.</Trans>
+            </p>
           ) : (
             <>
               <ul className="flex flex-col gap-3">
@@ -94,6 +86,7 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
                     key={item.variantId}
                     item={item}
                     notices={notices[item.variantId]}
+                    compact={desktop}
                     onQuantity={(quantity) => setQuantity({ variantId: item.variantId, quantity })}
                     onRemove={() => remove(item.variantId)}
                     onNavigate={close}
@@ -101,24 +94,23 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
                 ))}
               </ul>
 
-              <textarea
+              <input
                 value={comment}
                 onChange={(event) => setComment(event.target.value)}
                 maxLength={MAX_COMMENT_LENGTH}
-                rows={2}
                 placeholder={t`Комментарий для магазина`}
                 aria-label={t`Комментарий для магазина`}
-                className="mt-4 w-full resize-none rounded-field bg-[#f6f5fb] px-3.5 py-3 text-[15px] text-ink-night outline-none placeholder:text-ink-muted focus:ring-2 focus:ring-ink-night"
+                className="mt-4 h-12 w-full rounded-field bg-[#f6f5fb] px-3.5 text-[15px] text-ink-night outline-none placeholder:text-ink-muted focus:ring-2 focus:ring-ink-night lg:mt-3.5 lg:h-[46px] lg:rounded-[14px] lg:text-[14px]"
               />
 
-              <div className="mt-[18px] flex items-baseline justify-between">
-                <span className="text-[15px] text-ink-soft">
+              <div className="mt-[18px] flex items-baseline justify-between lg:mt-4">
+                <span className="text-[15px] text-ink-soft lg:text-[14px]">
                   <Trans>Итого</Trans>
                 </span>
-                <span className="text-[22px] font-extrabold tabular-nums">{formatPrice(total)}</span>
+                <span className="text-[22px] font-extrabold tabular-nums lg:text-[20px]">{formatPrice(total)}</span>
               </div>
 
-              <div className="mt-3.5">
+              <div className="mt-3.5 lg:mt-3">
                 <OrderButton
                   subdomain={subdomain}
                   shop={shop ?? { name: '', whatsapp: '' }}
@@ -127,7 +119,7 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
                   comment={comment}
                   disabled={!shop || checkState === 'loading'}
                 />
-                <p className="mt-2.5 text-center text-[12px] text-ink-muted">
+                <p className="mt-2.5 text-center text-[12px] text-ink-muted lg:hidden">
                   <Trans>Откроется WhatsApp с готовым сообщением для магазина</Trans>
                 </p>
               </div>

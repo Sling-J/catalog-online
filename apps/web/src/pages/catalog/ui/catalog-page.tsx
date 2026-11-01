@@ -1,5 +1,6 @@
+import { Plural } from '@lingui/react/macro';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 
 import { categoriesQueryOptions } from '@/entities/category';
 import {
@@ -10,17 +11,20 @@ import {
   type ProductSort,
 } from '@/entities/product';
 import { shopQueryOptions } from '@/entities/shop';
+import { CatalogSort } from '@/features/catalog-sort';
 import { ProductSearch } from '@/features/product-search';
 import {
   ActiveFilters,
   countActiveFilters,
   FiltersButton,
+  FiltersPanel,
   FiltersSheet,
+  FiltersToggle,
   type FilterState,
 } from '@/features/product-filters';
 import { AboutShopSheet } from '@/widgets/about-shop-sheet';
 import { CartButton, CartPill } from '@/widgets/cart-pill';
-import { CatalogGrid } from '@/widgets/catalog-grid';
+import { CatalogGrid, GridSkeleton } from '@/widgets/catalog-grid';
 import { CategoryBar } from '@/widgets/category-bar';
 import { ShopHeader } from '@/widgets/shop-header';
 
@@ -49,7 +53,9 @@ export function CatalogPage({
   const { data: allFacets } = useSuspenseQuery(productFacetsQueryOptions(subdomain));
 
   const [aboutOpen, setAboutOpen] = useState(false);
+  // телефон: фильтры шторкой; компьютер: раскрываются строкой под категориями
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
 
   const filters: FilterState = { values: selectedValues(search), priceMin: search.priceMin, priceMax: search.priceMax };
   const hasFilters = countActiveFilters(filters) > 0 || !!search.q;
@@ -84,22 +90,57 @@ export function CatalogPage({
         search={
           <div className="flex gap-2">
             <ProductSearch value={search.q ?? ''} onChange={changeQuery} />
-            <FiltersButton count={countActiveFilters(filters)} onClick={() => setFiltersOpen(true)} />
+            <div className="lg:hidden">
+              <FiltersButton count={countActiveFilters(filters)} onClick={() => setFiltersOpen(true)} />
+            </div>
           </div>
         }
         actions={<CartButton subdomain={subdomain} />}
       >
-        <CategoryBar categories={categories} selectedId={search.category} onSelect={selectCategory} />
+        <CategoryBar
+          categories={categories}
+          selectedId={search.category}
+          onSelect={selectCategory}
+          trailing={
+            <>
+              <p className="mr-2 text-[14px] text-ink-quiet">
+                <Plural value={facets.total} one="# товар" few="# товара" many="# товаров" other="# товара" />
+              </p>
+              <FiltersToggle
+                count={countActiveFilters(filters)}
+                expanded={panelOpen}
+                onClick={() => setPanelOpen((open) => !open)}
+              />
+              <CatalogSort pill value={params.sort ?? 'new'} onChange={changeSort} />
+            </>
+          }
+        />
         <ActiveFilters all={allFacets} state={filters} onChange={changeFilters} />
       </ShopHeader>
       <main>
-        <CatalogGrid
-          subdomain={subdomain}
-          params={params}
-          onSortChange={changeSort}
-          hasFilters={hasFilters}
-          onResetFilters={resetAll}
-        />
+        {panelOpen && (
+          <div className="mx-auto hidden max-w-[1240px] px-5 lg:block">
+            <FiltersPanel
+              all={allFacets}
+              current={facets}
+              state={filters}
+              onChange={changeFilters}
+              onReset={resetFilters}
+            />
+          </div>
+        )}
+        {/* шапка и категории на месте сразу, сетка мерцает, пока грузится выборка */}
+        <Suspense fallback={<GridSkeleton />}>
+          <CatalogGrid
+            subdomain={subdomain}
+            params={params}
+            onSortChange={changeSort}
+            hasFilters={hasFilters}
+            onResetQuery={() => changeQuery('')}
+            onResetFilters={resetAll}
+            onShowAllCategories={() => selectCategory(undefined)}
+          />
+        </Suspense>
       </main>
       <CartPill subdomain={subdomain} />
       <AboutShopSheet shop={shop} open={aboutOpen} onClose={() => setAboutOpen(false)} />
