@@ -14,7 +14,11 @@ export {
   isInStock,
   parseProductPath,
   productPath,
+  selectedValues,
   toggleSelection,
+  toProductParams,
+  validateCatalogSearch,
+  type CatalogSearch,
   type Selection,
   type ValueState,
 } from './lib';

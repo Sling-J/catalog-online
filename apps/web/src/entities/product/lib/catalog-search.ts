@@ -1,4 +1,4 @@
-import type { ProductListParams, ProductSort } from '@/entities/product';
+import type { ProductListParams, ProductSort } from '@/entities/product/api';
 
 /**
  * Что каталог хранит в адресе: категория, сортировка, поиск и фильтры. Значения по умолчанию в адрес не попадают.

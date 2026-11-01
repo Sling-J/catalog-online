@@ -2,11 +2,14 @@ import type { QueryClient } from '@tanstack/react-query';
 import { notFound } from '@tanstack/react-router';
 
 import { categoriesQueryOptions } from '@/entities/category';
-import { productFacetsQueryOptions, productsQueryOptions } from '@/entities/product';
+import {
+  productFacetsQueryOptions,
+  productsQueryOptions,
+  toProductParams,
+  type CatalogSearch,
+} from '@/entities/product';
 import { shopQueryOptions } from '@/entities/shop';
 import { isNotFoundError } from '@/shared/api';
-
-import { toProductParams, type CatalogSearch } from '../lib';
 
 /**
  * Предзагрузка данных каталога в загрузчике маршрута: на сервере кладёт их в кеш для первого экрана,

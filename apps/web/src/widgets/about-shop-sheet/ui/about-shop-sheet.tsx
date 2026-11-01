@@ -11,7 +11,8 @@ import { ScheduleList } from './schedule-list';
 
 /** «О магазине»: как найти, график, контакты. Шторка на телефоне, окно на компьютере. */
 export function AboutShopSheet({ shop, open, onClose }: { shop: StorefrontShop; open: boolean; onClose: () => void }) {
-  const placement = useSheetPlacement();
+  // на компьютере — панель под названием магазина слева (S8)
+  const placement = useSheetPlacement('dropdown-left');
 
   return (
     <Sheet

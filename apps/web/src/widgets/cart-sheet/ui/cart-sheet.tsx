@@ -31,7 +31,8 @@ import { CartLine } from './cart-line';
  */
 export function CartSheet({ subdomain }: { subdomain: string }) {
   const { t } = useLingui();
-  const placement = useSheetPlacement();
+  // на компьютере — панель под кнопкой корзины в шапке справа (S8)
+  const placement = useSheetPlacement('dropdown-right');
   const { data: shop } = useQuery(shopQueryOptions(subdomain));
   const { open, items, payable, notices, checkState, total, comment, sentOrder } = useUnit({
     open: $open,

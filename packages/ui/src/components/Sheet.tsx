@@ -2,6 +2,12 @@ import { useEffect, useId, useRef, type ReactNode } from 'react';
 
 import { cx } from '../cx.js';
 
+/**
+ * bottom — шторка снизу (телефон), center — окно по центру, dropdown-left / dropdown-right — выпадающая панель
+ * под шапкой у левого или правого края контейнера (компьютер).
+ */
+export type SheetPlacement = 'bottom' | 'center' | 'dropdown-left' | 'dropdown-right';
+
 export type SheetProps = {
   open: boolean;
   onClose: () => void;
@@ -9,13 +15,22 @@ export type SheetProps = {
   /** Действие справа от заголовка, например «Сбросить». */
   headerAction?: ReactNode;
   children: ReactNode;
-  /** bottom — шторка снизу (телефон), center — окно по центру (компьютер). */
-  placement?: 'bottom' | 'center';
+  placement?: SheetPlacement;
   className?: string;
 };
 
+const dropdown =
+  'fixed top-[88px] bottom-auto m-0 h-fit max-h-[calc(100dvh-112px)] w-[400px] rounded-[26px] shadow-[0_24px_60px_rgb(23_19_61/0.18)] backdrop:bg-ink-night/15';
+
+const placements: Record<SheetPlacement, string> = {
+  bottom: 'top-auto bottom-0 w-full rounded-t-[28px] shadow-sheet',
+  center: 'm-auto w-[min(560px,calc(100%-32px))] rounded-panel shadow-device',
+  'dropdown-left': `${dropdown} left-[max(20px,calc(50%-600px))] right-auto`,
+  'dropdown-right': `${dropdown} right-[max(20px,calc(50%-600px))] left-auto`,
+};
+
 /**
- * Шторка или окно поверх страницы на нативном dialog: фокус и затемнение даёт браузер.
+ * Шторка, окно или выпадающая панель поверх страницы на нативном dialog: фокус и затемнение даёт браузер.
  * Закрывается по Esc и по клику на затемнение.
  */
 export function Sheet({ open, onClose, title, headerAction, children, placement = 'bottom', className }: SheetProps) {
@@ -42,9 +57,7 @@ export function Sheet({ open, onClose, title, headerAction, children, placement 
       }}
       className={cx(
         'm-0 max-h-[88dvh] max-w-none overflow-y-auto bg-white p-0 font-sans text-ink-night backdrop:bg-ink-night/40',
-        placement === 'bottom'
-          ? 'top-auto bottom-0 w-full rounded-t-[28px] shadow-sheet'
-          : 'm-auto w-[min(560px,calc(100%-32px))] rounded-panel shadow-device',
+        placements[placement],
         className,
       )}
     >

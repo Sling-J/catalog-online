@@ -1,9 +1,14 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import { categoriesQueryOptions } from '@/entities/category';
-import { productFacetsQueryOptions, type ProductSort } from '@/entities/product';
+import {
+  productFacetsQueryOptions,
+  selectedValues,
+  toProductParams,
+  type CatalogSearch,
+  type ProductSort,
+} from '@/entities/product';
 import { shopQueryOptions } from '@/entities/shop';
 import { ProductSearch } from '@/features/product-search';
 import {
@@ -14,17 +19,27 @@ import {
   type FilterState,
 } from '@/features/product-filters';
 import { AboutShopSheet } from '@/widgets/about-shop-sheet';
-import { CartPill } from '@/widgets/cart-pill';
+import { CartButton, CartPill } from '@/widgets/cart-pill';
 import { CatalogGrid } from '@/widgets/catalog-grid';
 import { CategoryBar } from '@/widgets/category-bar';
 import { ShopHeader } from '@/widgets/shop-header';
 
-import { selectedValues, toProductParams } from '../lib';
+/** Как страница меняет адрес: строит новый выбор из прежнего; `replace` — не плодить записи истории. */
+export type SearchChange = (update: (prev: CatalogSearch) => CatalogSearch, options?: { replace?: boolean }) => void;
 
-// Витрина собирается по шагам: шапка и «О магазине» — T-103, категории, сетка, сортировка — T-104, поиск и фильтры — T-105.
-export function CatalogPage({ subdomain }: { subdomain: string }) {
-  const search = useSearch({ from: '/' });
-  const navigate = useNavigate({ from: '/' });
+/**
+ * Каталог. Выбор (категория, сортировка, поиск, фильтры) приходит из адреса маршрута и меняется через
+ * `onSearchChange`: так одну и ту же страницу можно показать и на `/`, и под окном товара на компьютере.
+ */
+export function CatalogPage({
+  subdomain,
+  search,
+  onSearchChange,
+}: {
+  subdomain: string;
+  search: CatalogSearch;
+  onSearchChange: SearchChange;
+}) {
   const params = toProductParams(search);
 
   const { data: shop } = useSuspenseQuery(shopQueryOptions(subdomain));
@@ -41,35 +56,39 @@ export function CatalogPage({ subdomain }: { subdomain: string }) {
 
   // выбор живёт в адресе (FR-V4): ссылкой можно поделиться, «назад» возвращает прежний выбор;
   // поиск и фильтры меняются на ходу, поэтому пишем их поверх текущей записи, а не новой
-  const selectCategory = (category: string | undefined) => void navigate({ search: (prev) => ({ ...prev, category }) });
+  const selectCategory = (category: string | undefined) => onSearchChange((prev) => ({ ...prev, category }));
   const changeSort = (sort: ProductSort) =>
-    void navigate({ search: (prev) => ({ ...prev, sort: sort === 'new' ? undefined : sort }) });
-  const changeQuery = (q: string) =>
-    void navigate({ search: (prev) => ({ ...prev, q: q || undefined }), replace: true });
+    onSearchChange((prev) => ({ ...prev, sort: sort === 'new' ? undefined : sort }));
+  const changeQuery = (q: string) => onSearchChange((prev) => ({ ...prev, q: q || undefined }), { replace: true });
   const changeFilters = (next: FilterState) =>
-    void navigate({
-      search: (prev) => ({
+    onSearchChange(
+      (prev) => ({
         ...prev,
         values: next.values.length > 0 ? next.values.join(',') : undefined,
         priceMin: next.priceMin,
         priceMax: next.priceMax,
       }),
-      replace: true,
-    });
+      { replace: true },
+    );
   const resetAll = () =>
-    void navigate({
-      search: (prev) => ({ ...prev, q: undefined, values: undefined, priceMin: undefined, priceMax: undefined }),
+    onSearchChange((prev) => ({ ...prev, q: undefined, values: undefined, priceMin: undefined, priceMax: undefined }), {
       replace: true,
     });
   const resetFilters = () => changeFilters({ values: [] });
 
   return (
-    <div className="min-h-dvh bg-paper pb-28 font-sans text-ink-night">
-      <ShopHeader shop={shop} onOpenAbout={() => setAboutOpen(true)}>
-        <div className="flex gap-2 px-4 pb-3">
-          <ProductSearch value={search.q ?? ''} onChange={changeQuery} />
-          <FiltersButton count={countActiveFilters(filters)} onClick={() => setFiltersOpen(true)} />
-        </div>
+    <div className="min-h-dvh bg-paper pb-28 font-sans text-ink-night lg:pb-10">
+      <ShopHeader
+        shop={shop}
+        onOpenAbout={() => setAboutOpen(true)}
+        search={
+          <div className="flex gap-2">
+            <ProductSearch value={search.q ?? ''} onChange={changeQuery} />
+            <FiltersButton count={countActiveFilters(filters)} onClick={() => setFiltersOpen(true)} />
+          </div>
+        }
+        actions={<CartButton subdomain={subdomain} />}
+      >
         <CategoryBar categories={categories} selectedId={search.category} onSelect={selectCategory} />
         <ActiveFilters all={allFacets} state={filters} onChange={changeFilters} />
       </ShopHeader>

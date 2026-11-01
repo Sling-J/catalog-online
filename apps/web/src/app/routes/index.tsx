@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { CatalogPage, loadCatalog, validateCatalogSearch } from '@/pages/catalog';
+import { validateCatalogSearch } from '@/entities/product';
+import { CatalogPage, loadCatalog } from '@/pages/catalog';
 import { LandingPage } from '@/pages/landing';
 
 export const Route = createFileRoute('/')({
@@ -16,5 +17,14 @@ export const Route = createFileRoute('/')({
 // Один и тот же адрес `/`: на основном домене — лендинг, на поддомене магазина — каталог.
 function Home() {
   const { tenant } = Route.useRouteContext();
-  return tenant.kind === 'shop' ? <CatalogPage subdomain={tenant.subdomain} /> : <LandingPage />;
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
+  if (tenant.kind !== 'shop') return <LandingPage />;
+  return (
+    <CatalogPage
+      subdomain={tenant.subdomain}
+      search={search}
+      onSearchChange={(update, options) => void navigate({ search: (prev) => update(prev), replace: options?.replace })}
+    />
+  );
 }

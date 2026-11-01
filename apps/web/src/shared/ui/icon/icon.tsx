@@ -1,11 +1,28 @@
 import type { ReactNode } from 'react';
 
 export type IconName =
-  'chevron-right' | 'chevron-left' | 'pin' | 'whatsapp' | 'copy' | 'check' | 'search' | 'sliders' | 'close' | 'share';
+  | 'chevron-right'
+  | 'chevron-left'
+  | 'pin'
+  | 'whatsapp'
+  | 'copy'
+  | 'check'
+  | 'search'
+  | 'sliders'
+  | 'close'
+  | 'share'
+  | 'cart';
 
 // Контурные иконки 24×24, штрих берут от `currentColor`.
 const glyphs: Record<IconName, ReactNode> = {
   'chevron-right': <path d="M9 6l6 6-6 6" />,
+  cart: (
+    <>
+      <path d="M3 4h2.5l2 11h10l2-8H7" />
+      <circle cx="9" cy="19.5" r="1.5" />
+      <circle cx="17" cy="19.5" r="1.5" />
+    </>
+  ),
   pin: (
     <>
       <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />

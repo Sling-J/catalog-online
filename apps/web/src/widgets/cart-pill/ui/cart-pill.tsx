@@ -14,7 +14,7 @@ export function CartPill({ subdomain }: { subdomain: string }) {
   if (count === 0) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-x-3 bottom-5 z-20 flex justify-center">
+    <div className="pointer-events-none fixed inset-x-3 bottom-5 z-20 flex justify-center lg:hidden">
       <button
         type="button"
         onClick={() => open(subdomain)}

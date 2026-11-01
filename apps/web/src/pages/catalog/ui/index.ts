@@ -1,1 +1,1 @@
-export { CatalogPage } from './catalog-page';
+export { CatalogPage, type SearchChange } from './catalog-page';

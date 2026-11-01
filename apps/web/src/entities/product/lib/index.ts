@@ -9,3 +9,4 @@ export {
   type Selection,
   type ValueState,
 } from './variant-selection';
+export { selectedValues, toProductParams, validateCatalogSearch, type CatalogSearch } from './catalog-search';

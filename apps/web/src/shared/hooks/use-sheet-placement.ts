@@ -1,19 +1,11 @@
-import { useSyncExternalStore } from 'react';
+import type { SheetPlacement } from '@catalog/ui';
 
-const DESKTOP = '(min-width: 1024px)';
+import { useIsDesktop } from './use-is-desktop';
 
-const subscribe = (onChange: () => void) => {
-  const query = window.matchMedia(DESKTOP);
-  query.addEventListener('change', onChange);
-  return () => query.removeEventListener('change', onChange);
-};
-
-/** Шторка снизу на телефоне, окно по центру на компьютере. На сервере шторка закрыта, значение не важно. */
-export function useSheetPlacement(): 'bottom' | 'center' {
-  const desktop = useSyncExternalStore(
-    subscribe,
-    () => window.matchMedia(DESKTOP).matches,
-    () => false,
-  );
-  return desktop ? 'center' : 'bottom';
+/**
+ * Шторка снизу на телефоне; на компьютере — то, что попросили: окно по центру (по умолчанию)
+ * или выпадающая панель у левого/правого края. На сервере шторка закрыта, значение не важно.
+ */
+export function useSheetPlacement(desktop: Exclude<SheetPlacement, 'bottom'> = 'center'): SheetPlacement {
+  return useIsDesktop() ? desktop : 'bottom';
 }

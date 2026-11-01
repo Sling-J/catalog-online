@@ -2,33 +2,36 @@ import type { Image } from '@catalog/contract';
 import { cx } from '@catalog/ui';
 import { useState } from 'react';
 
-/** Галерея на всю ширину: фото листаются свайпом (прокрутка с «прилипанием»), точки показывают текущее. */
+/**
+ * Галерея: фото листаются свайпом (прокрутка с «прилипанием»), точки показывают текущее.
+ * На телефоне 4:5 на всю ширину, на компьютере заполняет всю высоту окна товара.
+ */
 export function ProductGallery({ photos, name }: { photos: Image[]; name: string }) {
   const [index, setIndex] = useState(0);
 
-  if (photos.length === 0) return <div aria-hidden="true" className="aspect-[4/5] w-full bg-chip-haze" />;
+  if (photos.length === 0) return <div aria-hidden="true" className="aspect-[4/5] w-full bg-chip-haze lg:h-full" />;
 
   return (
-    <div className="relative">
+    <div className="relative lg:h-full">
       <ul
         onScroll={(event) => {
           const list = event.currentTarget;
           setIndex(Math.round(list.scrollLeft / list.clientWidth));
         }}
-        className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] lg:h-full [&::-webkit-scrollbar]:hidden"
       >
         {photos.map((photo, position) => (
           <li key={photo.sizes[1280]} className="w-full flex-none snap-center">
             <img
               src={photo.sizes[640]}
               srcSet={`${photo.sizes[640]} 640w, ${photo.sizes[1280]} 1280w`}
-              sizes="(min-width: 1024px) 640px, 100vw"
+              sizes="(min-width: 1024px) 576px, 100vw"
               width={photo.width}
               height={photo.height}
               alt={photos.length > 1 ? `${name} (${position + 1}/${photos.length})` : name}
               loading={position === 0 ? 'eager' : 'lazy'}
               fetchPriority={position === 0 ? 'high' : 'auto'}
-              className="block aspect-[4/5] w-full bg-chip-haze object-cover"
+              className="block aspect-[4/5] w-full bg-chip-haze object-cover lg:aspect-auto lg:h-full"
             />
           </li>
         ))}
@@ -36,7 +39,7 @@ export function ProductGallery({ photos, name }: { photos: Image[]; name: string
       {photos.length > 1 && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-3.5 flex justify-center gap-1.5"
+          className="pointer-events-none absolute inset-x-0 bottom-3.5 flex justify-center gap-1.5 lg:bottom-4"
         >
           {photos.map((photo, position) => (
             <span

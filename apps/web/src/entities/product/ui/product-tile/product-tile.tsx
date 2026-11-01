@@ -4,6 +4,7 @@ import { Trans } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 
 import { productPath } from '@/entities/product/lib';
+import { useIsDesktop } from '@/shared/hooks';
 import { formatPrice } from '@/shared/lib';
 
 /**
@@ -12,10 +13,15 @@ import { formatPrice } from '@/shared/lib';
  */
 export function ProductTile({ card }: { card: StorefrontProductCard }) {
   const out = card.stockLevel === 'out';
+  const desktop = useIsDesktop();
   return (
     <Link
       to="/$product"
       params={{ product: productPath(card) }}
+      // выбор в каталоге (категория, фильтры) едет с адресом: под окном товара на компьютере виден тот же каталог
+      search
+      // на компьютере каталог остаётся под окном на том же месте, на телефоне карточка открывается сверху
+      resetScroll={!desktop}
       aria-label={card.name}
       className="group relative block overflow-hidden bg-chip-haze"
     >

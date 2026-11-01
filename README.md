@@ -23,8 +23,8 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 | `packages/contract` | Контракт API `openapi.yaml` и сгенерированный код |
 
 ## Что нужно для разработки
-- Node.js 22 LTS или новее
-- pnpm 10 (`corepack enable` или глобальная установка)
+- Node.js 22 LTS или новее (версиями удобно управлять через nvm; на Windows — nvm-windows)
+- pnpm 10: `corepack enable`, версия берётся из `packageManager` в `package.json`, поэтому команды `pnpm` запускайте из каталога репозитория (вне проекта `corepack` выберет самую свежую версию, она может не запуститься; закрепить нужную: `corepack prepare pnpm@10.18.1 --activate`)
 - Docker — для PostgreSQL и S3-хранилища (в разработке SeaweedFS)
 
 ## Команды
