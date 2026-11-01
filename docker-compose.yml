@@ -1,0 +1,32 @@
+# Окружение для разработки (T-007): PostgreSQL и S3-совместимое хранилище файлов.
+# Запуск: docker compose up -d. Данные — в ./.data (в git не попадают).
+name: catalog-online
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-catalog}
+      POSTGRES_USER: ${POSTGRES_USER:-catalog}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-catalog}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - ./.data/postgres:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-catalog} -d ${POSTGRES_DB:-catalog}']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # S3-совместимое хранилище для фото, логотипов и файлов импорта.
+  # ADR 0001 называл MinIO, но его образы больше не публикуются на Docker Hub —
+  # для разработки используем SeaweedFS (S3 API тот же). Выбор для продакшена — отдельным решением.
+  storage:
+    image: chrislusf/seaweedfs:4.20
+    command: server -dir=/data -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json
+    ports:
+      - '${S3_PORT:-8333}:8333'
+    volumes:
+      - ./.data/storage:/data
+      - ./infra/dev/seaweedfs-s3.json:/etc/seaweedfs/s3.json:ro

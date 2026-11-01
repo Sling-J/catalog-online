@@ -16,4 +16,15 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - Документацию библиотек и фреймворков смотри через Context7 MCP, а не по памяти.
 
 ## Команды
-Кода пока нет. Команды сборки/тестов добавить после выбора стека.
+Монорепо pnpm + Turborepo, Node ≥ 22.19 (`docs/02-architecture/adr/0001-stack.md`).
+- `pnpm install` — зависимости.
+- `pnpm generate` — код из `packages/contract/openapi.yaml` (Hey API) в `packages/contract/src/gen` (в git не хранится, turbo запускает сам перед проверками).
+- `pnpm check` — lint + typecheck + test + build по всем пакетам; перед коммитом должен проходить.
+- `pnpm format` / `pnpm format:check` — Prettier.
+- `pnpm i18n:extract` — строки Lingui в каталоги `.po`.
+- `docker compose up -d` — PostgreSQL и S3-хранилище для разработки (`.env.example`).
+
+## Код
+- Контракт API правится только в `openapi.yaml`, затем `pnpm generate`; сгенерированное (`*.gen.ts`) руками не трогаем.
+- Демо-данные «Айгерим Kids» для моков — `@catalog/contract/fixtures`, обработчики MSW — `@catalog/contract/msw`.
+- Токены дизайн-системы — `packages/ui/src/tokens.css` (Tailwind v4 `@theme`), источник — `DESIGN.md`.

@@ -1,0 +1,66 @@
+{
+  "name": "@catalog/contract",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./query": {
+      "types": "./dist/query.d.ts",
+      "default": "./dist/query.js"
+    },
+    "./zod": {
+      "types": "./dist/zod.d.ts",
+      "default": "./dist/zod.js"
+    },
+    "./msw": {
+      "types": "./dist/msw.d.ts",
+      "default": "./dist/msw.js"
+    },
+    "./nest": {
+      "types": "./dist/nest.d.ts",
+      "default": "./dist/nest.js"
+    },
+    "./fixtures": {
+      "types": "./dist/fixtures/index.d.ts",
+      "default": "./dist/fixtures/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "openapi.yaml"
+  ],
+  "scripts": {
+    "generate": "openapi-ts",
+    "lint:contract": "redocly lint openapi.yaml",
+    "lint": "pnpm run lint:contract && eslint .",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.105.0",
+    "msw": "^2.15.0"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "msw": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@catalog/tsconfig": "workspace:*",
+    "@hey-api/openapi-ts": "0.99.0",
+    "@redocly/cli": "2.72.1",
+    "@tanstack/react-query": "5.105.0",
+    "msw": "2.15.0"
+  }
+}

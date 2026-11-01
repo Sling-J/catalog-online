@@ -1,0 +1,33 @@
+{
+  "name": "catalog-online",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.18.1",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "generate": "turbo run generate",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "i18n:extract": "turbo run i18n:extract",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "turbo run lint typecheck test build"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.19.2",
+    "eslint": "10.14.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.13.0",
+    "prettier": "3.9.10",
+    "turbo": "2.11.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.0.5"
+  }
+}

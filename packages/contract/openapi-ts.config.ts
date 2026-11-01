@@ -1,0 +1,17 @@
+import { defineConfig } from '@hey-api/openapi-ts';
+
+// Генерация из контракта (ADR 0001): типы, SDK на fetch, хуки TanStack Query,
+// схемы Zod, моки MSW для фронтов и типы контроллеров для NestJS.
+export default defineConfig({
+  input: './openapi.yaml',
+  output: { path: './src/gen' },
+  plugins: [
+    '@hey-api/client-fetch',
+    '@hey-api/typescript',
+    '@hey-api/sdk',
+    '@tanstack/react-query',
+    { name: 'zod', responses: true },
+    'msw',
+    'nestjs',
+  ],
+});

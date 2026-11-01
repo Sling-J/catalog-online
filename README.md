@@ -24,19 +24,16 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 
 ## Что нужно для разработки
 - Node.js 22 LTS или новее
-- pnpm (через `corepack enable`)
-- Docker — для PostgreSQL и MinIO
+- pnpm 10 (`corepack enable` или глобальная установка)
+- Docker — для PostgreSQL и S3-хранилища (в разработке SeaweedFS)
 
 ## Команды
-Появляются по мере выполнения задач фундамента (E0 в [backlog](docs/05-tasks/backlog.md)).
-
-| Команда | Что делает | Готово в задаче |
-|---|---|---|
-| `pnpm install` | Установить зависимости | T-002 |
-| `pnpm dev` | Запустить все приложения | T-002 |
-| `pnpm build` | Собрать всё | T-002 |
-| `pnpm lint` | Линтеры, включая проверку контракта | T-003, T-004 |
-| `pnpm typecheck` | Проверка типов | T-002 |
-| `pnpm test` | Тесты (Vitest) | T-003 |
-| `pnpm generate` | Код из `packages/contract/openapi.yaml` (Hey API) | T-004 |
-| `docker compose up -d` | PostgreSQL и MinIO для разработки | T-007 |
+| Команда | Что делает |
+|---|---|
+| `pnpm install` | Установить зависимости |
+| `pnpm generate` | Код из `packages/contract/openapi.yaml` (Hey API): типы, SDK, хуки Query, Zod, MSW, типы для Nest |
+| `pnpm check` | Линтеры (включая контракт), типы, тесты и сборка всех пакетов |
+| `pnpm dev` | Запустить приложения (появятся в E1, E3, E4) |
+| `pnpm format` | Prettier |
+| `pnpm i18n:extract` | Строки Lingui в каталоги `.po` |
+| `docker compose up -d` | PostgreSQL и S3-хранилище для разработки (настройки — `.env.example`) |

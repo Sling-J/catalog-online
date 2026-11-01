@@ -12,14 +12,14 @@ updated: 2026-11-01
 
 ## E0. Фундамент
 - [x] **T-001** Git-репозиторий, `.gitignore`, `.editorconfig`, README с командами. — S · ADR
-- [ ] **T-002** Монорепо: pnpm workspaces + Turborepo; пустые `apps/web`, `apps/admin`, `apps/api`, `packages/ui`, `packages/contract`; задачи `dev`, `build`, `lint`, `typecheck`, `test`, `generate`. Node 22 LTS. — M · ADR
-- [ ] **T-003** Общие настройки TypeScript, ESLint, Prettier; Vitest в каждом пакете. — S · ADR
-- [ ] **T-004** Генерация из контракта: Hey API (точная версия) — типы, SDK, хуки TanStack Query, Zod, MSW; плагин NestJS. Линтер Redocly в задаче `lint`. — M · ADR, API
-- [ ] **T-005** `packages/ui`: токены из `DESIGN.md` (цвета, шрифт Geologica, радиусы, отступы, тени) для Tailwind; базовые компоненты — кнопка (пухлая с подложкой), чип, поле, переключатель, пилюля наличия, шторка/окно. — L · DESIGN.md
-- [ ] **T-006** Lingui в монорепо: конфиг, каталоги `ru`, общий каталог `packages/ui`, задача извлечения строк. — S · ADR, NFR-6
-- [ ] **T-007** Docker Compose для разработки: PostgreSQL, MinIO. — S · ADR
-- [ ] **T-008** CI (GitHub Actions или аналог): установка, `generate`, `lint`, `typecheck`, `test`, `build` через Turborepo с кешем. — M · ADR
-- [ ] **T-009** Фото для моков и демо-магазина: набор из `design-assets/storefront` + данные «Айгерим Kids» в моках MSW. — S · S5
+- [x] **T-002** Монорепо: pnpm workspaces + Turborepo; пустые `apps/web`, `apps/admin`, `apps/api`, `packages/ui`, `packages/contract`; задачи `dev`, `build`, `lint`, `typecheck`, `test`, `generate`. Node 22 LTS. — M · ADR
+- [x] **T-003** Общие настройки TypeScript, ESLint, Prettier; Vitest в каждом пакете. — S · ADR
+- [x] **T-004** Генерация из контракта: Hey API (точная версия) — типы, SDK, хуки TanStack Query, Zod, MSW; плагин NestJS. Линтер Redocly в задаче `lint`. — M · ADR, API
+- [x] **T-005** `packages/ui`: токены из `DESIGN.md` (цвета, шрифт Geologica, радиусы, отступы, тени) для Tailwind; базовые компоненты — кнопка (пухлая с подложкой), чип, поле, переключатель, пилюля наличия, шторка/окно. — L · DESIGN.md
+- [x] **T-006** Lingui в монорепо: конфиг, каталоги `ru`, общий каталог `packages/ui`, задача извлечения строк. — S · ADR, NFR-6
+- [x] **T-007** Docker Compose для разработки: PostgreSQL, MinIO. — S · ADR
+- [x] **T-008** CI (GitHub Actions или аналог): установка, `generate`, `lint`, `typecheck`, `test`, `build` через Turborepo с кешем. — M · ADR
+- [x] **T-009** Фото для моков и демо-магазина: набор из `design-assets/storefront` + данные «Айгерим Kids» в моках MSW. — S · S5
 
 ## E1. Витрина (`apps/web`, на моках)
 - [ ] **T-101** Каркас TanStack Start: маршруты, TanStack Query с передачей кеша с сервера, MSW в разработке. — M · ADR

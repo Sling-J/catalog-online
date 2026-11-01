@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.turbo
+pnpm-lock.yaml
+**/src/gen
+**/src/locales
+design-assets
+.claude
+.impeccable
+docs
+*.md

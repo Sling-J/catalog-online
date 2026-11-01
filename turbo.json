@@ -1,0 +1,30 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "tasks": {
+    "generate": {
+      "inputs": ["openapi.yaml", "openapi-ts.config.ts"],
+      "outputs": ["src/gen/**"]
+    },
+    "build": {
+      "dependsOn": ["^build", "generate"],
+      "outputs": ["dist/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build", "generate"]
+    },
+    "lint": {
+      "dependsOn": ["generate"]
+    },
+    "test": {
+      "dependsOn": ["^build", "generate"]
+    },
+    "i18n:extract": {
+      "cache": false
+    },
+    "dev": {
+      "dependsOn": ["^build", "generate"],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

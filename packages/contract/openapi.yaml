@@ -1659,7 +1659,8 @@ components:
             settingsFilled: { type: boolean }
             productCount: { type: integer }
             productsWithoutPhoto: { type: integer }
-            canPublish: { type: boolean, description: 'Есть название, адрес витрины, WhatsApp и хотя бы один видимый товар' }
+            canPublish:
+              { type: boolean, description: 'Есть название, адрес витрины, WhatsApp и хотя бы один видимый товар' }
     ShopUpdate:
       type: object
       description: Только переданные поля. Логотип — отдельно через /shop/logo
@@ -1801,7 +1802,8 @@ components:
         id: { type: string, format: uuid }
         position: { type: integer }
         status: { type: string, enum: [processing, ready, failed] }
-        image: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }], description: 'null пока processing' }
+        image:
+          { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }], description: 'null пока processing' }
 
     # ─── Категории и свойства ───
     Category:
@@ -1895,7 +1897,8 @@ components:
                 zeroed: { type: integer }
                 skipped: { type: integer }
             - type: 'null'
-        failureCode: { type: [string, 'null'], description: 'Для failed: unreadable_file, too_many_rows, no_required_columns…' }
+        failureCode:
+          { type: [string, 'null'], description: 'Для failed: unreadable_file, too_many_rows, no_required_columns…' }
         createdAt: { type: string, format: date-time }
         finishedAt: { type: [string, 'null'], format: date-time }
     ImportRowError:
