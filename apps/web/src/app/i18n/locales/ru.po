@@ -1,0 +1,128 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-11-01 16:16+0500\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: ru\n"
+
+msgid "в воскресенье"
+msgstr "в воскресенье"
+
+msgid "в понедельник"
+msgstr "в понедельник"
+
+msgid "в пятницу"
+msgstr "в пятницу"
+
+msgid "в среду"
+msgstr "в среду"
+
+msgid "в субботу"
+msgstr "в субботу"
+
+msgid "в четверг"
+msgstr "в четверг"
+
+msgid "во вторник"
+msgstr "во вторник"
+
+msgid "Воскресенье"
+msgstr "Воскресенье"
+
+msgid "Вс"
+msgstr "Вс"
+
+msgid "Вт"
+msgstr "Вт"
+
+msgid "Вторник"
+msgstr "Вторник"
+
+msgid "Выходной"
+msgstr "Выходной"
+
+msgid "График работы"
+msgstr "График работы"
+
+msgid "Закрыто"
+msgstr "Закрыто"
+
+msgid "Магазин в кармане"
+msgstr "Магазин в кармане"
+
+msgid "Магазин не найден"
+msgstr "Магазин не найден"
+
+msgid "Написать в WhatsApp"
+msgstr "Написать в WhatsApp"
+
+msgid "О магазине: адрес, график, контакты"
+msgstr "О магазине: адрес, график, контакты"
+
+#. placeholder {0}: weekdays.on[status.next.day]
+#. placeholder {1}: status.next.time
+msgid "Откроется {0} в {1}"
+msgstr "Откроется {0} в {1}"
+
+#. placeholder {0}: status.next.time
+msgid "Откроется в {0}"
+msgstr "Откроется в {0}"
+
+#. placeholder {0}: status.next.time
+msgid "Откроется завтра в {0}"
+msgstr "Откроется завтра в {0}"
+
+msgid "открыто"
+msgstr "открыто"
+
+#. placeholder {0}: status.closesAt
+msgid "Открыто до {0}"
+msgstr "Открыто до {0}"
+
+msgid "Открыть в 2ГИС"
+msgstr "Открыть в 2ГИС"
+
+msgid "Пн"
+msgstr "Пн"
+
+msgid "Понедельник"
+msgstr "Понедельник"
+
+msgid "Пт"
+msgstr "Пт"
+
+msgid "Пятница"
+msgstr "Пятница"
+
+msgid "Сб"
+msgstr "Сб"
+
+msgid "Связаться"
+msgstr "Связаться"
+
+#. placeholder {0}: weekdays.long[first].toLowerCase()
+msgid "Сегодня, {0}"
+msgstr "Сегодня, {0}"
+
+msgid "Скопировано"
+msgstr "Скопировано"
+
+msgid "Скопировать адрес"
+msgstr "Скопировать адрес"
+
+msgid "Ср"
+msgstr "Ср"
+
+msgid "Среда"
+msgstr "Среда"
+
+msgid "Суббота"
+msgstr "Суббота"
+
+msgid "Четверг"
+msgstr "Четверг"
+
+msgid "Чт"
+msgstr "Чт"

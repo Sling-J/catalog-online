@@ -65,6 +65,12 @@ importers:
       '@catalog/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@lingui/core':
+        specifier: 6.11.0
+        version: 6.11.0(@babel/core@7.29.7)
+      '@lingui/react':
+        specifier: 6.11.0
+        version: 6.11.0(@babel/core@7.29.7)(react@19.3.1)
       '@tanstack/react-query':
         specifier: 5.105.0
         version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
@@ -87,6 +93,15 @@ importers:
       '@catalog/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
+      '@lingui/cli':
+        specifier: 6.11.0
+        version: 6.11.0(rolldown@1.2.16)
+      '@lingui/format-po':
+        specifier: 6.11.0
+        version: 6.11.0
+      '@lingui/vite-plugin':
+        specifier: 6.11.0
+        version: 6.11.0(@babel/core@7.29.7)(@lingui/babel-plugin-lingui-macro@6.11.0(@babel/core@7.29.7))(@rolldown/plugin-babel@0.2.4(@babel/core@7.29.7)(@babel/runtime@7.29.10)(rolldown@1.2.16)(vite@8.3.5(@types/node@24.19.2)(jiti@2.7.0)))(rolldown@1.2.16)(vite@8.3.5(@types/node@24.19.2)(jiti@2.7.0))
       '@tailwindcss/vite':
         specifier: 4.3.3
         version: 4.3.3(vite@8.3.5(@types/node@24.19.2)(jiti@2.7.0))
@@ -150,6 +165,9 @@ importers:
       '@lingui/core':
         specifier: 6.11.0
         version: 6.11.0(@babel/core@7.29.7)
+      '@lingui/format-po':
+        specifier: 6.11.0
+        version: 6.11.0
       '@lingui/react':
         specifier: 6.11.0
         version: 6.11.0(@babel/core@7.29.7)(react@19.3.1)

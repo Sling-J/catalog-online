@@ -7,22 +7,17 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: ru\n"
 
-#: src/components/StockPill.tsx:43
 msgid "В наличии"
 msgstr "В наличии"
 
-#: src/components/StockPill.tsx:41
 msgid "В наличии: {quantity} шт."
 msgstr "В наличии: {quantity} шт."
 
-#: src/components/StockPill.tsx:33
 msgid "Нет в наличии"
 msgstr "Нет в наличии"
 
-#: src/components/StockPill.tsx:36
 msgid "Осталось {quantity} шт."
 msgstr "Осталось {quantity} шт."
 
-#: src/components/StockPill.tsx:38
 msgid "Осталось мало"
 msgstr "Осталось мало"

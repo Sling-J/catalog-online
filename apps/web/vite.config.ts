@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { lingui } from '@lingui/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import react from '@vitejs/plugin-react';
@@ -36,6 +37,8 @@ export default defineConfig({
     }),
     // плагин React — после плагина Start
     react(),
+    // макросы Lingui раскрывает сам плагин, как в packages/ui; .po-каталоги импортируются как модули
+    lingui({ macroTransform: true }),
     tailwindcss(),
     demoPhotos(),
   ],
