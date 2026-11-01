@@ -4,6 +4,7 @@ import { useEffect, type ReactNode } from 'react';
 
 import { cartMounted } from '@/entities/cart';
 import { NotFoundPage } from '@/pages/not-found';
+import { CartSheet } from '@/widgets/cart-sheet';
 
 import { getTenant } from '../lib';
 import appCss from '../styles.css?url';
@@ -25,11 +26,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function Root() {
+  const { tenant } = Route.useRouteContext();
   // корзину читаем из хранилища уже после гидратации, чтобы разметка сервера и браузера совпала
   useEffect(() => {
     cartMounted();
   }, []);
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      {/* корзина открывается и из каталога, и с карточки товара — поэтому одна на всё приложение */}
+      {tenant.kind === 'shop' && <CartSheet />}
+    </>
+  );
 }
 
 function RootDocument({ children }: { children: ReactNode }) {

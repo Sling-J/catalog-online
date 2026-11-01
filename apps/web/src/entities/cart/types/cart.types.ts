@@ -16,3 +16,16 @@ export type CartItem = {
   /** Остаток, если магазин показывает точное число; иначе `null`. */
   maxQuantity: number | null;
 };
+
+/** Что изменилось в позиции при перепроверке (плашка у строки). */
+export type CartNotice =
+  | { kind: 'price_changed'; from: number; to: number }
+  | { kind: 'quantity_reduced'; to: number }
+  | { kind: 'out_of_stock' }
+  | { kind: 'unavailable' };
+
+/** Изменения по позициям: ключ — id варианта. */
+export type CartNotices = Record<string, CartNotice[]>;
+
+/** Как прошла перепроверка: `failed` — нет связи, показываем сохранённую корзину. */
+export type CheckState = 'idle' | 'loading' | 'done' | 'failed';

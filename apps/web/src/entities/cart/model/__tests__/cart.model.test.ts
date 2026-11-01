@@ -4,11 +4,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CartItem } from '@/entities/cart/types';
 
 import {
+  $checkState,
+  $comment,
   $count,
   $items,
+  $notices,
+  $open,
   $total,
   cartCleared,
+  cartClosed,
   cartMounted,
+  cartOpened,
+  checkCartFx,
+  commentChanged,
   itemRemoved,
   quantityChanged,
   variantAdded,
@@ -75,6 +83,92 @@ describe('корзина (Effector)', () => {
 
     await allSettled(variantAdded, { scope, params: item({ variantId: 'v9' }) });
     expect(JSON.parse(storage.data.get('catalog:cart:v1')!)).toHaveLength(2);
+  });
+
+  describe('перепроверка при открытии', () => {
+    const response = (
+      lines: { variantId: string; status: 'ok' | 'out_of_stock'; quantity: number; price: number | null }[],
+    ) => ({
+      items: lines,
+      total: 0,
+    });
+
+    it('применяет ответ: новая цена, закончившееся не считается в сумме', async () => {
+      const scope = fork({
+        handlers: [
+          [
+            checkCartFx,
+            async () =>
+              response([
+                { variantId: 'v1', status: 'ok', quantity: 2, price: 1200 },
+                { variantId: 'v2', status: 'out_of_stock', quantity: 0, price: null },
+              ]),
+          ],
+        ],
+      });
+      await allSettled(variantAdded, { scope, params: item({ quantity: 2 }) });
+      await allSettled(variantAdded, { scope, params: item({ variantId: 'v2', price: 500 }) });
+
+      await allSettled(cartOpened, { scope, params: 'aigerim-kids' });
+
+      expect(scope.getState($open)).toBe(true);
+      expect(scope.getState($checkState)).toBe('done');
+      expect(scope.getState($items).find((i) => i.variantId === 'v1')!.price).toBe(1200);
+      expect(scope.getState($notices).v1).toEqual([{ kind: 'price_changed', from: 1000, to: 1200 }]);
+      expect(scope.getState($notices).v2).toEqual([{ kind: 'out_of_stock' }]);
+      // закрытая позиция остаётся в корзине, но не считается
+      expect(scope.getState($items)).toHaveLength(2);
+      expect(scope.getState($count)).toBe(2);
+      expect(scope.getState($total)).toBe(2400);
+    });
+
+    it('нет связи: корзина остаётся как была, состояние — failed', async () => {
+      const scope = fork({
+        handlers: [
+          [
+            checkCartFx,
+            async () => {
+              throw new Error('Failed to fetch');
+            },
+          ],
+        ],
+      });
+      await allSettled(variantAdded, { scope, params: item() });
+      await allSettled(cartOpened, { scope, params: 'aigerim-kids' });
+
+      expect(scope.getState($checkState)).toBe('failed');
+      expect(scope.getState($items)).toHaveLength(1);
+      expect(scope.getState($notices)).toEqual({});
+    });
+
+    it('пустую корзину не проверяет', async () => {
+      let called = false;
+      const scope = fork({
+        handlers: [
+          [
+            checkCartFx,
+            async () => {
+              called = true;
+              return response([]);
+            },
+          ],
+        ],
+      });
+      await allSettled(cartOpened, { scope, params: 'aigerim-kids' });
+      expect(called).toBe(false);
+      expect(scope.getState($checkState)).toBe('idle');
+    });
+
+    it('закрытие корзины и комментарий', async () => {
+      const scope = fork();
+      await allSettled(cartOpened, { scope, params: 'aigerim-kids' });
+      await allSettled(commentChanged, { scope, params: 'Позвоните перед приходом' });
+      expect(scope.getState($comment)).toBe('Позвоните перед приходом');
+      await allSettled(cartClosed, { scope });
+      expect(scope.getState($open)).toBe(false);
+      await allSettled(commentChanged, { scope, params: 'я'.repeat(900) });
+      expect(scope.getState($comment)).toHaveLength(500);
+    });
   });
 
   it('пока корзина не прочитана, сохранённое не затирается', async () => {

@@ -13,7 +13,7 @@ import {
   type RequestHandlerOptions,
 } from '../gen/msw.gen.js';
 import type { Problem } from '../gen/types.gen.js';
-import { createDemoShopData, demoShop } from './demo-shop.js';
+import { createDemoShopData, demoShop, LOW_STOCK } from './demo-shop.js';
 import { computeFacets, readFilters, selectCards } from './filtering.js';
 
 export type DemoHandlersOptions = RequestHandlerOptions & {
@@ -87,7 +87,12 @@ export const demoStorefrontHandlers = ({ assetBase, ...options }: DemoHandlersOp
         };
       }
       const outOfStock = variant.stock.level === 'out';
-      const quantity = outOfStock ? 0 : item.quantity;
+      // у «мало» остаток не больше LOW_STOCK: так в моках видно «количество уменьшено»
+      const quantity = outOfStock
+        ? 0
+        : variant.stock.level === 'low'
+          ? Math.min(item.quantity, LOW_STOCK)
+          : item.quantity;
       total += quantity * variant.price;
       return {
         variantId: item.variantId,

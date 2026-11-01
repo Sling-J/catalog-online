@@ -14,6 +14,7 @@ import {
   type FilterState,
 } from '@/features/product-filters';
 import { AboutShopSheet } from '@/widgets/about-shop-sheet';
+import { CartPill } from '@/widgets/cart-pill';
 import { CatalogGrid } from '@/widgets/catalog-grid';
 import { CategoryBar } from '@/widgets/category-bar';
 import { ShopHeader } from '@/widgets/shop-header';
@@ -63,7 +64,7 @@ export function CatalogPage({ subdomain }: { subdomain: string }) {
   const resetFilters = () => changeFilters({ values: [] });
 
   return (
-    <div className="min-h-dvh bg-paper font-sans text-ink-night">
+    <div className="min-h-dvh bg-paper pb-28 font-sans text-ink-night">
       <ShopHeader shop={shop} onOpenAbout={() => setAboutOpen(true)}>
         <div className="flex gap-2 px-4 pb-3">
           <ProductSearch value={search.q ?? ''} onChange={changeQuery} />
@@ -81,6 +82,7 @@ export function CatalogPage({ subdomain }: { subdomain: string }) {
           onResetFilters={resetAll}
         />
       </main>
+      <CartPill subdomain={subdomain} />
       <AboutShopSheet shop={shop} open={aboutOpen} onClose={() => setAboutOpen(false)} />
       <FiltersSheet
         open={filtersOpen}

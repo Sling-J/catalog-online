@@ -1,7 +1,8 @@
 import { setupServer } from 'msw/node';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import type { StorefrontFacets, StorefrontProductCard } from '../gen/types.gen.js';
+import type { StorefrontFacets, StorefrontProduct, StorefrontProductCard } from '../gen/types.gen.js';
+import { LOW_STOCK } from './demo-shop.js';
 import { demoStorefrontHandlers } from './handlers.js';
 
 const server = setupServer(...demoStorefrontHandlers({ assetBase: '' }));
@@ -84,5 +85,50 @@ describe('моки витрины: список товаров', () => {
     const filtered = await getJson<StorefrontFacets>(`/facets?categoryId=${first.id}`);
     expect(filtered.total).toBeLessThan(items.length);
     expect(filtered.total).toBeGreaterThan(0);
+  });
+});
+
+describe('моки витрины: перепроверка корзины', () => {
+  const check = async (items: { variantId: string; quantity: number }[]) => {
+    const response = await fetch(`${base}/cart/check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items }),
+    });
+    return response.json() as Promise<{
+      items: { variantId: string; status: string; quantity: number; price: number | null }[];
+    }>;
+  };
+
+  const firstVariantWith = async (level: 'in' | 'low' | 'out') => {
+    const cards = (await getJson<Page>('/products')).items;
+    for (const card of cards) {
+      const product = await getJson<StorefrontProduct>(`/products/${card.shortId}`);
+      const variant = product.variants.find((entry) => entry.stock.level === level);
+      if (variant) return variant;
+    }
+    throw new Error(`в демо нет варианта с уровнем ${level}`);
+  };
+
+  it('в наличии — как есть', async () => {
+    const variant = await firstVariantWith('in');
+    const { items } = await check([{ variantId: variant.id, quantity: 5 }]);
+    expect(items[0]).toMatchObject({ status: 'ok', quantity: 5, price: variant.price });
+  });
+
+  it('«мало» — количество не больше LOW_STOCK', async () => {
+    const variant = await firstVariantWith('low');
+    const { items } = await check([{ variantId: variant.id, quantity: 9 }]);
+    expect(items[0]!.quantity).toBe(LOW_STOCK);
+  });
+
+  it('закончилось и неизвестный вариант', async () => {
+    const out = await firstVariantWith('out');
+    const { items } = await check([
+      { variantId: out.id, quantity: 1 },
+      { variantId: '0192d000-0000-7000-8000-00000000ffff', quantity: 1 },
+    ]);
+    expect(items[0]).toMatchObject({ status: 'out_of_stock', quantity: 0 });
+    expect(items[1]).toMatchObject({ status: 'unavailable', quantity: 0 });
   });
 });

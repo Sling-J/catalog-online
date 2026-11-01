@@ -45,7 +45,7 @@ export const demoShop: StorefrontShop = {
   isPreview: false,
 };
 
-const LOW_STOCK = 2;
+export const LOW_STOCK = 2;
 
 type CategoryKey = 'outer' | 'dress' | 'tops' | 'shoes' | 'acc';
 
