@@ -24,7 +24,7 @@ describe('buildCartItem', () => {
       productShortId: 'abcde',
       slug: 'kurtka',
       name: 'Куртка',
-      variantLabel: 'Рост 104',
+      variantLabel: 'Рост: 104',
       price: 18900,
       photo: '/demo/jacket.jpg',
       maxQuantity: 2,

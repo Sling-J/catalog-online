@@ -97,6 +97,6 @@ describe('getPriceRange / describeVariant', () => {
   });
 
   it('подпись варианта собирается из значений свойств', () => {
-    expect(describeVariant(product, product.variants[1]!)).toBe('Рост 104, Цвет красный');
+    expect(describeVariant(product, product.variants[1]!)).toBe('Рост: 104, Цвет: красный');
   });
 });

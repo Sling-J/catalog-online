@@ -8,6 +8,7 @@ msgstr ""
 "Language: ru\n"
 
 #. placeholder {0}: facets.total
+#. placeholder {0}: order.count
 msgid "{0, plural, one {# товар} few {# товара} many {# товаров} other {# товара}}"
 msgstr "{0, plural, one {# товар} few {# товара} many {# товаров} other {# товара}}"
 
@@ -104,6 +105,12 @@ msgstr "До, ₸"
 msgid "Дороже"
 msgstr "Дороже"
 
+msgid "Заказ отправлен"
+msgstr "Заказ отправлен"
+
+msgid "Заказать через WhatsApp"
+msgstr "Заказать через WhatsApp"
+
 msgid "Закончился"
 msgstr "Закончился"
 
@@ -113,11 +120,21 @@ msgstr "Закрыто"
 msgid "зачёркнутых нет в наличии"
 msgstr "зачёркнутых нет в наличии"
 
+msgid "Заявка ушла в WhatsApp"
+msgstr "Заявка ушла в WhatsApp"
+
 msgid "Здесь пока нет товаров"
 msgstr "Здесь пока нет товаров"
 
+#. placeholder {0}: shop.name
+msgid "Здравствуйте! Заказ с сайта {0}:"
+msgstr "Здравствуйте! Заказ с сайта {0}:"
+
 msgid "Итого"
 msgstr "Итого"
+
+msgid "Комментарий"
+msgstr "Комментарий"
 
 msgid "Комментарий для магазина"
 msgstr "Комментарий для магазина"
@@ -133,6 +150,9 @@ msgstr "Магазин кое-что обновил — проверьте ко�
 
 msgid "Магазин не найден"
 msgstr "Магазин не найден"
+
+msgid "Магазин проверит наличие и ответит вам в чате"
+msgstr "Магазин проверит наличие и ответит вам в чате"
 
 msgid "мало"
 msgstr "мало"
@@ -186,6 +206,9 @@ msgstr "От, ₸"
 msgid "Откроется {0} в {1}"
 msgstr "Откроется {0} в {1}"
 
+msgid "Откроется WhatsApp с готовым сообщением для магазина"
+msgstr "Откроется WhatsApp с готовым сообщением для магазина"
+
 #. placeholder {0}: status.next.time
 msgid "Откроется в {0}"
 msgstr "Откроется в {0}"
@@ -201,8 +224,14 @@ msgstr "открыто"
 msgid "Открыто до {0}"
 msgstr "Открыто до {0}"
 
+msgid "Открыть WhatsApp ещё раз"
+msgstr "Открыть WhatsApp ещё раз"
+
 msgid "Открыть в 2ГИС"
 msgstr "Открыть в 2ГИС"
+
+msgid "Отправлено ✓"
+msgstr "Отправлено ✓"
 
 msgid "Очистить поиск"
 msgstr "Очистить поиск"
@@ -252,6 +281,9 @@ msgstr "Скопировано"
 
 msgid "Скопировать адрес"
 msgstr "Скопировать адрес"
+
+msgid "Скопировать текст"
+msgstr "Скопировать текст"
 
 msgid "Сортировка"
 msgstr "Сортировка"

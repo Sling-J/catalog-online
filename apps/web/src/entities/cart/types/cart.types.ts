@@ -8,7 +8,7 @@ export type CartItem = {
   productShortId: string;
   slug: string;
   name: string;
-  /** «Рост 104» или пусто, если у товара нет свойств. */
+  /** «Рост: 104, Цвет: синий» или пусто, если у товара нет свойств. */
   variantLabel: string;
   price: number;
   /** Адрес миниатюры. */

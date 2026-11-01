@@ -52,11 +52,11 @@ export function getPriceRange(product: StorefrontProduct): { min: number; max: n
   return { min: Math.min(...prices), max: Math.max(...prices) };
 }
 
-/** Подпись выбранного варианта: «Рост 104» или «Один размер», если свойств нет. */
+/** Подпись варианта в формате заказа (FR-V8): «Рост: 104, Цвет: синий»; пусто, если свойств нет. */
 export function describeVariant(product: StorefrontProduct, variant: Variant): string {
   const parts = product.attributes.flatMap((attribute) => {
     const value = attribute.values.find((entry) => variant.valueIds.includes(entry.id));
-    return value ? `${attribute.name} ${value.value}` : [];
+    return value ? `${attribute.name}: ${value.value}` : [];
   });
   return parts.join(', ');
 }

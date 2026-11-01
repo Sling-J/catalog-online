@@ -35,7 +35,7 @@ function Root() {
     <>
       <Outlet />
       {/* корзина открывается и из каталога, и с карточки товара — поэтому одна на всё приложение */}
-      {tenant.kind === 'shop' && <CartSheet />}
+      {tenant.kind === 'shop' && <CartSheet subdomain={tenant.subdomain} />}
     </>
   );
 }

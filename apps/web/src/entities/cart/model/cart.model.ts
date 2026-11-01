@@ -77,10 +77,10 @@ export const $checkState = createStore<CheckState>('idle', { name: 'cart.checkSt
   .on(checkCartFx.fail, () => 'failed')
   .reset(cartCleared);
 
+// после оформления корзина очищается, а шторка остаётся открытой — на ней экран «Отправлено»
 export const $open = createStore(false, { name: 'cart.open' })
   .on(cartOpened, () => true)
-  .on(cartClosed, () => false)
-  .reset(cartCleared);
+  .on(cartClosed, () => false);
 
 export const $comment = createStore('', { name: 'cart.comment' })
   .on(commentChanged, (_, text) => text.slice(0, MAX_COMMENT_LENGTH))
