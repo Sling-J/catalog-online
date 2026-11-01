@@ -1,3 +1,4 @@
+import { Button } from '@catalog/ui';
 import { Plural, Trans } from '@lingui/react/macro';
 import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 
@@ -12,10 +13,15 @@ export function CatalogGrid({
   subdomain,
   params,
   onSortChange,
+  hasFilters,
+  onResetFilters,
 }: {
   subdomain: string;
   params: ProductListParams;
   onSortChange: (sort: ProductSort) => void;
+  /** Включены ли поиск или фильтры — от этого зависит текст пустой выборки. */
+  hasFilters: boolean;
+  onResetFilters: () => void;
 }) {
   const { data: facets } = useSuspenseQuery(productFacetsQueryOptions(subdomain, params));
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } = useSuspenseInfiniteQuery(
@@ -39,9 +45,7 @@ export function CatalogGrid({
         <CatalogSort value={params.sort ?? 'new'} onChange={onSortChange} />
       </div>
       {cards.length === 0 ? (
-        <p className="px-6 py-16 text-center text-[15px] text-ink-quiet">
-          <Trans>Здесь пока нет товаров</Trans>
-        </p>
+        <EmptyState filtered={hasFilters} onReset={onResetFilters} />
       ) : (
         <ul className="grid grid-cols-3 gap-0.5 lg:grid-cols-5 lg:gap-2 lg:px-4">
           {cards.map((card) => (
@@ -53,5 +57,29 @@ export function CatalogGrid({
       )}
       {hasNextPage && <div ref={marker} aria-hidden="true" className="h-px" />}
     </section>
+  );
+}
+
+function EmptyState({ filtered, onReset }: { filtered: boolean; onReset: () => void }) {
+  return (
+    <div className="px-6 py-16 text-center">
+      {filtered ? (
+        <>
+          <p className="text-[18px] font-extrabold">
+            <Trans>Ничего не нашлось</Trans>
+          </p>
+          <p className="mt-1.5 text-[14px] text-ink-quiet">
+            <Trans>Попробуйте другой запрос или уберите фильтры</Trans>
+          </p>
+          <Button className="mt-4" onClick={onReset}>
+            <Trans>Сбросить поиск и фильтры</Trans>
+          </Button>
+        </>
+      ) : (
+        <p className="text-[15px] text-ink-quiet">
+          <Trans>Здесь пока нет товаров</Trans>
+        </p>
+      )}
+    </div>
   );
 }

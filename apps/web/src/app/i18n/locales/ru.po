@@ -11,6 +11,10 @@ msgstr ""
 msgid "{0, plural, one {# товар} few {# товара} many {# товаров} other {# товара}}"
 msgstr "{0, plural, one {# товар} few {# товара} many {# товаров} other {# товара}}"
 
+#. placeholder {0}: current.total
+msgid "{0, plural, one {Показать # товар} few {Показать # товара} many {Показать # товаров} other {Показать # товара}}"
+msgstr "{0, plural, one {Показать # товар} few {Показать # товара} many {Показать # товаров} other {Показать # товара}}"
+
 msgid "в воскресенье"
 msgstr "в воскресенье"
 
@@ -56,6 +60,13 @@ msgstr "График работы"
 msgid "Дешевле"
 msgstr "Дешевле"
 
+#. placeholder {0}: formatPrice(priceMax ?? 0)
+msgid "до {0}"
+msgstr "до {0}"
+
+msgid "До, ₸"
+msgstr "До, ₸"
+
 msgid "Дороже"
 msgstr "Дороже"
 
@@ -80,6 +91,9 @@ msgstr "Написать в WhatsApp"
 msgid "нет в наличии"
 msgstr "нет в наличии"
 
+msgid "Ничего не нашлось"
+msgstr "Ничего не нашлось"
+
 msgid "Новые"
 msgstr "Новые"
 
@@ -87,8 +101,12 @@ msgid "О магазине: адрес, график, контакты"
 msgstr "О магазине: адрес, график, контакты"
 
 #. placeholder {0}: formatPrice(card.price)
+#. placeholder {0}: formatPrice(priceMin)
 msgid "от {0}"
 msgstr "от {0}"
+
+msgid "От, ₸"
+msgstr "От, ₸"
 
 #. placeholder {0}: weekdays.on[status.next.day]
 #. placeholder {1}: status.next.time
@@ -113,11 +131,20 @@ msgstr "Открыто до {0}"
 msgid "Открыть в 2ГИС"
 msgstr "Открыть в 2ГИС"
 
+msgid "Очистить поиск"
+msgstr "Очистить поиск"
+
 msgid "Пн"
 msgstr "Пн"
 
+msgid "Поиск по магазину"
+msgstr "Поиск по магазину"
+
 msgid "Понедельник"
 msgstr "Понедельник"
+
+msgid "Попробуйте другой запрос или уберите фильтры"
+msgstr "Попробуйте другой запрос или уберите фильтры"
 
 msgid "Пт"
 msgstr "Пт"
@@ -127,6 +154,12 @@ msgstr "Пятница"
 
 msgid "Сб"
 msgstr "Сб"
+
+msgid "Сбросить"
+msgstr "Сбросить"
+
+msgid "Сбросить поиск и фильтры"
+msgstr "Сбросить поиск и фильтры"
 
 msgid "Связаться"
 msgstr "Связаться"
@@ -152,6 +185,23 @@ msgstr "Среда"
 
 msgid "Суббота"
 msgstr "Суббота"
+
+msgid "Убрать фильтр по цене"
+msgstr "Убрать фильтр по цене"
+
+#. placeholder {0}: filter.attributeName
+#. placeholder {1}: filter.value
+msgid "Убрать фильтр: {0} {1}"
+msgstr "Убрать фильтр: {0} {1}"
+
+msgid "Фильтры"
+msgstr "Фильтры"
+
+msgid "Фильтры, выбрано: {count}"
+msgstr "Фильтры, выбрано: {count}"
+
+msgid "Цена"
+msgstr "Цена"
 
 msgid "Четверг"
 msgstr "Четверг"

@@ -1,1 +1,1 @@
-export { toProductParams, validateCatalogSearch, type CatalogSearch } from './catalog-search';
+export { selectedValues, toProductParams, validateCatalogSearch, type CatalogSearch } from './catalog-search';

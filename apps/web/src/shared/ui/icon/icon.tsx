@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export type IconName = 'chevron-right' | 'pin' | 'whatsapp' | 'copy' | 'check';
+export type IconName = 'chevron-right' | 'pin' | 'whatsapp' | 'copy' | 'check' | 'search' | 'sliders' | 'close';
 
 // Контурные иконки 24×24, штрих берут от `currentColor`.
 const glyphs: Record<IconName, ReactNode> = {
@@ -24,6 +24,20 @@ const glyphs: Record<IconName, ReactNode> = {
     </>
   ),
   check: <path d="M5 12.5l4.5 4.5L19 7" />,
+  search: (
+    <>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.5-3.5" />
+    </>
+  ),
+  sliders: (
+    <>
+      <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
+      <circle cx="16" cy="7" r="2" />
+      <circle cx="10" cy="17" r="2" />
+    </>
+  ),
+  close: <path d="M6 6l12 12M18 6L6 18" />,
 };
 
 export function Icon({ name, size = 20, className }: { name: IconName; size?: number; className?: string }) {

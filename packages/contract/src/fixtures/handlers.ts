@@ -14,6 +14,7 @@ import {
 } from '../gen/msw.gen.js';
 import type { Problem } from '../gen/types.gen.js';
 import { createDemoShopData, demoShop } from './demo-shop.js';
+import { computeFacets, readFilters, selectCards } from './filtering.js';
 
 export type DemoHandlersOptions = RequestHandlerOptions & {
   /** Откуда приложение отдаёт фото (`<assetBase>/demo/<имя>.jpg`). Пустая строка — адреса от корня страницы. */
@@ -25,23 +26,6 @@ const DEFAULT_PAGE_SIZE = 30;
 // Картинки отдаёт само приложение (папка /demo), поэтому по умолчанию база — адрес страницы, а не API.
 const dataFor = (request: Request, assetBase?: string) =>
   createDemoShopData(assetBase ?? globalThis.location?.origin ?? new URL(request.url).origin);
-
-/** Карточки по фильтрам запроса: категория, поиск, сортировка (демо-магазин плоский, без подкатегорий). */
-const filterCards = (request: Request, assetBase?: string) => {
-  const { cards, products } = dataFor(request, assetBase);
-  const params = new URL(request.url).searchParams;
-  const categoryId = params.get('categoryId');
-  const query = params.get('q')?.toLowerCase();
-  const sort = params.get('sort');
-  const items = cards.filter((card) => {
-    const product = products.find((entry) => entry.id === card.id);
-    if (categoryId && product?.category?.id !== categoryId) return false;
-    return !query || card.name.toLowerCase().includes(query);
-  });
-  if (sort === 'price_asc') items.sort((a, b) => a.price - b.price);
-  if (sort === 'price_desc') items.sort((a, b) => b.price - a.price);
-  return items;
-};
 
 const notFound = (): Response =>
   HttpResponse.json<Problem>(
@@ -64,7 +48,7 @@ export const demoStorefrontHandlers = ({ assetBase, ...options }: DemoHandlersOp
   handleListStorefrontProducts(({ params, request }) => {
     if (!isDemo(params.subdomain)) return notFound();
     const query = new URL(request.url).searchParams;
-    const items = filterCards(request, assetBase);
+    const items = selectCards(dataFor(request, assetBase), readFilters(new URL(request.url)));
     // курсор в моках — просто смещение от начала выборки
     const offset = Number(query.get('cursor') ?? 0) || 0;
     const limit = Number(query.get('limit') ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE;
@@ -77,7 +61,7 @@ export const demoStorefrontHandlers = ({ assetBase, ...options }: DemoHandlersOp
   handleGetStorefrontFacets(
     ({ params, request }) =>
       isDemo(params.subdomain)
-        ? HttpResponse.json({ ...dataFor(request, assetBase).facets, total: filterCards(request, assetBase).length })
+        ? HttpResponse.json(computeFacets(dataFor(request, assetBase), readFilters(new URL(request.url))))
         : notFound(),
     options,
   ),

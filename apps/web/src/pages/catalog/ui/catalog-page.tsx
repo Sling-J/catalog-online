@@ -3,37 +3,94 @@ import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import { categoriesQueryOptions } from '@/entities/category';
-import type { ProductSort } from '@/entities/product';
+import { productFacetsQueryOptions, type ProductSort } from '@/entities/product';
 import { shopQueryOptions } from '@/entities/shop';
+import { ProductSearch } from '@/features/product-search';
+import {
+  ActiveFilters,
+  countActiveFilters,
+  FiltersButton,
+  FiltersSheet,
+  type FilterState,
+} from '@/features/product-filters';
 import { AboutShopSheet } from '@/widgets/about-shop-sheet';
 import { CatalogGrid } from '@/widgets/catalog-grid';
 import { CategoryBar } from '@/widgets/category-bar';
 import { ShopHeader } from '@/widgets/shop-header';
 
-import { toProductParams } from '../lib';
+import { selectedValues, toProductParams } from '../lib';
 
 // Витрина собирается по шагам: шапка и «О магазине» — T-103, категории, сетка, сортировка — T-104, поиск и фильтры — T-105.
 export function CatalogPage({ subdomain }: { subdomain: string }) {
-  const { data: shop } = useSuspenseQuery(shopQueryOptions(subdomain));
-  const { data: categories } = useSuspenseQuery(categoriesQueryOptions(subdomain));
   const search = useSearch({ from: '/' });
   const navigate = useNavigate({ from: '/' });
-  const [aboutOpen, setAboutOpen] = useState(false);
+  const params = toProductParams(search);
 
-  // выбор живёт в адресе (FR-V4): ссылкой можно поделиться, «назад» возвращает прежний выбор
+  const { data: shop } = useSuspenseQuery(shopQueryOptions(subdomain));
+  const { data: categories } = useSuspenseQuery(categoriesQueryOptions(subdomain));
+  const { data: facets } = useSuspenseQuery(productFacetsQueryOptions(subdomain, params));
+  // весь магазин без фильтров — чтобы подписать выбранные значения, даже если в выборке их уже нет
+  const { data: allFacets } = useSuspenseQuery(productFacetsQueryOptions(subdomain));
+
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const filters: FilterState = { values: selectedValues(search), priceMin: search.priceMin, priceMax: search.priceMax };
+  const hasFilters = countActiveFilters(filters) > 0 || !!search.q;
+
+  // выбор живёт в адресе (FR-V4): ссылкой можно поделиться, «назад» возвращает прежний выбор;
+  // поиск и фильтры меняются на ходу, поэтому пишем их поверх текущей записи, а не новой
   const selectCategory = (category: string | undefined) => void navigate({ search: (prev) => ({ ...prev, category }) });
   const changeSort = (sort: ProductSort) =>
     void navigate({ search: (prev) => ({ ...prev, sort: sort === 'new' ? undefined : sort }) });
+  const changeQuery = (q: string) =>
+    void navigate({ search: (prev) => ({ ...prev, q: q || undefined }), replace: true });
+  const changeFilters = (next: FilterState) =>
+    void navigate({
+      search: (prev) => ({
+        ...prev,
+        values: next.values.length > 0 ? next.values.join(',') : undefined,
+        priceMin: next.priceMin,
+        priceMax: next.priceMax,
+      }),
+      replace: true,
+    });
+  const resetAll = () =>
+    void navigate({
+      search: (prev) => ({ ...prev, q: undefined, values: undefined, priceMin: undefined, priceMax: undefined }),
+      replace: true,
+    });
+  const resetFilters = () => changeFilters({ values: [] });
 
   return (
     <div className="min-h-dvh bg-paper font-sans text-ink-night">
       <ShopHeader shop={shop} onOpenAbout={() => setAboutOpen(true)}>
+        <div className="flex gap-2 px-4 pb-3">
+          <ProductSearch value={search.q ?? ''} onChange={changeQuery} />
+          <FiltersButton count={countActiveFilters(filters)} onClick={() => setFiltersOpen(true)} />
+        </div>
         <CategoryBar categories={categories} selectedId={search.category} onSelect={selectCategory} />
+        <ActiveFilters all={allFacets} state={filters} onChange={changeFilters} />
       </ShopHeader>
       <main>
-        <CatalogGrid subdomain={subdomain} params={toProductParams(search)} onSortChange={changeSort} />
+        <CatalogGrid
+          subdomain={subdomain}
+          params={params}
+          onSortChange={changeSort}
+          hasFilters={hasFilters}
+          onResetFilters={resetAll}
+        />
       </main>
       <AboutShopSheet shop={shop} open={aboutOpen} onClose={() => setAboutOpen(false)} />
+      <FiltersSheet
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        all={allFacets}
+        current={facets}
+        state={filters}
+        onChange={changeFilters}
+        onReset={resetFilters}
+      />
     </div>
   );
 }

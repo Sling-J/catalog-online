@@ -61,7 +61,7 @@ const heightAttr = { id: id(10), name: 'Рост' };
 const shoeAttr = { id: id(11), name: 'Размер обуви' };
 const heights = ['92', '98', '104', '110', '116', '122', '128'];
 const shoeSizes = ['24', '25', '26', '27', '28', '29', '30', '31'];
-const valueId = (attr: 'h' | 's', value: string): string => id((attr === 'h' ? 100 : 200) + Number(value));
+const valueId = (attr: 'h' | 's', value: string): string => id((attr === 'h' ? 100 : 300) + Number(value));
 
 type Row = {
   key: number;

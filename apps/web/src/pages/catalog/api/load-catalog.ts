@@ -20,6 +20,8 @@ export async function loadCatalog(queryClient: QueryClient, subdomain: string, s
       queryClient.ensureQueryData(categoriesQueryOptions(subdomain)),
       queryClient.ensureInfiniteQueryData(productsQueryOptions(subdomain, params)),
       queryClient.ensureQueryData(productFacetsQueryOptions(subdomain, params)),
+      // весь магазин без фильтров: подписи выбранных значений в чипах и шторке
+      queryClient.ensureQueryData(productFacetsQueryOptions(subdomain)),
     ]);
   } catch (error) {
     if (isNotFoundError(error)) throw notFound();

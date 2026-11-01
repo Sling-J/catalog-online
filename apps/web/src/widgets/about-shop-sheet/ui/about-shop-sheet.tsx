@@ -5,7 +5,7 @@ import { Trans } from '@lingui/react/macro';
 import { formatPhone, instagramLink, ShopAvatar, twoGisLink, whatsappLink } from '@/entities/shop';
 import { Icon } from '@/shared/ui';
 
-import { useSheetPlacement } from '../hooks';
+import { useSheetPlacement } from '@/shared/hooks';
 import { CopyAddressButton } from './copy-address-button';
 import { ScheduleList } from './schedule-list';
 

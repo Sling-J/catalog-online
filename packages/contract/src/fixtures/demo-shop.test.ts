@@ -29,6 +29,11 @@ describe('демо-магазин соответствует контракту'
     expect(() => zStorefrontFacets.parse(demoFacets)).not.toThrow();
   });
 
+  it('id значений свойств не повторяются (рост 128 и размер обуви 28 не должны совпасть)', () => {
+    const ids = demoFacets.attributes.flatMap((attribute) => attribute.values.map((value) => value.id));
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
   it('14 товаров, у каждого есть фото и хотя бы один вариант', () => {
     expect(demoProducts).toHaveLength(14);
     demoProducts.forEach((product) => {

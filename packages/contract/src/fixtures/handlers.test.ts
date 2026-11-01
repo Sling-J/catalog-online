@@ -40,6 +40,41 @@ describe('моки витрины: список товаров', () => {
     expect(items[0]?.cover?.sizes[320]).toMatch(/^\/demo\//);
   });
 
+  it('ищет по названию без учёта регистра', async () => {
+    const { items } = await getJson<Page>('/products?q=ПЛАТЬЕ');
+    expect(items.length).toBeGreaterThan(0);
+    items.forEach((card) => expect(card.name.toLowerCase()).toContain('платье'));
+  });
+
+  it('фильтрует по цене', async () => {
+    const { items } = await getJson<Page>('/products?priceMin=5000&priceMax=10000');
+    expect(items.length).toBeGreaterThan(0);
+    items.forEach((card) => {
+      expect(card.price).toBeGreaterThanOrEqual(5000);
+      expect(card.price).toBeLessThanOrEqual(10000);
+    });
+  });
+
+  it('фильтрует по значениям свойств: внутри свойства ИЛИ', async () => {
+    const facets = await getJson<StorefrontFacets>('/facets');
+    const [first, second] = facets.attributes[0]!.values;
+    const one = await getJson<Page>(`/products?values=${first!.id}`);
+    const both = await getJson<Page>(`/products?values=${first!.id},${second!.id}`);
+    expect(one.items.length).toBeGreaterThan(0);
+    expect(one.items.length).toBeLessThan(14);
+    expect(both.items.length).toBeGreaterThanOrEqual(one.items.length);
+  });
+
+  it('фасеты: значения свойства не пропадают после выбора этого свойства, цены считаются без фильтра по цене', async () => {
+    const all = await getJson<StorefrontFacets>('/facets');
+    const attribute = all.attributes[0]!;
+    const picked = attribute.values[0]!;
+    const filtered = await getJson<StorefrontFacets>(`/facets?values=${picked.id}&priceMin=9000`);
+    expect(filtered.attributes.find((entry) => entry.id === attribute.id)?.values.length).toBeGreaterThan(1);
+    expect(filtered.price.min).toBeLessThan(9000);
+    expect(filtered.total).toBeLessThanOrEqual(all.total);
+  });
+
   it('число товаров в фильтрах считается по выборке', async () => {
     const all = await getJson<StorefrontFacets>('/facets');
     expect(all.total).toBe(14);

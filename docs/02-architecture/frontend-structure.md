@@ -43,6 +43,8 @@ app → pages → widgets → features → entities → shared
 
 > Примечание (2026-11-01, T-103): срезам одного слоя нельзя импортировать друг друга, поэтому виджеты шапки и «О магазине» не знают друг о друге: состояние «шторка открыта» держит страница (`pages/catalog`) и передаёт им пропсами. Общие для виджетов вещи (аватар магазина, «Открыто до…», график, ссылки WhatsApp/2ГИС) лежат в `entities/shop`; общая иконка — `shared/ui/icon`.
 
+> Примечание (2026-11-01, T-105): в `shared` появился сегмент `hooks` (общие React-хуки без бизнес-контекста, например `useSheetPlacement` — шторка снизу на телефоне и окно по центру на компьютере); импортируется через индекс (`@/shared/hooks`). Поиск и фильтры — отдельные срезы `features/product-search` и `features/product-filters`, друг о друге не знают: их связывает страница `pages/catalog`, а выбор хранится в адресе.
+
 ## 2. Структура среза (feature / widget / entity / page)
 
 ```
@@ -100,7 +102,7 @@ ui/
 ## 6. Алиас
 
 - Алиас один: `@/*` → `src/*` (`@/shared/lib`, `@/features/add-to-cart`). Относительные пути только внутри одной папки (`./order-form`).
-- `shared/types`, `shared/constants` импортируются по файлу (`@/shared/constants/breakpoints`), остальные сегменты `shared` — через индекс (`@/shared/api`, `@/shared/lib`, `@/shared/ui`).
+- `shared/types`, `shared/constants` импортируются по файлу (`@/shared/constants/breakpoints`), остальные сегменты `shared` — через индекс (`@/shared/api`, `@/shared/hooks`, `@/shared/lib`, `@/shared/ui`).
 - Пакеты монорепо — по имени: `@catalog/ui`, `@catalog/contract`.
 
 ## 7. Состояние и данные (как FSD сочетается со стеком)

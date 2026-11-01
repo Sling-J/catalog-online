@@ -5,7 +5,15 @@ import { infiniteQueryOptions, type skipToken } from '@tanstack/react-query';
 export type ProductSort = NonNullable<NonNullable<ListStorefrontProductsData['query']>['sort']>;
 
 /** Что выбрал покупатель; всё это живёт в адресе страницы (FR-V4). */
-export type ProductListParams = { categoryId?: string; sort?: ProductSort };
+export type ProductListParams = {
+  categoryId?: string;
+  sort?: ProductSort;
+  q?: string;
+  /** Id значений свойств (размеры и т.п.). */
+  values?: string[];
+  priceMin?: number;
+  priceMax?: number;
+};
 
 export const PRODUCTS_PAGE_SIZE = 30;
 
@@ -25,6 +33,18 @@ export const productsQueryOptions = (subdomain: string, params: ProductListParam
   });
 };
 
-/** Число товаров в выборке (и фильтры, когда дойдём до T-105). */
-export const productFacetsQueryOptions = (subdomain: string, params: ProductListParams) =>
-  getStorefrontFacetsOptions({ path: { subdomain }, query: { categoryId: params.categoryId } });
+/**
+ * Число товаров и значения фильтров, которые есть в выборке. Без параметров — по всему магазину:
+ * так подписываем выбранные фильтры, даже если в текущей выборке их уже нет.
+ */
+export const productFacetsQueryOptions = (subdomain: string, params: ProductListParams = {}) =>
+  getStorefrontFacetsOptions({
+    path: { subdomain },
+    query: {
+      categoryId: params.categoryId,
+      q: params.q,
+      values: params.values,
+      priceMin: params.priceMin,
+      priceMax: params.priceMax,
+    },
+  });

@@ -6,6 +6,8 @@ export type SheetProps = {
   open: boolean;
   onClose: () => void;
   title: ReactNode;
+  /** Действие справа от заголовка, например «Сбросить». */
+  headerAction?: ReactNode;
   children: ReactNode;
   /** bottom — шторка снизу (телефон), center — окно по центру (компьютер). */
   placement?: 'bottom' | 'center';
@@ -16,7 +18,7 @@ export type SheetProps = {
  * Шторка или окно поверх страницы на нативном dialog: фокус и затемнение даёт браузер.
  * Закрывается по Esc и по клику на затемнение.
  */
-export function Sheet({ open, onClose, title, children, placement = 'bottom', className }: SheetProps) {
+export function Sheet({ open, onClose, title, headerAction, children, placement = 'bottom', className }: SheetProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -50,9 +52,12 @@ export function Sheet({ open, onClose, title, children, placement = 'bottom', cl
         {placement === 'bottom' && (
           <div aria-hidden="true" className="mx-auto mb-3.5 h-[5px] w-10 rounded-pill bg-[#dcd8ee]" />
         )}
-        <h2 id={titleId} className="text-title">
-          {title}
-        </h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 id={titleId} className="text-title">
+            {title}
+          </h2>
+          {headerAction}
+        </div>
         <div className="mt-3.5">{children}</div>
       </div>
     </dialog>
