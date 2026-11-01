@@ -31,6 +31,15 @@ export function ShopHeader({
   return (
     // телефон: шапка закреплена, на бумаге под стеклом; компьютер: белая строка 84 px, категории ниже на бумаге
     <header className="sticky top-0 z-10 border-b border-[#eceaf5] bg-paper/94 backdrop-blur-[14px] lg:static lg:border-b-0 lg:bg-transparent lg:backdrop-blur-none">
+      {/* превью из админки (A7): владелец видит, что это ещё не то, что видят покупатели */}
+      {shop.isPreview && (
+        <p className="flex items-center justify-center gap-2 bg-ink-night px-4 py-2 text-[13px] font-semibold text-white">
+          <span className="rounded-pill bg-sun px-2 py-0.5 text-[12px] font-bold text-ink-night">
+            <Trans>Черновик</Trans>
+          </span>
+          <Trans>так витрину увидят покупатели</Trans>
+        </p>
+      )}
       <div className="lg:border-b lg:border-[#eceaf5] lg:bg-white">
         <div className="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-2.5 gap-y-3 px-4 pt-3.5 pb-3 lg:h-[84px] lg:flex-nowrap lg:gap-6 lg:px-5 lg:py-0">
           <button

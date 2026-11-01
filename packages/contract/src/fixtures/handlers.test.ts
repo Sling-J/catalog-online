@@ -147,6 +147,14 @@ describe('моки витрины: служебные состояния', () =>
     expect(body.shop.whatsapp).toMatch(/^\+7/);
   });
 
+  it('превью открывает скрытый каталог и помечает магазин isPreview', async () => {
+    const response = await fetch('http://api.test/v1/storefront/skrytyj-magazin?preview=demo');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ subdomain: 'skrytyj-magazin', isPreview: true });
+    const products = await fetch('http://api.test/v1/storefront/skrytyj-magazin/products?preview=demo');
+    expect(products.status).toBe(200);
+  });
+
   it('есть товар, раскупленный целиком — для экрана «Закончился»', async () => {
     const { items } = await getJson<Page>('/products');
     const soldOut = items.filter((card) => card.stockLevel === 'out');

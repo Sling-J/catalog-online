@@ -33,7 +33,11 @@ const notFound = (): Response =>
     { status: 404, headers: { 'Content-Type': 'application/problem+json' } },
   );
 
-const isDemo = (subdomain: string | readonly string[] | undefined): boolean => subdomain === demoShop.subdomain;
+// превью (`?preview=` с любым токеном) открывает и скрытый магазин — как неопубликованную витрину в админке
+const isPreview = (request: Request): boolean => new URL(request.url).searchParams.has('preview');
+
+const isDemo = (subdomain: string | readonly string[] | undefined, request: Request): boolean =>
+  subdomain === demoShop.subdomain || (subdomain === HIDDEN_DEMO_SUBDOMAIN && isPreview(request));
 
 // Скрытый магазин: 410 с контактами для заглушки (то же лицо, что у демо-магазина)
 const gone = (): Response => {
@@ -51,17 +55,17 @@ const gone = (): Response => {
 };
 
 export const demoStorefrontHandlers = ({ assetBase, ...options }: DemoHandlersOptions = {}): HttpHandler[] => [
-  handleGetStorefrontShop(({ params }) => {
-    if (params.subdomain === HIDDEN_DEMO_SUBDOMAIN) return gone();
-    return isDemo(params.subdomain) ? HttpResponse.json(demoShop) : notFound();
+  handleGetStorefrontShop(({ params, request }) => {
+    if (!isDemo(params.subdomain, request)) return params.subdomain === HIDDEN_DEMO_SUBDOMAIN ? gone() : notFound();
+    return HttpResponse.json({ ...demoShop, subdomain: String(params.subdomain), isPreview: isPreview(request) });
   }, options),
   handleListStorefrontCategories(
     ({ params, request }) =>
-      isDemo(params.subdomain) ? HttpResponse.json(dataFor(request, assetBase).categories) : notFound(),
+      isDemo(params.subdomain, request) ? HttpResponse.json(dataFor(request, assetBase).categories) : notFound(),
     options,
   ),
   handleListStorefrontProducts(({ params, request }) => {
-    if (!isDemo(params.subdomain)) return notFound();
+    if (!isDemo(params.subdomain, request)) return notFound();
     const query = new URL(request.url).searchParams;
     const items = selectCards(dataFor(request, assetBase), readFilters(new URL(request.url)));
     // курсор в моках — просто смещение от начала выборки
@@ -75,14 +79,14 @@ export const demoStorefrontHandlers = ({ assetBase, ...options }: DemoHandlersOp
   }, options),
   handleGetStorefrontFacets(
     ({ params, request }) =>
-      isDemo(params.subdomain)
+      isDemo(params.subdomain, request)
         ? HttpResponse.json(computeFacets(dataFor(request, assetBase), readFilters(new URL(request.url))))
         : notFound(),
     options,
   ),
   handleGetStorefrontProduct(({ params, request }) => {
     const product = dataFor(request, assetBase).products.find((entry) => entry.shortId === params.shortId);
-    return isDemo(params.subdomain) && product ? HttpResponse.json(product) : notFound();
+    return isDemo(params.subdomain, request) && product ? HttpResponse.json(product) : notFound();
   }, options),
   handleCheckStorefrontCart(async ({ request }) => {
     const { items } = await request.json();

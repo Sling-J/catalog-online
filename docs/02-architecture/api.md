@@ -25,6 +25,7 @@ updated: 2026-11-01
 - **Вход:** cookie `sid` (HttpOnly, Secure, SameSite=Lax, родительский домен). Изменяющие запросы обязаны слать заголовок `X-Requested-With` — простая защита от CSRF. Суперадминка — отдельный cookie `staff_sid`.
 - **Ограничение частоты** на вход, регистрацию, письма и события витрины — ответ `429` с `Retry-After`.
 - **Превью неопубликованной витрины** (A7): `POST /v1/admin/preview-token` → токен в `?preview=` у запросов витрины.
+  > Примечание (2026-11-02, T-113): несохранённые правки админка передаёт витрине через `postMessage`; формат сообщений — `packages/contract/src/preview.ts` (`@catalog/contract/preview`), описание — `04-design/storefront.md`, «Превью из админки». `PreviewToken` добавлен и в `checkStorefrontCart`.
 
 ## Где что на экранах
 | Экран | Запросы |

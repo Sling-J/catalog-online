@@ -163,6 +163,7 @@ paths:
       summary: Перепроверка цен и наличия корзины (FR-V7)
       parameters:
         - $ref: '#/components/parameters/Subdomain'
+        - $ref: '#/components/parameters/PreviewToken'
       requestBody:
         required: true
         content:

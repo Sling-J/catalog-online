@@ -25,6 +25,10 @@ msgstr "{0, plural, one {# товар} few {# товара} many {# товаро
 msgid "{0, plural, one {Показать # товар} few {Показать # товара} many {Показать # товаров} other {Показать # товара}}"
 msgstr "{0, plural, one {Показать # товар} few {Показать # товара} many {Показать # товаров} other {Показать # товара}}"
 
+#. placeholder {0}: category.name
+msgid "{0} — {name}"
+msgstr "{0} — {name}"
+
 #. placeholder {0}: item.variantLabel
 #. placeholder {1}: item.quantity
 msgid "{0} · {1} шт."
@@ -40,6 +44,18 @@ msgstr "{0} шт."
 
 msgid "{count, plural, one {# товар в корзине} few {# товара в корзине} many {# товаров в корзине} other {# товара в корзине}}"
 msgstr "{count, plural, one {# товар в корзине} few {# товара в корзине} many {# товаров в корзине} other {# товара в корзине}}"
+
+msgid "{name} — каталог с ценами и наличием"
+msgstr "{name} — каталог с ценами и наличием"
+
+msgid "{productName} — {price} · {shopName}"
+msgstr "{productName} — {price} · {shopName}"
+
+msgid "{productName} в магазине «{shopName}», {price}. Заказ — в WhatsApp."
+msgstr "{productName} в магазине «{shopName}», {price}. Заказ — в WhatsApp."
+
+msgid "{productName} в магазине «{shopName}». Сейчас закончился — спросите в WhatsApp."
+msgstr "{productName} в магазине «{shopName}». Сейчас закончился — спросите в WhatsApp."
 
 msgid "Больше"
 msgstr "Больше"
@@ -204,6 +220,9 @@ msgstr "Здравствуйте! Подскажите, что сейчас ес
 msgid "Итого"
 msgstr "Итого"
 
+msgid "Каталог магазина «{name}»: цены, размеры и наличие. Заказ — в WhatsApp."
+msgstr "Каталог магазина «{name}»: цены, размеры и наличие. Заказ — в WhatsApp."
+
 msgid "Каталог сейчас обновляется"
 msgstr "Каталог сейчас обновляется"
 
@@ -307,7 +326,7 @@ msgstr "Осталось мало"
 
 #. placeholder {0}: formatAmount(bounds.min)
 #. placeholder {0}: formatPrice(card.price)
-#. placeholder {0}: formatPrice(priceMin)
+#. placeholder {0}: formatPrice(min)
 msgid "от {0}"
 msgstr "от {0}"
 
@@ -486,6 +505,9 @@ msgstr "Ссылка устарела: магазин убрал этот тов
 msgid "Суббота"
 msgstr "Суббота"
 
+msgid "так витрину увидят покупатели"
+msgstr "так витрину увидят покупатели"
+
 msgid "Такого товара нет"
 msgstr "Такого товара нет"
 
@@ -551,6 +573,9 @@ msgstr "Цена снизилась: было {0}"
 
 msgid "Цена, ₸"
 msgstr "Цена, ₸"
+
+msgid "Черновик"
+msgstr "Черновик"
 
 msgid "Четверг"
 msgstr "Четверг"

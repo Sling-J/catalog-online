@@ -12,6 +12,7 @@ import {
   type CatalogSearch,
 } from '@/entities/product';
 import { shopQueryOptions } from '@/entities/shop';
+import { useTrackView } from '@/features/track-view';
 import { useIsDesktop } from '@/shared/hooks';
 import { ProductView } from '@/widgets/product-view';
 
@@ -33,6 +34,7 @@ export function ProductPage({
   const openCart = useUnit(cartOpened);
   const { data: product } = useSuspenseQuery(productQueryOptions(subdomain, shortId));
   const { data: shop } = useSuspenseQuery(shopQueryOptions(subdomain));
+  useTrackView(subdomain, product.id);
 
   // соседи по каталогу нужны только окну на компьютере; каталог под ним всё равно загружается
   const { data: list } = useInfiniteQuery({

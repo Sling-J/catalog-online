@@ -15,7 +15,7 @@ export function getRouter() {
   const i18n = createI18n();
   const router = createRouter({
     routeTree,
-    context: { queryClient },
+    context: { queryClient, i18n },
     Wrap: ({ children }) => <I18nProvider i18n={i18n}>{children}</I18nProvider>,
     defaultPreload: 'intent',
     defaultPreloadStaleTime: 0,

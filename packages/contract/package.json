@@ -24,6 +24,10 @@
       "types": "./dist/nest.d.ts",
       "default": "./dist/nest.js"
     },
+    "./preview": {
+      "types": "./dist/preview.d.ts",
+      "default": "./dist/preview.js"
+    },
     "./fixtures": {
       "types": "./dist/fixtures/index.d.ts",
       "default": "./dist/fixtures/index.js"
