@@ -14,6 +14,8 @@ export default tseslint.config(
       '**/coverage/**',
       '**/.turbo/**',
       '**/src/gen/**',
+      '**/routeTree.gen.ts',
+      '**/public/mockServiceWorker.js',
       '**/src/locales/**/*.ts',
       'design-assets/**',
       'design/canvas/**',

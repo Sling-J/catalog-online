@@ -37,6 +37,8 @@ app → pages → widgets → features → entities → shared
 ### Файлы маршрутов (TanStack Start / Router)
 Файловый роутер требует каталог маршрутов, поэтому `src/routes/` принадлежит слою `app`. Файл маршрута тонкий: путь, `validateSearch`, `loader` (предзагрузка Query), `head`/SEO и подключение компонента из `pages`. Разметки и бизнес-логики в нём нет. Серверная логика Start (request middleware, определение магазина по поддомену) — тоже в `app`.
 
+Точки входа Start лежат в `app` и подключены в `vite.config.ts`: `app/router.tsx` (роутер и QueryClient на каждый запрос), `app/client.tsx`, `app/server.ts`; маршруты — `app/routes`, дерево маршрутов `app/routeTree.gen.ts` генерирует Start и хранится в git. Моки API (MSW, только в разработке) — `app/mocks`.
+
 ## 2. Структура среза (feature / widget / entity / page)
 
 ```

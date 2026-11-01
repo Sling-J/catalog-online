@@ -11,3 +11,5 @@ design/canvas
 .impeccable
 docs
 *.md
+**/routeTree.gen.ts
+**/public/mockServiceWorker.js

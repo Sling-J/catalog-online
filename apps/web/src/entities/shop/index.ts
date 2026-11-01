@@ -1,0 +1,1 @@
+export { shopQueryOptions } from './api';
