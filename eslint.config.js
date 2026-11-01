@@ -4,6 +4,7 @@ import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import { fsdBoundaries } from './eslint.fsd.js';
 
 export default tseslint.config(
   {
@@ -32,5 +33,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     },
   },
+  ...fsdBoundaries('apps/web'),
+  ...fsdBoundaries('apps/admin'),
   prettier,
 );

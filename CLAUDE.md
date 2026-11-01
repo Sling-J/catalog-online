@@ -5,7 +5,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 ## Начало каждой сессии
 1. Прочитай `docs/status.md`: текущая стадия и следующий шаг.
 2. Карта документации: `docs/README.md`. Процесс: `docs/06-process/workflow.md`.
-3. Перед задачей — документы её темы из таблицы «Где что лежит» ниже и стек в `docs/02-architecture/adr/0001-stack.md`.
+3. Перед задачей — документы её темы из таблицы «Где что лежит» ниже и стек в `docs/02-architecture/adr/0001-stack.md`. Перед кодом фронта — `docs/02-architecture/frontend-structure.md`.
 
 ## Правила работы
 - Работаем в паре с основателем (опытный разработчик). На развилках (продукт, UX, архитектура, стек, зависимости) предлагай вариант с рекомендацией и спрашивай. Детали внутри согласованного плана решай сам.
@@ -28,6 +28,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 | Дизайн-система | `DESIGN.md` (+ `.impeccable/design.json`, токены в коде — `packages/ui/src/tokens.css`) |
 | Экраны и решения по витрине и админке | `docs/04-design/storefront.md`, `admin.md`; макеты (вёрстка) — `design/canvas/` (копия холста, см. её README) |
 | Стек и архитектурные решения | `docs/02-architecture/adr/` |
+| Структура кода фронтов (FSD) | `docs/02-architecture/frontend-structure.md` (ADR 0002) |
 | Модель данных, соглашения API | `docs/02-architecture/data-model.md`, `api.md`; контракт — `packages/contract/openapi.yaml` |
 | План и задачи | `docs/05-tasks/roadmap.md`, `backlog.md` |
 | Нерешённое | `docs/open-questions.md` |
@@ -56,4 +57,5 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 ## Код
 - Контракт API правится только в `openapi.yaml`, затем `pnpm generate`; сгенерированное (`*.gen.ts`) руками не трогаем.
 - Демо-данные «Айгерим Kids» для моков — `@catalog/contract/fixtures`, обработчики MSW — `@catalog/contract/msw`.
+- Код `apps/web` и `apps/admin` — по FSD (`docs/02-architecture/frontend-structure.md`): слои `app → pages → widgets → features → entities → shared`, без импортов между срезами одного слоя, снаружи среза только через его `index.ts`, алиас `@/*` → `src/*`. Границы проверяет `pnpm lint` (`eslint.fsd.js`).
 - Токены дизайн-системы — `packages/ui/src/tokens.css` (Tailwind v4 `@theme`), источник — `DESIGN.md`.

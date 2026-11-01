@@ -22,6 +22,7 @@ updated: 2026-11-01
 - [x] **T-009** Фото для моков и демо-магазина: данные «Айгерим Kids» и обработчики MSW в `@catalog/contract`; раздача фото из `design-assets/storefront` по `/demo` — в T-101. — S · S5
 
 ## E1. Витрина (`apps/web`, на моках)
+- [x] **T-100** Скелет FSD в `apps/web` (слои, алиас `@/*`) и линтер границ слоёв, срезов и публичного API (`eslint.fsd.js`, `eslint-plugin-boundaries`); файлы маршрутов в `app` появятся в T-101. — M · [ADR 0002](../02-architecture/adr/0002-frontend-fsd.md), [frontend-structure.md](../02-architecture/frontend-structure.md)
 - [ ] **T-101** Каркас TanStack Start: маршруты, TanStack Query с передачей кеша с сервера, MSW в разработке. — M · ADR
 - [ ] **T-102** Определение магазина по поддомену в request middleware; основной домен → лендинг; в разработке — `*.localhost`. — M · ADR, FR-V1
 - [ ] **T-103** Шапка магазина и шторка «О магазине» (как найти, 2ГИС, график с «сегодня», контакты). — M · S «Каталог», «О магазине», FR-V9

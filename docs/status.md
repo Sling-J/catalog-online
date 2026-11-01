@@ -3,7 +3,7 @@
 Обновляется в конце каждой рабочей сессии. Стадии описаны в [06-process/workflow.md](06-process/workflow.md).
 
 **Стадия:** 5 — разработка. E0 готов, следующий E1 «Витрина».
-**Обновлено:** 2026-11-01
+**Обновлено:** 2026-11-01 (добавлены правила FSD для фронтов)
 
 ## Сделано
 - Идея и её оценка (`00-vision/`).
@@ -25,7 +25,7 @@
   - контракт API — `packages/contract/openapi.yaml` (линтер Redocly, `redocly.yaml`) и соглашения `02-architecture/api.md` (API1–API4).
 
 ## Следующий шаг
-1. E0 «Фундамент» готов (T-001–T-009): монорепо pnpm + Turborepo, TS 6 / ESLint / Prettier / Vitest, генерация Hey API, `packages/ui` (токены и базовые компоненты), Lingui, docker-compose (PostgreSQL + SeaweedFS вместо MinIO), CI, демо-данные. `pnpm check` проходит. Следующий — E1 «Витрина», T-101; основатель даёт указания по архитектуре фронта.
+1. E0 «Фундамент» готов (T-001–T-009): монорепо pnpm + Turborepo, TS 6 / ESLint / Prettier / Vitest, генерация Hey API, `packages/ui` (токены и базовые компоненты), Lingui, docker-compose (PostgreSQL + SeaweedFS вместо MinIO), CI, демо-данные. `pnpm check` проходит. Следующий — E1 «Витрина». Правила архитектуры фронта приняты 2026-11-01: FSD с поправками основателя (`02-architecture/frontend-structure.md`, ADR 0002). T-100 готов: скелет FSD в `apps/web`, алиас `@/*`, линтер границ `eslint-plugin-boundaries` (`eslint.fsd.js`). Следующий — T-101 (каркас TanStack Start).
 2. Открыто: закон РК о хранении персональных данных → выбор хостинга (КЗ или за рубежом), отдельный ADR. Не блокирует разработку.
 3. Позже: заказ 3D-иллюстраций вместо CSS-заглушек.
 
