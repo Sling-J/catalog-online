@@ -33,7 +33,7 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 | `pnpm install` | Установить зависимости |
 | `pnpm generate` | Код из `packages/contract/openapi.yaml` (Hey API): типы, SDK, хуки Query, Zod, MSW, типы для Nest |
 | `pnpm check` | Линтеры (включая контракт и границы FSD), типы, тесты и сборка всех пакетов |
-| `pnpm dev` | Запустить приложения: `apps/web` на http://localhost:3000 с моками API (admin и api появятся в E3, E4) |
+| `pnpm dev` | Запустить приложения: `apps/web` на http://localhost:3000 с моками API (admin и api появятся в E3, E4). Витрина демо-магазина — http://aigerim-kids.localhost:3000, лендинг — http://localhost:3000 |
 | `pnpm format` | Prettier |
 | `pnpm i18n:extract` | Строки Lingui в каталоги `.po` |
 | `docker compose up -d` | PostgreSQL и S3-хранилище для разработки (настройки — `.env.example`) |
