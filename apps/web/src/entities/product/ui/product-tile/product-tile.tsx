@@ -23,7 +23,7 @@ export function ProductTile({ card }: { card: StorefrontProductCard }) {
       // на компьютере каталог остаётся под окном на том же месте, на телефоне карточка открывается сверху
       resetScroll={!desktop}
       aria-label={card.name}
-      className="group relative block overflow-hidden bg-chip-haze lg:rounded-[14px]"
+      className="press group relative block overflow-hidden bg-chip-haze lg:rounded-[14px]"
     >
       {card.cover ? (
         <img

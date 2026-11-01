@@ -38,6 +38,21 @@
   /* Ссылки, счётчики, фокус, иконка адреса (макеты витрины и админки) */
   --color-iris: #3b2fd9;
 
+  /*
+   * Наведение (только мышь; Tailwind ставит hover: под @media (hover: hover)): поверхность на шаг темнее,
+   * тёмная — светлее, яркие — на волосок светлее; рамка темнеет. Правило — DESIGN.md, «Hover».
+   */
+  --color-haze-hover: #e4e1f3;
+  --color-lilac-hover: #e6e2f5;
+  --color-ink-hover: #2a2560;
+  --color-line: #dad6ec;
+  --color-line-hover: #b9b3d6;
+  --color-sun-hover: #ffdb5c;
+  --color-mint-hover: #78ecbf;
+  --color-mint-soft: #e6fbf2;
+  --color-mint-soft-hover: #d4f6e7;
+  --shadow-hover: 0 6px 18px rgb(23 19 61 / 0.16);
+
   /* Типографика: display и headline растягиваются по ширине экрана */
   --text-display: clamp(42px, 6.8vw, 98px);
   --text-display--line-height: 1;
@@ -96,6 +111,62 @@
   /* Движение */
   --ease-press: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /*
+   * Появление (макеты витрины V6): карточка товара на телефоне въезжает справа, шторки и плашка корзины
+   * поднимаются снизу, окна и выпадающие панели на компьютере «всплывают», затемнение проявляется.
+   * Подключать через motion-safe:, чтобы при «меньше движения» ничего не двигалось.
+   * Длительности закрытия (ниже) повторены в Sheet.tsx — там ждём конца анимации, чтобы закрыть dialog.
+   */
+  --animate-slide-in: slide-in 0.32s var(--ease-out-soft);
+  --animate-sheet-up: sheet-up 0.34s var(--ease-out-soft);
+  --animate-pop: pop 0.28s var(--ease-out-soft);
+  --animate-fade: fade 0.25s ease;
+  --animate-fade-fast: fade 0.2s ease;
+  @keyframes slide-in {
+    from {
+      transform: translateX(40px);
+      opacity: 0;
+    }
+  }
+  @keyframes sheet-up {
+    from {
+      transform: translateY(60px);
+      opacity: 0;
+    }
+  }
+  @keyframes pop {
+    from {
+      transform: translateY(12px) scale(0.98);
+      opacity: 0;
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Закрытие: шторка уходит вниз (с того места, куда её дотянули пальцем), окна и панели гаснут */
+  --animate-sheet-down: sheet-down 0.24s cubic-bezier(0.4, 0, 1, 1) forwards;
+  --animate-pop-out: pop-out 0.16s ease-in forwards;
+  --animate-fade-out: fade-out 0.2s ease-in forwards;
+  @keyframes sheet-down {
+    to {
+      transform: translateY(100%);
+    }
+  }
+  @keyframes pop-out {
+    to {
+      transform: scale(0.98);
+      opacity: 0;
+    }
+  }
+  @keyframes fade-out {
+    to {
+      opacity: 0;
+    }
+  }
 
   /* Пластилиновый предмет парит (угол — в --r у самого предмета); скелетон переливается */
   --animate-clay-float: clay-float 5s ease-in-out infinite;

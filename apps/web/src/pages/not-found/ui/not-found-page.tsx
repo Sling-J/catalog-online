@@ -20,7 +20,7 @@ export function NotFoundPage({ product }: { product?: boolean }) {
         >
           <Link
             to="/"
-            className="inline-flex h-[50px] items-center justify-center rounded-pill bg-ink-night px-[22px] text-[15px] font-bold text-white shadow-press-ink lg:h-[52px] lg:px-6"
+            className="press inline-flex h-[50px] items-center justify-center rounded-pill bg-ink-night px-[22px] text-[15px] font-bold text-white shadow-press-ink hover:bg-ink-hover lg:h-[52px] lg:px-6"
           >
             <Trans>Открыть каталог</Trans>
           </Link>

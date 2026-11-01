@@ -135,7 +135,11 @@ function OtherCategories({
           {label ? <Trans>«{label}» есть в других категориях</Trans> : <Trans>В других категориях есть</Trans>}
         </h2>
         {facets && (
-          <button type="button" onClick={onShowAll} className="text-caption font-semibold text-iris lg:text-[14px]">
+          <button
+            type="button"
+            onClick={onShowAll}
+            className="text-caption font-semibold text-iris hover:underline lg:text-[14px]"
+          >
             <Trans>Все {facets.total} →</Trans>
           </button>
         )}

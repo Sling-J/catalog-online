@@ -70,7 +70,9 @@ export function OrderSent({ order, onClose }: { order: SentOrder; onClose: () =>
         <span className="text-[17px] font-extrabold tabular-nums">{formatPrice(order.total)}</span>
       </div>
 
-      <div className="mt-[22px] flex flex-col items-center gap-1.5 lg:mt-[26px] lg:flex-row lg:justify-center lg:gap-2.5">
+      {/* телефон: кнопка и под ней ссылка «Открыть WhatsApp ещё раз»; компьютер: главная кнопка во всю ширину,
+          под ней в ряд две второстепенные — так подписи никогда не переносятся */}
+      <div className="mt-[22px] flex flex-col items-center gap-1.5 lg:mt-[26px] lg:items-stretch lg:gap-2.5">
         <Button size="state" onClick={onClose}>
           <Trans>Вернуться в каталог</Trans>
         </Button>
@@ -78,17 +80,27 @@ export function OrderSent({ order, onClose }: { order: SentOrder; onClose: () =>
           href={order.url}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex h-11 items-center justify-center rounded-pill px-4 text-[15px] font-semibold text-iris lg:h-[52px] lg:bg-chip-haze lg:px-[22px] lg:text-ink-night"
+          className="press inline-flex h-11 items-center justify-center rounded-pill px-4 text-[15px] font-semibold whitespace-nowrap text-iris hover:underline lg:hidden"
         >
           <Trans>Открыть WhatsApp ещё раз</Trans>
         </a>
-        <button
-          type="button"
-          onClick={copy}
-          className="hidden h-[52px] items-center justify-center rounded-pill bg-chip-haze px-[22px] text-[15px] font-semibold text-ink-night lg:inline-flex"
-        >
-          {copied ? <Trans>Скопировано</Trans> : <Trans>Скопировать текст</Trans>}
-        </button>
+        <div className="hidden grid-cols-2 gap-2.5 lg:grid">
+          <a
+            href={order.url}
+            target="_blank"
+            rel="noreferrer"
+            className="press inline-flex h-[52px] items-center justify-center rounded-pill bg-chip-haze px-[22px] text-[15px] font-semibold whitespace-nowrap text-ink-night hover:bg-haze-hover"
+          >
+            <Trans>Открыть WhatsApp</Trans>
+          </a>
+          <button
+            type="button"
+            onClick={copy}
+            className="inline-flex h-[52px] items-center justify-center rounded-pill bg-chip-haze px-[22px] text-[15px] font-semibold whitespace-nowrap text-ink-night hover:bg-haze-hover"
+          >
+            {copied ? <Trans>Скопировано</Trans> : <Trans>Скопировать текст</Trans>}
+          </button>
+        </div>
       </div>
     </div>
   );

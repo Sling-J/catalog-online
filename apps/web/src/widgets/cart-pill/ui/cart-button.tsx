@@ -22,7 +22,7 @@ export function CartButton({ subdomain }: { subdomain: string }) {
       aria-expanded={open}
       aria-label={count > 0 ? t`Корзина, товаров: ${count}` : t`Корзина`}
       className={cx(
-        'hidden h-12 items-center gap-2.5 rounded-pill bg-ink-night pr-[18px] pl-3.5 text-[15px] font-bold text-white tabular-nums lg:flex',
+        'hidden h-12 items-center gap-2.5 rounded-pill bg-ink-night pr-[18px] hover:bg-ink-hover pl-3.5 text-[15px] font-bold text-white tabular-nums lg:flex',
         open && 'shadow-[0_0_0_3px_#fff,0_0_0_5px_var(--color-iris)]',
       )}
     >

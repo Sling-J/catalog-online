@@ -53,7 +53,7 @@ export function CatalogPage({
   const { data: allFacets } = useSuspenseQuery(productFacetsQueryOptions(subdomain));
 
   const [aboutOpen, setAboutOpen] = useState(false);
-  // телефон: фильтры шторкой; компьютер: раскрываются строкой под категориями
+  // телефон: фильтры шторкой; компьютер: панель поверх сетки под категориями
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
 
@@ -117,18 +117,17 @@ export function CatalogPage({
         />
         <ActiveFilters all={allFacets} state={filters} onChange={changeFilters} />
       </ShopHeader>
-      <main>
-        {panelOpen && (
-          <div className="mx-auto hidden max-w-[1240px] px-5 lg:block">
-            <FiltersPanel
-              all={allFacets}
-              current={facets}
-              state={filters}
-              onChange={changeFilters}
-              onReset={resetFilters}
-            />
-          </div>
-        )}
+      {/* панель фильтров компьютера ложится поверх сетки, не сдвигая её */}
+      <main className="relative">
+        <FiltersPanel
+          open={panelOpen}
+          onClose={() => setPanelOpen(false)}
+          all={allFacets}
+          current={facets}
+          state={filters}
+          onChange={changeFilters}
+          onReset={resetFilters}
+        />
         {/* шапка и категории на месте сразу, сетка мерцает, пока грузится выборка */}
         <Suspense fallback={<GridSkeleton />}>
           <CatalogGrid

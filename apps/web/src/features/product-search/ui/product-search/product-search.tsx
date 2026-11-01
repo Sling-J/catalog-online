@@ -69,7 +69,7 @@ export function ProductSearch({ value, onChange }: { value: string; onChange: (q
             setText('');
             commit('');
           }}
-          className="flex size-[22px] flex-none items-center justify-center rounded-full bg-[#dcd8ee] text-ink-night lg:size-6"
+          className="flex size-[22px] flex-none items-center justify-center rounded-full bg-[#dcd8ee] text-ink-night hover:bg-line-hover lg:size-6"
         >
           <Icon name="close" size={12} strokeWidth={3} />
         </button>

@@ -16,6 +16,7 @@ import { ErrorPage } from '@/pages/error';
 import { NotFoundPage } from '@/pages/not-found';
 import { ShopUnavailablePage } from '@/pages/shop-unavailable';
 import { isNotFoundData } from '@/shared/api';
+import { markAppMounted } from '@/shared/lib';
 import { CartSheet } from '@/widgets/cart-sheet';
 
 import { getTenant } from '../lib';
@@ -66,6 +67,7 @@ function Root() {
   // корзину читаем из хранилища уже после гидратации, чтобы разметка сервера и браузера совпала
   useEffect(() => {
     cartMounted();
+    markAppMounted();
   }, []);
   return (
     <>

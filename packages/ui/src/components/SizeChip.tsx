@@ -30,13 +30,13 @@ export function SizeChip({
       aria-pressed={selected}
       className={cx(
         'inline-flex shrink-0 items-center justify-center border-[1.5px] font-sans font-semibold tabular-nums',
-        'transition-colors duration-150 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris',
+        'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris',
         sizes[size],
         selected
-          ? 'border-ink-night bg-ink-night text-white'
+          ? 'border-ink-night bg-ink-night text-white hover:border-ink-hover hover:bg-ink-hover'
           : out
             ? 'cursor-default border-dashed border-[#d6d2e8] bg-transparent text-stock-out line-through'
-            : 'border-[#dad6ec] bg-white text-ink-night',
+            : 'border-line bg-white text-ink-night hover:border-line-hover',
         className,
       )}
       {...rest}

@@ -18,7 +18,7 @@ export function CartPill({ subdomain }: { subdomain: string }) {
       <button
         type="button"
         onClick={() => open(subdomain)}
-        className="pointer-events-auto flex w-full max-w-[480px] items-center gap-2.5 rounded-pill bg-ink-night/90 py-2 pr-2 pl-[18px] text-left text-white backdrop-blur-lg"
+        className="pointer-events-auto flex w-full max-w-[480px] motion-safe:animate-sheet-up items-center gap-2.5 rounded-pill bg-ink-night/90 py-2 pr-2 pl-[18px] text-left text-white backdrop-blur-lg"
       >
         <span className="flex-1">
           <span className="block text-[13px] opacity-80">

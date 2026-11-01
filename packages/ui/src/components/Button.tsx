@@ -20,11 +20,11 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 // Пухлые кнопки с подложкой: при нажатии кнопка «проседает» на подложку (Press Rule).
 const variants: Record<ButtonVariant, string> = {
-  primary: 'bg-sun text-ink-night',
-  dark: 'bg-ink-night text-white',
-  confirm: 'bg-mint text-mint-ink',
-  soft: 'bg-chip-haze text-ink-night',
-  line: 'bg-white text-ink-night ring-[1.5px] ring-inset ring-[#dad6ec]',
+  primary: 'bg-sun text-ink-night hover:bg-sun-hover',
+  dark: 'bg-ink-night text-white hover:bg-ink-hover',
+  confirm: 'bg-mint text-mint-ink hover:bg-mint-hover',
+  soft: 'bg-chip-haze text-ink-night hover:bg-haze-hover',
+  line: 'bg-white text-ink-night ring-[1.5px] ring-line ring-inset hover:ring-line-hover',
 };
 
 const press: Partial<Record<ButtonVariant, string>> = {
@@ -61,7 +61,6 @@ export function Button({
       type={type}
       className={cx(
         'inline-flex items-center justify-center gap-2 rounded-pill font-sans font-bold whitespace-nowrap tabular-nums',
-        'transition-transform duration-200 ease-press active:translate-y-[3px] active:shadow-none',
         'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris',
         'disabled:pointer-events-none disabled:bg-chip-haze disabled:text-ink-quiet disabled:shadow-none',
         variants[variant],

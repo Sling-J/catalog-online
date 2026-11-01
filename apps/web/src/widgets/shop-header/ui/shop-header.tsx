@@ -37,12 +37,12 @@ export function ShopHeader({
             type="button"
             onClick={onOpenAbout}
             aria-label={t`О магазине: адрес, график, контакты`}
-            className="order-1 flex min-w-0 flex-1 items-center gap-3 rounded-field text-left lg:max-w-[360px] lg:flex-none"
+            className="group order-1 flex min-w-0 flex-1 items-center gap-3 rounded-field text-left lg:max-w-[360px] lg:flex-none"
           >
             <ShopAvatar name={shop.name} logo={shop.logo} className="lg:size-12 lg:text-[16px]" />
             <span className="min-w-0">
               <span className="flex items-center gap-1 text-[17px] font-extrabold lg:text-[18px]">
-                <span className="truncate">{shop.name}</span>
+                <span className="truncate decoration-2 underline-offset-4 group-hover:underline">{shop.name}</span>
                 {/* телефон: шторка, компьютер: выпадающая панель */}
                 <Icon name="chevron-right" size={16} strokeWidth={2.4} className="flex-none text-ink-muted lg:hidden" />
                 <Icon
@@ -68,7 +68,7 @@ export function ShopHeader({
             target="_blank"
             rel="noreferrer"
             aria-label={t`Написать в WhatsApp`}
-            className={`order-2 flex size-11 flex-none items-center justify-center rounded-full bg-mint text-mint-ink shadow-[0_3px_0_var(--color-mint-underside)] lg:order-3 lg:h-12 lg:w-auto lg:px-[18px] ${search ? '' : 'lg:ml-auto'}`}
+            className={`press order-2 flex size-11 flex-none items-center justify-center rounded-full bg-mint text-mint-ink shadow-[0_3px_0_var(--color-mint-underside)] hover:bg-mint-hover lg:order-3 lg:h-12 lg:w-auto lg:px-[18px] ${search ? '' : 'lg:ml-auto'}`}
           >
             <Icon name="whatsapp" size={22} className="lg:hidden" />
             <span className="hidden text-[15px] font-bold lg:inline">

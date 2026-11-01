@@ -28,7 +28,7 @@ export function CatalogSort({
       className={cx(
         'relative flex items-center font-semibold',
         pill
-          ? 'h-10 gap-1.5 rounded-pill border-[1.5px] border-[#dad6ec] bg-white px-4 text-[14px]'
+          ? 'h-10 gap-1.5 rounded-pill border-[1.5px] border-line bg-white px-4 text-[14px] hover:border-line-hover'
           : 'gap-1 py-1.5 text-[13px]',
       )}
     >

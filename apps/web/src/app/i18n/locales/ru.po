@@ -337,6 +337,9 @@ msgstr "открыто"
 msgid "Открыто до {0}"
 msgstr "Открыто до {0}"
 
+msgid "Открыть WhatsApp"
+msgstr "Открыть WhatsApp"
+
 msgid "Открыть WhatsApp ещё раз"
 msgstr "Открыть WhatsApp ещё раз"
 

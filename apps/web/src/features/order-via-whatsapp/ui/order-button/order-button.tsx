@@ -61,10 +61,10 @@ export function OrderButton({
       }}
       className={cx(
         'inline-flex h-14 w-full items-center justify-center rounded-pill text-[16px] font-bold lg:h-[52px] lg:text-[15px]',
-        'transition-transform duration-200 ease-press focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris',
+        'press focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris',
         inactive
           ? 'bg-chip-haze text-ink-quiet'
-          : 'bg-mint text-mint-ink shadow-[0_5px_0_var(--color-mint-underside)] active:translate-y-[3px] active:shadow-none lg:shadow-press-mint',
+          : 'bg-mint text-mint-ink shadow-[0_5px_0_var(--color-mint-underside)] hover:bg-mint-hover lg:shadow-press-mint',
       )}
     >
       <Trans>Заказать через WhatsApp</Trans>

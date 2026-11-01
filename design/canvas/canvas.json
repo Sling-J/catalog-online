@@ -288,6 +288,22 @@
       "w": 7800,
       "x": 0,
       "y": 24736
+    },
+    "StoreFiltersDesk.dc.html": {
+      "h": 1130,
+      "is_interactive": false,
+      "title": "Витрина · компьютер — фильтры панелью поверх сетки",
+      "w": 1560,
+      "x": 2010,
+      "y": 9980
+    },
+    "StoreFiltersDeskVariants.dc.html": {
+      "h": 2200,
+      "is_interactive": false,
+      "title": "Фильтры · компьютер — невыбранные варианты А–В",
+      "w": 3120,
+      "x": 0,
+      "y": 48960
     }
   },
   "createdOnFiles": {
@@ -310,7 +326,8 @@
     "secReview2",
     "secArchive",
     "subArchLanding",
-    "subArchStore"
+    "subArchStore",
+    "secCheck"
   ],
   "notes": {
     "secApproved": {
@@ -408,6 +425,14 @@
       "w": 240,
       "x": 0,
       "y": 22176
+    },
+    "secCheck": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Витрина: фильтры на компьютере, варианты А–В (выбран Г, 2026-11-02)",
+      "w": 240,
+      "x": 0,
+      "y": 48700
     }
   },
   "order": [
@@ -417,6 +442,7 @@
     "DesignSystem.dc.html",
     "StoreV6.dc.html",
     "StoreV6DeskModal.dc.html",
+    "StoreFiltersDesk.dc.html",
     "StoreStates.dc.html",
     "StoreStatesDesk.dc.html",
     "AdminPhone.dc.html",
@@ -443,7 +469,8 @@
     "StoreV2.dc.html",
     "StoreV3.dc.html",
     "StoreV4.dc.html",
-    "StoreV5.dc.html"
+    "StoreV5.dc.html",
+    "StoreFiltersDeskVariants.dc.html"
   ],
   "pages": [],
   "title": "catalog-online — дизайн"

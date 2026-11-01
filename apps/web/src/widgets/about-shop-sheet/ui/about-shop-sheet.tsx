@@ -35,11 +35,11 @@ export function AboutShopSheet({ shop, open, onClose }: { shop: StorefrontShop; 
                 href={twoGisLink(shop.address)}
                 target="_blank"
                 rel="noreferrer"
-                className="flex h-[42px] flex-1 items-center justify-center rounded-[14px] bg-ink-night text-[14px] font-bold text-white"
+                className="press flex h-[42px] flex-1 items-center justify-center rounded-[14px] bg-ink-night text-[14px] font-bold text-white hover:bg-ink-hover"
               >
                 <Trans>Открыть в 2ГИС</Trans>
               </a>
-              <CopyAddressButton address={shop.address} className="h-[42px] bg-[#f1effa]" />
+              <CopyAddressButton address={shop.address} className="h-[42px] bg-[#f1effa] hover:bg-lilac-hover" />
             </div>
           </>
         )}
@@ -49,7 +49,7 @@ export function AboutShopSheet({ shop, open, onClose }: { shop: StorefrontShop; 
             href={whatsappLink(shop.whatsapp)}
             target="_blank"
             rel="noreferrer"
-            className="flex-1 rounded-[14px] bg-[#e6fbf2] px-3 py-2.5 text-mint-ink tabular-nums"
+            className="press flex-1 rounded-[14px] bg-mint-soft px-3 py-2.5 text-mint-ink tabular-nums hover:bg-mint-soft-hover"
           >
             WhatsApp {formatPhone(shop.whatsapp)}
           </a>
@@ -58,7 +58,7 @@ export function AboutShopSheet({ shop, open, onClose }: { shop: StorefrontShop; 
               href={instagramLink(shop.instagram)}
               target="_blank"
               rel="noreferrer"
-              className="rounded-[14px] bg-[#f6f5fb] px-3 py-2.5"
+              className="press rounded-[14px] bg-[#f6f5fb] px-3 py-2.5 hover:bg-chip-haze"
             >
               {shop.instagram}
             </a>
@@ -95,11 +95,11 @@ export function AboutShopSheet({ shop, open, onClose }: { shop: StorefrontShop; 
               href={twoGisLink(shop.address)}
               target="_blank"
               rel="noreferrer"
-              className="flex h-11 flex-1 items-center justify-center rounded-[14px] bg-ink-night text-[14px] font-bold text-white"
+              className="press flex h-11 flex-1 items-center justify-center rounded-[14px] bg-ink-night text-[14px] font-bold text-white hover:bg-ink-hover"
             >
               <Trans>Открыть в 2ГИС</Trans>
             </a>
-            <CopyAddressButton address={shop.address} className="h-11 bg-white" />
+            <CopyAddressButton address={shop.address} className="h-11 bg-white hover:bg-chip-haze" />
           </div>
         </section>
       )}
@@ -117,7 +117,7 @@ export function AboutShopSheet({ shop, open, onClose }: { shop: StorefrontShop; 
           href={whatsappLink(shop.whatsapp)}
           target="_blank"
           rel="noreferrer"
-          className="flex h-[52px] items-center justify-between rounded-field bg-[#e6fbf2] px-4 text-mint-ink"
+          className="press flex h-[52px] items-center justify-between rounded-field bg-mint-soft px-4 text-mint-ink hover:bg-mint-soft-hover"
         >
           <span className="text-[15px] font-semibold">WhatsApp</span>
           <span className="text-[14px] tabular-nums">{formatPhone(shop.whatsapp)}</span>
@@ -127,7 +127,7 @@ export function AboutShopSheet({ shop, open, onClose }: { shop: StorefrontShop; 
             href={instagramLink(shop.instagram)}
             target="_blank"
             rel="noreferrer"
-            className="flex h-[52px] items-center justify-between rounded-field bg-[#f6f5fb] px-4"
+            className="press flex h-[52px] items-center justify-between rounded-field bg-[#f6f5fb] px-4 hover:bg-chip-haze"
           >
             <span className="text-[15px] font-semibold">Instagram</span>
             <span className="text-[14px] text-ink-quiet">{shop.instagram}</span>

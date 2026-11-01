@@ -1,3 +1,36 @@
 @import 'tailwindcss';
 @import '@catalog/ui/tokens.css';
 @source '../../../../packages/ui/src';
+
+/*
+ * Нажатие (макет витрины V6, класс s6-btn): кнопки, плитки и ссылки-кнопки проседают на 2 px с пружиной.
+ * Ссылкам, которые выглядят как кнопки, ставим класс `press`. Сдвиг — через transform, чтобы не спорить
+ * с утилитами translate-* (центрирование стрелок, плашки).
+ */
+@layer base {
+  html {
+    /* место под полосу прокрутки держим всегда: окно товара запрещает прокрутку — страница не прыгает вбок */
+    scrollbar-gutter: stable;
+    /* на Android браузер подсвечивает нажатое серым поверх нашего нажатия */
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* всё, что нажимается, — с рукой (Tailwind 4 по умолчанию даёт кнопкам обычную стрелку; в макете — pointer) */
+  button:not(:disabled),
+  [role='button'],
+  .press {
+    cursor: pointer;
+  }
+  button,
+  .press {
+    transition:
+      transform 0.25s var(--ease-press),
+      background-color 0.2s,
+      color 0.2s,
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  button:not(:disabled):active,
+  .press:active {
+    transform: translateY(2px);
+  }
+}

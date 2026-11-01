@@ -1,3 +1,4 @@
+import { cx } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
 
@@ -13,12 +14,15 @@ export function PriceRange({
   min,
   max,
   bounds,
+  compact,
   onChange,
 }: {
   min: number | undefined;
   max: number | undefined;
   /** Самая низкая и самая высокая цена в выборке — подсказка в полях. */
   bounds: { min: number; max: number };
+  /** Поля 40 px — в панели фильтров на компьютере; в шторке 48 px. */
+  compact?: boolean;
   onChange: (range: { priceMin?: number; priceMax?: number }) => void;
 }) {
   const { t } = useLingui();
@@ -44,7 +48,10 @@ export function PriceRange({
       inputMode="numeric"
       placeholder={placeholder}
       aria-label={label}
-      className="h-12 min-w-0 flex-1 rounded-field bg-[#f1effa] px-3.5 text-[15px] text-ink-night tabular-nums outline-none placeholder:text-ink-muted focus:ring-2 focus:ring-ink-night"
+      className={cx(
+        'min-w-0 flex-1 rounded-field bg-[#f1effa] px-3.5 text-ink-night tabular-nums outline-none placeholder:text-ink-muted focus:ring-2 focus:ring-ink-night',
+        compact ? 'h-10 text-[14px]' : 'h-12 text-[15px]',
+      )}
     />
   );
 

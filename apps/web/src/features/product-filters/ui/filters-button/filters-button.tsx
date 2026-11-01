@@ -10,7 +10,7 @@ export function FiltersButton({ count, onClick }: { count: number; onClick: () =
       type="button"
       onClick={onClick}
       aria-label={count > 0 ? t`Фильтры, выбрано: ${count}` : t`Фильтры`}
-      className="relative flex size-[46px] flex-none items-center justify-center rounded-field bg-chip-haze text-ink-night"
+      className="relative flex size-[46px] flex-none items-center justify-center rounded-field bg-chip-haze text-ink-night hover:bg-haze-hover"
     >
       <Icon name="sliders" />
       {count > 0 && (

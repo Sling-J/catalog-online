@@ -57,7 +57,7 @@ function RemovableChip({ label, removeLabel, onRemove }: { label: string; remove
       type="button"
       onClick={onRemove}
       aria-label={removeLabel}
-      className="inline-flex h-8 shrink-0 items-center gap-2 rounded-pill bg-[#e9e5ff] px-3 text-[13px] font-semibold text-iris focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris"
+      className="inline-flex h-8 shrink-0 items-center gap-2 rounded-pill bg-[#e9e5ff] px-3 hover:bg-[#ddd7ff] text-[13px] font-semibold text-iris focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris"
     >
       {label}
       <Icon name="close" size={12} strokeWidth={3} />

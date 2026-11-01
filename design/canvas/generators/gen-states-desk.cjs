@@ -118,7 +118,7 @@ ${clay.bubble("Отправлено ✓")}
 ${h("Заявка ушла в WhatsApp")}
 ${p("Магазин проверит наличие и ответит вам в чате. Если WhatsApp не открылся — откройте ещё раз или скопируйте текст заказа и отправьте сами.")}
 <div style="margin: 22px auto 0; max-width: 420px; display: flex; align-items: center; gap: 12px; text-align: left; border-radius: 20px; background: #F6F5FB; padding: 14px 16px"><img src="${img("jacket")}" alt="" style="width: 48px; height: 48px; border-radius: 12px; object-fit: cover"><img src="${img("sneakers")}" alt="" style="width: 48px; height: 48px; border-radius: 12px; object-fit: cover"><span style="flex: 1; font-size: 14px; color: #4A4580">2 товара</span><span style="font-weight: 800; font-size: 17px; font-variant-numeric: tabular-nums">31 700 ₸</span></div>
-${row(btnDark("Вернуться в каталог"), btnSoft("Открыть WhatsApp ещё раз"), btnSoft("Скопировать текст"))}
+<div style="margin-top: 26px; display: flex; flex-direction: column; gap: 10px">${btnDark("Вернуться в каталог")}<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">${btnSoft("Открыть WhatsApp")}${btnSoft("Скопировать текст")}</div></div>
 </div>`]);
 
 // 8. Каталог скрыт

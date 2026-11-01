@@ -4,7 +4,7 @@ import { Plural, Trans, useLingui } from '@lingui/react/macro';
 
 import { buildFilterSections, toggleValue } from '@/features/product-filters/lib';
 import type { FilterState } from '@/features/product-filters/types';
-import { PriceRange } from './price-range';
+import { PriceRange } from '../price-range';
 
 /**
  * Шторка фильтров: значения свойств, которые есть в выборке, и цена «от — до».
@@ -38,7 +38,7 @@ export function FiltersSheet({
       onClose={onClose}
       title={<Trans>Фильтры</Trans>}
       headerAction={
-        <button type="button" onClick={onReset} className="py-1.5 text-[14px] font-semibold text-iris">
+        <button type="button" onClick={onReset} className="py-1.5 text-[14px] font-semibold text-iris hover:underline">
           <Trans>Сбросить</Trans>
         </button>
       }

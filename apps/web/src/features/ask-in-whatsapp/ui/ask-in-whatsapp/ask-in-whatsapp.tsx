@@ -30,11 +30,11 @@ export function AskInWhatsApp({
       target="_blank"
       rel="noreferrer"
       className={cx(
-        'inline-flex items-center justify-center gap-2 font-sans transition-transform duration-200 ease-press',
+        'inline-flex items-center justify-center gap-2 font-sans press',
         'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris',
         variant === 'button'
-          ? 'h-[52px] rounded-pill bg-mint px-[22px] text-[15px] font-bold text-mint-ink shadow-press-mint active:translate-y-[3px] active:shadow-none lg:h-[54px] lg:px-6 lg:text-[16px]'
-          : 'h-11 rounded-pill px-4 text-[15px] font-semibold text-iris',
+          ? 'h-[52px] rounded-pill bg-mint px-[22px] text-[15px] font-bold text-mint-ink shadow-press-mint hover:bg-mint-hover lg:h-[54px] lg:px-6 lg:text-[16px]'
+          : 'h-11 rounded-pill px-4 text-[15px] font-semibold text-iris hover:underline',
         block && 'w-full',
         className,
       )}

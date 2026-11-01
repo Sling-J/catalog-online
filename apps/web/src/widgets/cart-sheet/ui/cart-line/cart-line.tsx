@@ -77,7 +77,7 @@ export function CartLine({
                 type="button"
                 aria-label={item.quantity > 1 ? t`Меньше` : t`Убрать из корзины`}
                 onClick={() => (item.quantity > 1 ? onQuantity(item.quantity - 1) : onRemove())}
-                className="size-[34px] rounded-full bg-white text-[17px] font-bold"
+                className="size-[34px] rounded-full bg-white text-[17px] font-bold hover:bg-chip-haze"
               >
                 −
               </button>
@@ -89,7 +89,7 @@ export function CartLine({
                 aria-label={t`Больше`}
                 disabled={item.quantity >= limit}
                 onClick={() => onQuantity(item.quantity + 1)}
-                className="size-[34px] rounded-full bg-white text-[17px] font-bold disabled:opacity-40"
+                className="size-[34px] rounded-full bg-white text-[17px] font-bold hover:bg-chip-haze disabled:opacity-40"
               >
                 +
               </button>
@@ -122,7 +122,7 @@ function Notices({
 }) {
   if (!notices || notices.length === 0) return null;
   const remove = (
-    <button type="button" onClick={onRemove} className="underline">
+    <button type="button" onClick={onRemove} className="underline hover:text-ink-night">
       <Trans>Убрать</Trans>
     </button>
   );
