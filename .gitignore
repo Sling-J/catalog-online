@@ -1,0 +1,40 @@
+# Зависимости
+node_modules/
+.pnpm-store/
+
+# Сборка и кеши
+dist/
+build/
+.output/
+.vinxi/
+.tanstack/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# Окружение и секреты
+.env
+.env.*
+!.env.example
+
+# Логи
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Тесты в браузере
+playwright-report/
+test-results/
+
+# Локальные данные Docker (PostgreSQL, MinIO)
+.data/
+
+# Редакторы и ОС
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# Личные настройки Claude Code (общие — в .claude/settings.json)
+.claude/settings.local.json

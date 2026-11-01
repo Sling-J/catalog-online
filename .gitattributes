@@ -1,0 +1,15 @@
+# Текстовые файлы в репозитории — всегда с LF, независимо от ОС
+* text=auto eol=lf
+
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.avif binary
+*.heic binary
+*.woff2 binary
+*.xlsx binary
+
+# Скрипты Windows должны оставаться с CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf

@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-31T18:30:00Z",
+  "title": "Design System: catalog-online",
+  "extensions": {
+    "colorMeta": {
+      "lilac-field": { "role": "neutral", "displayName": "Сиреневое поле", "tonalRamp": ["#2A2259", "#3F3584", "#5848B5", "#7564DE", "#9A88F5", "#C9BBFF", "#E4DCFF", "#F5F1FF"] },
+      "ink-night": { "role": "primary", "displayName": "Чернила-ночь", "tonalRamp": ["#0B0A26", "#1D1B4B", "#2E2B69", "#3A3672", "#4A4580", "#6B6694", "#9A95B8", "#D6D3E8"] },
+      "sun": { "role": "primary", "displayName": "Солнечный жёлтый", "tonalRamp": ["#4A3A00", "#7A5E00", "#A37E00", "#C79A00", "#E8B800", "#FFD23F", "#FFE48A", "#FFF4CC"] },
+      "mint": { "role": "secondary", "displayName": "Мята", "tonalRamp": ["#0B3A28", "#105C3F", "#157A52", "#1E9E6A", "#26B985", "#5EE6B0", "#A8F3D4", "#E1FBF0"] },
+      "coral": { "role": "tertiary", "displayName": "Коралл", "tonalRamp": ["#2A0A00", "#5C1C08", "#9A3418", "#D9532F", "#F06F49", "#FF8F6B", "#FFC1AC", "#FFEAE2"] },
+      "stock-in": { "role": "status", "displayName": "Есть в наличии" },
+      "stock-low": { "role": "status", "displayName": "Осталось мало" },
+      "stock-out": { "role": "status", "displayName": "Нет в наличии" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Один главный заголовок на экран." },
+      "headline": { "displayName": "Headline", "purpose": "Заголовки секций." },
+      "title": { "displayName": "Title", "purpose": "Заголовки карточек, шагов и вопросов." },
+      "body-lg": { "displayName": "Body large", "purpose": "Подзаголовок под главным заголовком." },
+      "body": { "displayName": "Body", "purpose": "Основной текст." },
+      "label": { "displayName": "Label", "purpose": "Кнопки, вкладки, навигация." },
+      "caption": { "displayName": "Caption", "purpose": "Подписи и статусы наличия." },
+      "price": { "displayName": "Price", "purpose": "Цены и суммы с табличными цифрами." }
+    },
+    "shadows": [
+      { "name": "underside-sun", "value": "0 7px 0 #C79A00", "purpose": "Подложка жёлтой кнопки." },
+      { "name": "underside-ink", "value": "0 5px 0 #0B0A26", "purpose": "Подложка тёмной кнопки." },
+      { "name": "underside-mint", "value": "0 5px 0 #26B985", "purpose": "Подложка кнопки подтверждения." },
+      { "name": "device", "value": "0 40px 90px rgba(40,20,110,.28)", "purpose": "Тень телефона." },
+      { "name": "clay", "value": "inset -10px -14px 22px rgba(0,0,0,.25), inset 9px 10px 18px rgba(255,255,255,.45), 0 30px 40px rgba(60,30,120,.25)", "purpose": "Пластилиновый предмет." },
+      { "name": "row", "value": "0 6px 16px rgba(40,30,110,.07)", "purpose": "Строки и карточки на бумаге." },
+      { "name": "glass", "value": "backdrop-filter: blur(20px) saturate(160%); border: 1px solid rgba(255,255,255,.85)", "purpose": "Стеклянные панели." }
+    ],
+    "motion": [
+      { "name": "spring-press", "value": "transform .25s cubic-bezier(.34,1.56,.64,1)", "purpose": "Наведение и нажатие пухлых кнопок." },
+      { "name": "arrive", "value": ".7s cubic-bezier(.34,1.56,.64,1)", "purpose": "Появление нового сообщения или заказа." },
+      { "name": "float", "value": "5–7s ease-in-out infinite", "purpose": "Парение предметов, у каждого своя задержка." },
+      { "name": "drift", "value": "20s ease-in-out infinite", "purpose": "Медленный дрейф световых пятен фона." }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "720px" },
+      { "name": "tablet", "value": "1000px" },
+      { "name": "container", "value": "1200px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Главное действие экрана, одно на экран.",
+      "html": "<button class=\"ds-btn-primary\">Создать каталог бесплатно</button>",
+      "css": ".ds-btn-primary{background:#FFD23F;color:#1D1B4B;font:700 18px Geologica,system-ui,sans-serif;padding:19px 32px;border:0;border-radius:999px;box-shadow:0 7px 0 #C79A00;cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}.ds-btn-primary:hover{transform:translateY(-3px)}.ds-btn-primary:active{transform:translateY(4px)}.ds-btn-primary:focus-visible{outline:3px solid #1D1B4B;outline-offset:3px}"
+    },
+    {
+      "name": "Confirm Button",
+      "kind": "button",
+      "refersTo": "button-confirm",
+      "description": "Отправка и подтверждение заказа.",
+      "html": "<button class=\"ds-btn-confirm\">Подтвердить заказ</button>",
+      "css": ".ds-btn-confirm{background:#5EE6B0;color:#0B3A28;font:700 15px Geologica,system-ui,sans-serif;padding:15px 24px;border:0;border-radius:999px;box-shadow:0 5px 0 #26B985;cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}.ds-btn-confirm:hover{transform:translateY(-3px)}.ds-btn-confirm:active{transform:translateY(4px)}.ds-btn-confirm:focus-visible{outline:3px solid #1D1B4B;outline-offset:3px}"
+    },
+    {
+      "name": "Dark Button",
+      "kind": "button",
+      "refersTo": "button-dark",
+      "description": "Навигация и второстепенные действия.",
+      "html": "<button class=\"ds-btn-dark\">Создать каталог</button>",
+      "css": ".ds-btn-dark{background:#1D1B4B;color:#fff;font:600 15px Geologica,system-ui,sans-serif;padding:12px 22px;border:0;border-radius:999px;box-shadow:0 5px 0 #0B0A26;cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}.ds-btn-dark:hover{transform:translateY(-3px)}.ds-btn-dark:active{transform:translateY(4px)}.ds-btn-dark:focus-visible{outline:3px solid #1D1B4B;outline-offset:3px}"
+    },
+    {
+      "name": "Size Chips",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Выбор размера; отсутствующий зачёркнут.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\">104</button><button class=\"ds-chip ds-chip-on\" aria-pressed=\"true\">110</button><button class=\"ds-chip ds-chip-out\" disabled>116</button></div>",
+      "css": ".ds-chips{display:flex;gap:8px}.ds-chip{background:#EEECF8;color:#1D1B4B;font:600 13px Geologica,system-ui,sans-serif;padding:9px 16px;min-height:40px;border:0;border-radius:999px;cursor:pointer}.ds-chip-on{background:#1D1B4B;color:#fff;box-shadow:0 3px 0 #0B0A26}.ds-chip-out{color:#7A7598;text-decoration:line-through;cursor:default}.ds-chip:focus-visible{outline:3px solid #1D1B4B;outline-offset:2px}"
+    },
+    {
+      "name": "Product Row",
+      "kind": "custom",
+      "refersTo": "product-row",
+      "description": "Строка товара в витрине: миниатюра, название, цена, наличие, кнопка «+».",
+      "html": "<div class=\"ds-row\"><div class=\"ds-row-thumb\"></div><div class=\"ds-row-body\"><div class=\"ds-row-name\">Куртка демисезонная</div><div class=\"ds-row-price\">18 900 ₸</div><div class=\"ds-row-stock\"><span></span>Осталось 1</div></div><button class=\"ds-row-add\" aria-label=\"Добавить\">+</button></div>",
+      "css": ".ds-row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:22px;background:#fff;box-shadow:0 6px 16px rgba(40,30,110,.07);font-family:Geologica,system-ui,sans-serif;color:#1D1B4B;max-width:320px}.ds-row-thumb{width:60px;height:60px;border-radius:18px;background:radial-gradient(120% 120% at 30% 20%,#9C90FF,#3B2FD9)}.ds-row-body{flex:1}.ds-row-name{font-weight:600;font-size:14px}.ds-row-price{font-weight:800;font-size:15px;font-variant-numeric:tabular-nums}.ds-row-stock{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#A35A00}.ds-row-stock span{width:7px;height:7px;border-radius:50%;background:#A35A00}.ds-row-add{width:44px;height:44px;border-radius:50%;border:0;background:#1D1B4B;color:#fff;font:800 18px Geologica,sans-serif;box-shadow:0 4px 0 #0B0A26;cursor:pointer}"
+    },
+    {
+      "name": "Glass Card",
+      "kind": "card",
+      "refersTo": "card-glass",
+      "description": "Стеклянная панель на сиреневом поле.",
+      "html": "<div class=\"ds-glass\"><h3>Частые вопросы</h3><p>Каталог появляется сразу после загрузки таблицы.</p></div>",
+      "css": ".ds-glass{background:rgba(255,255,255,.55);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,.85);border-radius:30px;padding:24px 28px;font-family:Geologica,system-ui,sans-serif;color:#1D1B4B}.ds-glass h3{margin:0;font-size:18px;font-weight:700}.ds-glass p{margin:8px 0 0;font-size:16px;line-height:1.55;color:#3A3672}"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Поле ввода для админки и форм.",
+      "html": "<label class=\"ds-field\"><span>Номер WhatsApp</span><input placeholder=\"+7 700 000 00 00\"></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:6px;font-family:Geologica,system-ui,sans-serif;color:#1D1B4B;max-width:320px}.ds-field span{font-size:13px;font-weight:600}.ds-field input{font:400 16px Geologica,system-ui,sans-serif;color:#1D1B4B;background:#fff;border:1px solid #EEECF8;border-radius:16px;padding:14px 18px;outline:none;transition:border-color .2s,box-shadow .2s}.ds-field input::placeholder{color:#6B6694}.ds-field input:focus{border:2px solid #1D1B4B;padding:13px 17px;box-shadow:0 0 0 6px rgba(201,187,255,.6)}"
+    },
+    {
+      "name": "Glass Nav",
+      "kind": "nav",
+      "refersTo": "nav-bar",
+      "description": "Стеклянная навигационная пилюля.",
+      "html": "<nav class=\"ds-nav\"><b>catalog·online</b><span><a href=\"#\">Вопросы</a><button>Создать каталог</button></span></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 10px 10px 24px;border-radius:999px;background:rgba(255,255,255,.45);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,.75);font-family:Geologica,system-ui,sans-serif;color:#1D1B4B}.ds-nav b{font-weight:800;font-size:19px}.ds-nav span{display:flex;align-items:center;gap:20px;font-weight:600;font-size:15px}.ds-nav a{color:#1D1B4B;text-decoration:none}.ds-nav button{background:#1D1B4B;color:#fff;border:0;border-radius:999px;padding:12px 22px;font:600 15px Geologica,sans-serif;box-shadow:0 5px 0 #0B0A26;cursor:pointer}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Магазин в кармане",
+    "overview": "Главный герой каждого экрана — телефон и то, что происходит на нём под пальцем. Интерфейс сделан как предмет, который приятно трогать: пухлые кнопки с подложкой, мягкое стекло, скруглённые как у телефона углы, а вокруг парят пластилиновые предметы из мира магазина. Мир один на все поверхности: лендинг, витрина и админка одинаково яркие; меняется только плотность.",
+    "keyCharacteristics": [
+      "Сиреневое поле как основа каждой страницы, контент на белой бумаге или стекле.",
+      "Пухлые кнопки-«пилюли» с плотной цветной подложкой снизу, которые проседают при нажатии.",
+      "Матовое стекло для навигации, панелей и вопросов.",
+      "Парящие пластилиновые предметы как фирменный знак.",
+      "Один шрифт Geologica, жирные заголовки с плотным трекингом.",
+      "Цвет наличия всегда одинаковый: зелёный «есть», янтарный «мало», серо-сиреневый «нет»."
+    ],
+    "rules": [
+      { "name": "The Underside Rule", "body": "Каждая залитая кнопка и каждый яркий блок имеют подложку — более тёмный тон своего цвета, сдвинутый вниз без размытия.", "section": "colors" },
+      { "name": "The One Sun Rule", "body": "Жёлтый — одна главная кнопка на экран.", "section": "colors" },
+      { "name": "The Status Is Sacred Rule", "body": "Зелёный, янтарный и серо-сиреневый означают наличие и ничего больше.", "section": "colors" },
+      { "name": "The AA Rule", "body": "Мелкий текст — только цвета, проходящие 4.5:1 на своём фоне.", "section": "colors" },
+      { "name": "The Tight Heads Rule", "body": "Чем крупнее заголовок, тем плотнее трекинг.", "section": "typography" },
+      { "name": "The Tabular Money Rule", "body": "Все цены и суммы — табличными цифрами с пробелом между разрядами.", "section": "typography" },
+      { "name": "The Phone Is The Unit Rule", "body": "Ключевая демонстрация помещается в один экран телефона; если нет — вкладки.", "section": "layout" },
+      { "name": "The Press Rule", "body": "При нажатии кнопка опускается на высоту подложки, при наведении приподнимается на 3px с пружиной.", "section": "elevation" },
+      { "name": "The Nested Radius Rule", "body": "Внутренний радиус равен внешнему минус отступ.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do держать сиреневое поле фоном каждой поверхности, а данные — на белом или бумаге.",
+      "Do давать каждой залитой кнопке подложку её тона.",
+      "Do показывать наличие цветом и текстом вместе: «Осталось 1».",
+      "Do ставить предметы в поля, шапки секций, пустые состояния и экраны успеха.",
+      "Do на телефоне превращать параллельные сцены во вкладки.",
+      "Do задавать цвета через токены, чтобы позже добавить тёмную тему без переделки."
+    ],
+    "donts": [
+      "Don't делать «базарно»: никаких кричащих скидочных плашек, мигания, красного «SALE».",
+      "Don't делать скучно-корпоративно: никаких серых плоских кнопок без подложки и серых теней.",
+      "Don't ставить парящие предметы поверх таблиц, форм, цен и кнопок.",
+      "Don't использовать больше одной жёлтой кнопки на экране.",
+      "Don't использовать мятный, янтарный или зелёный не по назначению.",
+      "Don't использовать светлые сиреневые серые для текста меньше 18px."
+    ]
+  }
+}

@@ -1,0 +1,1966 @@
+openapi: 3.1.0
+info:
+  title: catalog-online API
+  version: 0.1.0
+  description: |
+    Контракт API — источник правды (ADR 0001). Из него Hey API генерирует типы, SDK,
+    хуки TanStack Query, схемы Zod, моки MSW (фронты) и типы контроллеров NestJS (бэк).
+
+    Соглашения — `docs/02-architecture/api.md`:
+    - `/v1/storefront/{subdomain}/…` — публичная витрина, без входа.
+    - `/v1/admin/…` — админка магазина, сессия в cookie `sid`; магазин берётся из сессии.
+    - `/v1/auth/…` — регистрация и вход. `/v1/staff/…` — суперадминка.
+    - Ошибки — RFC 9457 (`application/problem+json`) с машинным `code`.
+    - Списки — курсор: `?cursor=…&limit=…` → `{ items, nextCursor }`.
+    - Деньги — целые тенге. Время — ISO 8601 UTC. Идентификаторы — UUID v7.
+    - Файлы грузятся напрямую в хранилище по ссылке из `POST /v1/admin/uploads`.
+
+servers:
+  - url: https://api.example.kz
+    description: Адрес задаётся окружением
+
+security: []
+
+tags:
+  - name: storefront
+    description: Публичная витрина магазина
+  - name: auth
+    description: Регистрация, вход, почта, пароль
+  - name: shop
+    description: Настройки и публикация магазина
+  - name: uploads
+    description: Ссылки для прямой загрузки файлов
+  - name: products
+    description: Товары, варианты, фото
+  - name: categories
+  - name: attributes
+  - name: imports
+    description: Импорт Excel / CSV
+  - name: stats
+  - name: staff
+    description: Суперадминка
+
+paths:
+  # ───────────────────────── Витрина ─────────────────────────
+  /v1/storefront/{subdomain}:
+    get:
+      tags: [storefront]
+      operationId: getStorefrontShop
+      summary: Магазин для шапки и шторки «О магазине» (FR-V1, FR-V9)
+      parameters:
+        - $ref: '#/components/parameters/Subdomain'
+        - $ref: '#/components/parameters/PreviewToken'
+      responses:
+        '200':
+          description: Магазин
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StorefrontShop' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '410':
+          description: Каталог скрыт или магазин заблокирован — витрина показывает заглушку
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+
+  /v1/storefront/{subdomain}/categories:
+    get:
+      tags: [storefront]
+      operationId: listStorefrontCategories
+      summary: Категории с товарами в наличии (FR-V2)
+      parameters:
+        - $ref: '#/components/parameters/Subdomain'
+        - $ref: '#/components/parameters/PreviewToken'
+      responses:
+        '200':
+          description: Дерево категорий в порядке витрины
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/StorefrontCategory' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/storefront/{subdomain}/products:
+    get:
+      tags: [storefront]
+      operationId: listStorefrontProducts
+      summary: Сетка товаров с поиском, фильтрами и сортировкой (FR-V3–V5)
+      parameters:
+        - $ref: '#/components/parameters/Subdomain'
+        - $ref: '#/components/parameters/PreviewToken'
+        - $ref: '#/components/parameters/StorefrontCategoryFilter'
+        - $ref: '#/components/parameters/SearchQuery'
+        - $ref: '#/components/parameters/AttributeValuesFilter'
+        - $ref: '#/components/parameters/PriceMin'
+        - $ref: '#/components/parameters/PriceMax'
+        - name: sort
+          in: query
+          schema: { type: string, enum: [new, price_asc, price_desc], default: new }
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Страница товаров
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, nextCursor]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/StorefrontProductCard' }
+                  nextCursor: { $ref: '#/components/schemas/NextCursor' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/storefront/{subdomain}/facets:
+    get:
+      tags: [storefront]
+      operationId: getStorefrontFacets
+      summary: Значения фильтров, которые реально есть в выборке (FR-V4)
+      description: Принимает те же фильтры, что и список товаров; размеры и цены считаются по вариантам в наличии.
+      parameters:
+        - $ref: '#/components/parameters/Subdomain'
+        - $ref: '#/components/parameters/PreviewToken'
+        - $ref: '#/components/parameters/StorefrontCategoryFilter'
+        - $ref: '#/components/parameters/SearchQuery'
+        - $ref: '#/components/parameters/AttributeValuesFilter'
+        - $ref: '#/components/parameters/PriceMin'
+        - $ref: '#/components/parameters/PriceMax'
+      responses:
+        '200':
+          description: Фильтры и общее число товаров
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StorefrontFacets' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/storefront/{subdomain}/products/{shortId}:
+    get:
+      tags: [storefront]
+      operationId: getStorefrontProduct
+      summary: Карточка товара (FR-V6). Ищем по shortId; если slug в адресе устарел, фронт делает 301 на `slug` из ответа
+      parameters:
+        - $ref: '#/components/parameters/Subdomain'
+        - $ref: '#/components/parameters/PreviewToken'
+        - name: shortId
+          in: path
+          required: true
+          schema: { type: string, pattern: '^[0-9a-z]{5,6}$' }
+      responses:
+        '200':
+          description: Товар; закончившийся тоже отдаётся (все варианты с уровнем out), витрина покажет «Закончился»
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StorefrontProduct' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/storefront/{subdomain}/cart/check:
+    post:
+      tags: [storefront]
+      operationId: checkStorefrontCart
+      summary: Перепроверка цен и наличия корзины (FR-V7)
+      parameters:
+        - $ref: '#/components/parameters/Subdomain'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  maxItems: 100
+                  items: { $ref: '#/components/schemas/CartItemInput' }
+      responses:
+        '200':
+          description: Актуальное состояние каждой позиции
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/CartItemChecked' }
+                  total: { $ref: '#/components/schemas/Money' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/storefront/{subdomain}/events:
+    post:
+      tags: [storefront]
+      operationId: trackStorefrontEvent
+      summary: Просмотр витрины / товара или нажатие «Заказать через WhatsApp» — для статистики (FR-A10)
+      parameters:
+        - $ref: '#/components/parameters/Subdomain'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type]
+              properties:
+                type: { type: string, enum: [view, order_click] }
+                productId:
+                  type: [string, 'null']
+                  format: uuid
+                  description: Для просмотра карточки товара
+      responses:
+        '204': { description: 'Учтено (или отброшено как повтор / бот — ответ тот же)' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  # ───────────────────────── Вход ─────────────────────────
+  /v1/auth/register:
+    post:
+      tags: [auth]
+      operationId: register
+      summary: Регистрация магазина (FR-A1). Создаёт аккаунт и магазин-черновик, открывает сессию, отправляет письмо
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8, maxLength: 128 }
+      responses:
+        '201':
+          description: Создано, cookie `sid` установлен
+          headers:
+            Set-Cookie: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Me' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /v1/auth/login:
+    post:
+      tags: [auth]
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: Вошли, cookie `sid` установлен
+          headers:
+            Set-Cookie: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Me' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /v1/auth/logout:
+    post:
+      tags: [auth]
+      operationId: logout
+      security: [{ cookieAuth: [] }]
+      responses:
+        '204': { description: 'Сессия закрыта' }
+
+  /v1/auth/me:
+    get:
+      tags: [auth]
+      operationId: getMe
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Текущий аккаунт и магазин
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Me' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/auth/email/verify:
+    post:
+      tags: [auth]
+      operationId: verifyEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token: { type: string }
+      responses:
+        '204': { description: 'Почта подтверждена' }
+        '410': { $ref: '#/components/responses/Gone' }
+
+  /v1/auth/email/resend:
+    post:
+      tags: [auth]
+      operationId: resendVerificationEmail
+      security: [{ cookieAuth: [] }]
+      responses:
+        '204': { description: 'Письмо отправлено повторно' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /v1/auth/password/forgot:
+    post:
+      tags: [auth]
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '204': { description: 'Если такой аккаунт есть — письмо отправлено (ответ одинаковый)' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /v1/auth/password/reset:
+    post:
+      tags: [auth]
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, password]
+              properties:
+                token: { type: string }
+                password: { type: string, minLength: 8, maxLength: 128 }
+      responses:
+        '204': { description: 'Пароль изменён, все сессии закрыты' }
+        '410': { $ref: '#/components/responses/Gone' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/auth/password/change:
+    post:
+      tags: [auth]
+      operationId: changePassword
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword: { type: string }
+                newPassword: { type: string, minLength: 8, maxLength: 128 }
+      responses:
+        '204': { description: 'Пароль изменён, остальные сессии закрыты' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  # ───────────────────────── Магазин ─────────────────────────
+  /v1/admin/shop:
+    get:
+      tags: [shop]
+      operationId: getShop
+      summary: Настройки магазина и чек-лист готовности (FR-A2, FR-A9)
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Магазин
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shop' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      tags: [shop]
+      operationId: updateShop
+      summary: Мастер и настройки — частичное обновление
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ShopUpdate' }
+      responses:
+        '200':
+          description: Обновлённый магазин
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shop' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/shop/subdomain-availability:
+    get:
+      tags: [shop]
+      operationId: checkSubdomain
+      summary: Проверка адреса витрины на лету (мастер, шаг 2)
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: value
+          in: query
+          required: true
+          schema: { $ref: '#/components/schemas/SubdomainValue' }
+      responses:
+        '200':
+          description: Свободен ли адрес
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [available]
+                properties:
+                  available: { type: boolean }
+                  reason:
+                    type: [string, 'null']
+                    enum: [taken, reserved, invalid, null]
+
+  /v1/admin/shop/publish:
+    post:
+      tags: [shop]
+      operationId: publishShop
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Опубликован
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shop' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /v1/admin/shop/unpublish:
+    post:
+      tags: [shop]
+      operationId: unpublishShop
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Снят с публикации
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shop' }
+
+  /v1/admin/shop/logo:
+    put:
+      tags: [shop]
+      operationId: setShopLogo
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [uploadId]
+              properties:
+                uploadId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Логотип принят
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shop' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    delete:
+      tags: [shop]
+      operationId: deleteShopLogo
+      security: [{ cookieAuth: [] }]
+      responses:
+        '204': { description: 'Удалён — на витрине буквы из названия' }
+
+  /v1/admin/preview-token:
+    post:
+      tags: [shop]
+      operationId: createPreviewToken
+      summary: Короткоживущий токен для превью неопубликованной витрины в iframe (A7)
+      security: [{ cookieAuth: [] }]
+      responses:
+        '201':
+          description: Токен
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [token, expiresAt]
+                properties:
+                  token: { type: string }
+                  expiresAt: { type: string, format: date-time }
+
+  # ───────────────────────── Загрузка файлов ─────────────────────────
+  /v1/admin/uploads:
+    post:
+      tags: [uploads]
+      operationId: createUpload
+      summary: Ссылка для прямой загрузки в хранилище. Потом `uploadId` передаётся в нужный запрос
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [purpose, fileName, contentType, size]
+              properties:
+                purpose: { type: string, enum: [product_photo, logo, import] }
+                fileName: { type: string, maxLength: 255 }
+                contentType:
+                  type: string
+                  description: |
+                    product_photo, logo — image/jpeg, image/png, image/webp, image/heic, image/heif.
+                    import — .xlsx или text/csv.
+                size:
+                  type: integer
+                  minimum: 1
+                  description: Байт. Фото и логотип ≤ 15 МБ (FR-A4); импорт ≤ 20 МБ
+      responses:
+        '201':
+          description: Ссылка действует несколько минут
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Upload' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  # ───────────────────────── Товары ─────────────────────────
+  /v1/admin/products:
+    get:
+      tags: [products]
+      operationId: listProducts
+      summary: Список товаров (FR-A5); вкладки «Без фото», «Нет в наличии», «Скрытые»; очередь быстрого режима фото — `filter=no_photo`
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SearchQuery'
+        - name: categoryId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: filter
+          in: query
+          schema: { type: string, enum: [all, no_photo, out_of_stock, hidden], default: all }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [new, name, price_asc, price_desc, stock_asc], default: new }
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Страница товаров
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, nextCursor]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/ProductListItem' }
+                  nextCursor: { $ref: '#/components/schemas/NextCursor' }
+    post:
+      tags: [products]
+      operationId: createProduct
+      summary: Новый товар вручную
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductCreate' }
+      responses:
+        '201':
+          description: Создан
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/products/counts:
+    get:
+      tags: [products]
+      operationId: getProductCounts
+      summary: Числа для вкладок и баннера «N без фото»
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Счётчики
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [all, noPhoto, outOfStock, hidden]
+                properties:
+                  all: { type: integer }
+                  noPhoto: { type: integer }
+                  outOfStock: { type: integer }
+                  hidden: { type: integer }
+
+  /v1/admin/products/bulk:
+    post:
+      tags: [products]
+      operationId: bulkUpdateProducts
+      summary: Массовые действия — скрыть, показать, сменить категорию
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productIds, action]
+              properties:
+                productIds:
+                  type: array
+                  minItems: 1
+                  maxItems: 500
+                  items: { type: string, format: uuid }
+                action: { type: string, enum: [hide, show, set_category] }
+                categoryId:
+                  type: [string, 'null']
+                  format: uuid
+                  description: Для set_category; null — без категории
+      responses:
+        '200':
+          description: Сколько изменено
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [updated]
+                properties:
+                  updated: { type: integer }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/products/{productId}:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+    get:
+      tags: [products]
+      operationId: getProduct
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Товар с вариантами и фото
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [products]
+      operationId: updateProduct
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductUpdate' }
+      responses:
+        '200':
+          description: Обновлён
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    delete:
+      tags: [products]
+      operationId: deleteProduct
+      security: [{ cookieAuth: [] }]
+      responses:
+        '204': { description: 'Удалён вместе с вариантами и фото' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/admin/products/{productId}/variants:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+    put:
+      tags: [products]
+      operationId: replaceProductVariants
+      summary: Таблица размеров целиком — как в редакторе. Варианты с id обновляются, без id создаются, отсутствующие удаляются
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [variants]
+              properties:
+                variants:
+                  type: array
+                  minItems: 1
+                  maxItems: 200
+                  items: { $ref: '#/components/schemas/VariantInput' }
+      responses:
+        '200':
+          description: Товар после изменения
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/products/{productId}/photos:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+    post:
+      tags: [products]
+      operationId: addProductPhoto
+      summary: Прикрепить загруженное фото; сжатие идёт в фоне (status processing → ready)
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [uploadId]
+              properties:
+                uploadId: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Фото добавлено в конец
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Photo' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/products/{productId}/photos/order:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+    put:
+      tags: [products]
+      operationId: reorderProductPhotos
+      summary: Новый порядок фото; первое — обложка
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [photoIds]
+              properties:
+                photoIds:
+                  type: array
+                  items: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Фото в новом порядке
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Photo' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/products/{productId}/photos/{photoId}:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+      - name: photoId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      tags: [products]
+      operationId: deleteProductPhoto
+      security: [{ cookieAuth: [] }]
+      responses:
+        '204': { description: 'Удалено' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ───────────────────────── Категории ─────────────────────────
+  /v1/admin/categories:
+    get:
+      tags: [categories]
+      operationId: listCategories
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Дерево категорий с числом товаров
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Category' }
+    post:
+      tags: [categories]
+      operationId: createCategory
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 80 }
+                parentId: { type: [string, 'null'], format: uuid }
+      responses:
+        '201':
+          description: Создана в конце списка
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Category' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/categories/order:
+    put:
+      tags: [categories]
+      operationId: reorderCategories
+      summary: Порядок и вложенность после перетаскивания (до 2 уровней)
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [id, parentId, position]
+                    properties:
+                      id: { type: string, format: uuid }
+                      parentId: { type: [string, 'null'], format: uuid }
+                      position: { type: integer, minimum: 0 }
+      responses:
+        '200':
+          description: Дерево после изменения
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Category' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/categories/{categoryId}:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      tags: [categories]
+      operationId: renameCategory
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 80 }
+      responses:
+        '200':
+          description: Переименована
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Category' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    delete:
+      tags: [categories]
+      operationId: deleteCategory
+      summary: Удалить; товары остаются без категории (FR-A6)
+      security: [{ cookieAuth: [] }]
+      responses:
+        '204': { description: 'Удалена' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ───────────────────────── Свойства (атрибуты) ─────────────────────────
+  /v1/admin/attributes:
+    get:
+      tags: [attributes]
+      operationId: listAttributes
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Свойства со значениями в порядке витрины
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Attribute' }
+    post:
+      tags: [attributes]
+      operationId: createAttribute
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 60 }
+                inFilters: { type: boolean, default: true }
+                values:
+                  type: array
+                  items: { type: string, minLength: 1, maxLength: 60 }
+      responses:
+        '201':
+          description: Создано
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Attribute' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/attributes/{attributeId}:
+    parameters:
+      - $ref: '#/components/parameters/AttributeId'
+    patch:
+      tags: [attributes]
+      operationId: updateAttribute
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string, minLength: 1, maxLength: 60 }
+                inFilters: { type: boolean }
+      responses:
+        '200':
+          description: Обновлено
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Attribute' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    delete:
+      tags: [attributes]
+      operationId: deleteAttribute
+      summary: Удалить свойство; значения снимаются с вариантов
+      security: [{ cookieAuth: [] }]
+      responses:
+        '204': { description: 'Удалено' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/admin/attributes/{attributeId}/values:
+    parameters:
+      - $ref: '#/components/parameters/AttributeId'
+    put:
+      tags: [attributes]
+      operationId: replaceAttributeValues
+      summary: Значения и их порядок целиком. С id — переименовать/переставить, без id — добавить, отсутствующие — удалить (если не используются)
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [values]
+              properties:
+                values:
+                  type: array
+                  items:
+                    type: object
+                    required: [value]
+                    properties:
+                      id: { type: string, format: uuid }
+                      value: { type: string, minLength: 1, maxLength: 60 }
+      responses:
+        '200':
+          description: Свойство после изменения
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Attribute' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  # ───────────────────────── Импорт ─────────────────────────
+  /v1/admin/imports:
+    get:
+      tags: [imports]
+      operationId: listImports
+      summary: История импортов
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Страница истории
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, nextCursor]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Import' }
+                  nextCursor: { $ref: '#/components/schemas/NextCursor' }
+    post:
+      tags: [imports]
+      operationId: createImport
+      summary: Начать импорт загруженного файла. Разбор в фоне; если заголовки знакомы — сразу к предпросмотру
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [uploadId]
+              properties:
+                uploadId: { type: string, format: uuid }
+      responses:
+        '202':
+          description: Принято; опрашиваем GET /imports/{id}
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Import' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/imports/template:
+    get:
+      tags: [imports]
+      operationId: downloadImportTemplate
+      summary: Шаблон Excel
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Файл .xlsx
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema: { type: string, format: binary }
+
+  /v1/admin/imports/{importId}:
+    parameters:
+      - $ref: '#/components/parameters/ImportId'
+    get:
+      tags: [imports]
+      operationId: getImport
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Состояние импорта
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Import' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [imports]
+      operationId: cancelImport
+      summary: Отменить неприменённый импорт
+      security: [{ cookieAuth: [] }]
+      responses:
+        '204': { description: 'Отменён' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /v1/admin/imports/{importId}/mapping:
+    parameters:
+      - $ref: '#/components/parameters/ImportId'
+    put:
+      tags: [imports]
+      operationId: setImportMapping
+      summary: Сопоставление колонок; запоминается для файлов с теми же заголовками. Запускает предпросмотр
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mapping]
+              properties:
+                mapping:
+                  type: array
+                  items: { $ref: '#/components/schemas/ColumnMapping' }
+      responses:
+        '202':
+          description: Предпросмотр считается
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Import' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/imports/{importId}/errors:
+    parameters:
+      - $ref: '#/components/parameters/ImportId'
+    get:
+      tags: [imports]
+      operationId: listImportErrors
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Ошибки по строкам
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, nextCursor]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/ImportRowError' }
+                  nextCursor: { $ref: '#/components/schemas/NextCursor' }
+
+  /v1/admin/imports/{importId}/apply:
+    parameters:
+      - $ref: '#/components/parameters/ImportId'
+    post:
+      tags: [imports]
+      operationId: applyImport
+      summary: Применить; строки с ошибками пропускаются
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [zeroMissing]
+              properties:
+                zeroMissing:
+                  type: boolean
+                  description: Обнулить остаток артикулов, которых нет в файле
+      responses:
+        '202':
+          description: Применяется в фоне
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Import' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  # ───────────────────────── Статистика ─────────────────────────
+  /v1/admin/stats:
+    get:
+      tags: [stats]
+      operationId: getStats
+      summary: Просмотры и нажатия «Заказать» (FR-A10)
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: period
+          in: query
+          schema: { type: string, enum: ['7d', '30d', 'all'], default: '7d' }
+      responses:
+        '200':
+          description: Статистика за период
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Stats' }
+
+  # ───────────────────────── Суперадминка ─────────────────────────
+  /v1/staff/login:
+    post:
+      tags: [staff]
+      operationId: staffLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '204': { description: 'Вошли, cookie `staff_sid` установлен' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /v1/staff/shops:
+    get:
+      tags: [staff]
+      operationId: staffListShops
+      summary: Список магазинов (FR-S1)
+      security: [{ staffCookieAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SearchQuery'
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Страница магазинов
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, nextCursor]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/StaffShopItem' }
+                  nextCursor: { $ref: '#/components/schemas/NextCursor' }
+
+  /v1/staff/shops/{shopId}/block:
+    parameters:
+      - $ref: '#/components/parameters/ShopId'
+    post:
+      tags: [staff]
+      operationId: staffBlockShop
+      summary: Блокировка (FR-S2), пишется в журнал
+      security: [{ staffCookieAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 500 }
+      responses:
+        '204': { description: 'Заблокирован, сессии магазина закрыты' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/staff/shops/{shopId}/unblock:
+    parameters:
+      - $ref: '#/components/parameters/ShopId'
+    post:
+      tags: [staff]
+      operationId: staffUnblockShop
+      security: [{ staffCookieAuth: [] }]
+      responses:
+        '204': { description: 'Разблокирован' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/staff/shops/{shopId}/impersonate:
+    parameters:
+      - $ref: '#/components/parameters/ShopId'
+    post:
+      tags: [staff]
+      operationId: staffImpersonateShop
+      summary: Войти в админку «от имени» магазина (FR-S3), пишется в журнал
+      security: [{ staffCookieAuth: [] }]
+      responses:
+        '204': { description: 'Установлен cookie `sid` с отметкой impersonated_by' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sid
+      description: HttpOnly, Secure, SameSite=Lax, домен — родительский. Изменяющие запросы требуют заголовок `X-Requested-With`
+    staffCookieAuth:
+      type: apiKey
+      in: cookie
+      name: staff_sid
+
+  parameters:
+    Subdomain:
+      name: subdomain
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/SubdomainValue' }
+    PreviewToken:
+      name: preview
+      in: query
+      description: Токен из POST /v1/admin/preview-token — открывает неопубликованную витрину
+      schema: { type: string }
+    StorefrontCategoryFilter:
+      name: categoryId
+      in: query
+      description: С подкатегориями
+      schema: { type: string, format: uuid }
+    SearchQuery:
+      name: q
+      in: query
+      schema: { type: string, maxLength: 100 }
+    AttributeValuesFilter:
+      name: values
+      in: query
+      description: Id значений свойств через запятую. Внутри свойства — ИЛИ, между свойствами — И; учитываются варианты в наличии
+      style: form
+      explode: false
+      schema:
+        type: array
+        items: { type: string, format: uuid }
+    PriceMin:
+      name: priceMin
+      in: query
+      schema: { $ref: '#/components/schemas/Money' }
+    PriceMax:
+      name: priceMax
+      in: query
+      schema: { $ref: '#/components/schemas/Money' }
+    Cursor:
+      name: cursor
+      in: query
+      description: Непрозрачная строка из nextCursor
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 30 }
+    ProductId:
+      name: productId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    AttributeId:
+      name: attributeId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    ImportId:
+      name: importId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    ShopId:
+      name: shopId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    NotFound:
+      description: Не найдено
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unauthorized:
+      description: Нет сессии или неверный пароль
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Conflict:
+      description: Конфликт (адрес занят, артикул повторяется, импорт уже идёт…) — смотреть `code`
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Gone:
+      description: Ссылка просрочена или уже использована
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    ValidationError:
+      description: Ошибки в полях
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    TooManyRequests:
+      description: Слишком часто
+      headers:
+        Retry-After: { schema: { type: integer } }
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+
+  schemas:
+    # ─── Общее ───
+    Problem:
+      type: object
+      description: RFC 9457. Текст для человека фронт берёт из своих переводов по `code`
+      required: [type, title, status, code]
+      properties:
+        type: { type: string, format: uri, default: about:blank }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        code:
+          type: string
+          description: |
+            Машинный код: not_found, unauthorized, validation_failed, subdomain_taken, subdomain_reserved,
+            email_taken, sku_taken, category_name_taken, attribute_name_taken, attribute_value_in_use,
+            shop_not_ready, shop_hidden, shop_blocked, import_in_progress, import_not_ready,
+            photo_limit_reached, upload_not_found, token_expired, rate_limited
+        errors:
+          type: array
+          description: Для validation_failed — ошибки по полям
+          items:
+            type: object
+            required: [field, code]
+            properties:
+              field: { type: string, description: 'Путь: variants.2.price' }
+              code: { type: string, description: 'required, too_long, invalid_format, out_of_range…' }
+              params: { type: object, additionalProperties: true }
+    Money:
+      type: integer
+      minimum: 0
+      description: Целые тенге
+    NextCursor:
+      type: [string, 'null']
+      description: null — дальше ничего нет
+    SubdomainValue:
+      type: string
+      pattern: '^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])$'
+    Schedule:
+      type: object
+      description: null у дня — выходной. Время — по часовому поясу магазина
+      required: [mon, tue, wed, thu, fri, sat, sun]
+      properties:
+        mon: { $ref: '#/components/schemas/DayHours' }
+        tue: { $ref: '#/components/schemas/DayHours' }
+        wed: { $ref: '#/components/schemas/DayHours' }
+        thu: { $ref: '#/components/schemas/DayHours' }
+        fri: { $ref: '#/components/schemas/DayHours' }
+        sat: { $ref: '#/components/schemas/DayHours' }
+        sun: { $ref: '#/components/schemas/DayHours' }
+    DayHours:
+      type: [object, 'null']
+      required: [open, close]
+      properties:
+        open: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$' }
+        close: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$' }
+    Image:
+      type: object
+      description: Готовые размеры в WebP; width/height исходника — для соотношения сторон до загрузки
+      required: [width, height, sizes]
+      properties:
+        width: { type: integer }
+        height: { type: integer }
+        sizes:
+          type: object
+          required: ['320', '640', '1280']
+          properties:
+            '320': { type: string, format: uri }
+            '640': { type: string, format: uri }
+            '1280': { type: string, format: uri }
+    StockDisplay:
+      type: string
+      enum: [levels, exact]
+    StockInfo:
+      type: object
+      description: Наличие для покупателя по настройке магазина (D5). quantity — только при stockDisplay=exact
+      required: [level]
+      properties:
+        level: { type: string, enum: [in, low, out] }
+        quantity: { type: [integer, 'null'] }
+
+    # ─── Витрина ───
+    StorefrontShop:
+      type: object
+      required: [subdomain, name, logo, whatsapp, schedule, timezone, stockDisplay, isPreview]
+      properties:
+        subdomain: { type: string }
+        name: { type: string }
+        logo: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+        description: { type: [string, 'null'] }
+        address: { type: [string, 'null'] }
+        howToFind: { type: [string, 'null'] }
+        whatsapp: { type: string, description: 'E.164, +77000000000' }
+        instagram: { type: [string, 'null'] }
+        schedule: { $ref: '#/components/schemas/Schedule' }
+        timezone: { type: string, example: Asia/Almaty }
+        stockDisplay: { $ref: '#/components/schemas/StockDisplay' }
+        isPreview: { type: boolean, description: 'Открыто по preview-токену — витрина показывает плашку «Черновик»' }
+    StorefrontCategory:
+      type: object
+      required: [id, name, productCount, children]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        productCount: { type: integer }
+        children:
+          type: array
+          items: { $ref: '#/components/schemas/StorefrontCategory' }
+    StorefrontProductCard:
+      type: object
+      required: [id, shortId, slug, name, price, priceVaries, cover, stockLevel]
+      properties:
+        id: { type: string, format: uuid }
+        shortId: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        price: { $ref: '#/components/schemas/Money' }
+        priceVaries: { type: boolean, description: 'true — показывать «от X ₸»' }
+        cover: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+        stockLevel:
+          type: string
+          enum: [in, low, out]
+          description: low — плашка «мало»; out — только если включён показ закончившихся
+    StorefrontFacets:
+      type: object
+      required: [total, attributes, price]
+      properties:
+        total: { type: integer }
+        attributes:
+          type: array
+          items:
+            type: object
+            required: [id, name, values]
+            properties:
+              id: { type: string, format: uuid }
+              name: { type: string }
+              values:
+                type: array
+                items:
+                  type: object
+                  required: [id, value, count]
+                  properties:
+                    id: { type: string, format: uuid }
+                    value: { type: string }
+                    count: { type: integer }
+        price:
+          type: object
+          required: [min, max]
+          properties:
+            min: { $ref: '#/components/schemas/Money' }
+            max: { $ref: '#/components/schemas/Money' }
+    StorefrontProduct:
+      type: object
+      required: [id, shortId, slug, name, category, photos, attributes, variants]
+      properties:
+        id: { type: string, format: uuid }
+        shortId: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        description: { type: [string, 'null'] }
+        category:
+          oneOf:
+            - type: object
+              required: [id, name]
+              properties:
+                id: { type: string, format: uuid }
+                name: { type: string }
+            - type: 'null'
+        photos:
+          type: array
+          items: { $ref: '#/components/schemas/Image' }
+        attributes:
+          type: array
+          description: Свойства, по которым выбирается вариант, со значениями в порядке витрины
+          items:
+            type: object
+            required: [id, name, values]
+            properties:
+              id: { type: string, format: uuid }
+              name: { type: string }
+              values:
+                type: array
+                items:
+                  type: object
+                  required: [id, value]
+                  properties:
+                    id: { type: string, format: uuid }
+                    value: { type: string }
+        variants:
+          type: array
+          items:
+            type: object
+            required: [id, valueIds, price, stock]
+            properties:
+              id: { type: string, format: uuid }
+              valueIds:
+                type: array
+                items: { type: string, format: uuid }
+              price: { $ref: '#/components/schemas/Money' }
+              stock: { $ref: '#/components/schemas/StockInfo' }
+    CartItemInput:
+      type: object
+      required: [variantId, quantity]
+      properties:
+        variantId: { type: string, format: uuid }
+        quantity: { type: integer, minimum: 1, maximum: 999 }
+    CartItemChecked:
+      type: object
+      required: [variantId, status, quantity]
+      properties:
+        variantId: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [ok, price_changed, quantity_reduced, out_of_stock, unavailable]
+          description: unavailable — товар скрыт или удалён
+        quantity: { type: integer, description: 'С учётом остатка' }
+        price: { oneOf: [{ $ref: '#/components/schemas/Money' }, { type: 'null' }] }
+        previousPrice: { oneOf: [{ $ref: '#/components/schemas/Money' }, { type: 'null' }] }
+        product:
+          oneOf:
+            - type: object
+              required: [shortId, slug, name, variantLabel, cover]
+              properties:
+                shortId: { type: string }
+                slug: { type: string }
+                name: { type: string }
+                variantLabel: { type: string, example: 'Рост 110' }
+                cover: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+            - type: 'null'
+
+    # ─── Вход ───
+    Me:
+      type: object
+      required: [account, shop]
+      properties:
+        account:
+          type: object
+          required: [id, email, emailVerified, impersonated]
+          properties:
+            id: { type: string, format: uuid }
+            email: { type: string, format: email }
+            emailVerified: { type: boolean }
+            impersonated: { type: boolean, description: 'Вход суперадмина «от имени» — админка показывает плашку' }
+        shop:
+          type: object
+          required: [id, name, subdomain, status, setupCompleted]
+          properties:
+            id: { type: string, format: uuid }
+            name: { type: [string, 'null'] }
+            subdomain: { type: [string, 'null'] }
+            status: { $ref: '#/components/schemas/ShopStatus' }
+            setupCompleted: { type: boolean, description: 'false — открыть мастер' }
+
+    # ─── Магазин ───
+    ShopStatus:
+      type: string
+      enum: [draft, published, blocked]
+    Shop:
+      type: object
+      required: [id, status, schedule, timezone, stockDisplay, lowStockThreshold, showOutOfStock, readiness]
+      properties:
+        id: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/ShopStatus' }
+        subdomain: { type: [string, 'null'] }
+        name: { type: [string, 'null'] }
+        logo: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+        description: { type: [string, 'null'] }
+        whatsapp: { type: [string, 'null'] }
+        instagram: { type: [string, 'null'] }
+        address: { type: [string, 'null'] }
+        howToFind: { type: [string, 'null'] }
+        schedule: { $ref: '#/components/schemas/Schedule' }
+        timezone: { type: string }
+        stockDisplay: { $ref: '#/components/schemas/StockDisplay' }
+        lowStockThreshold: { type: integer, minimum: 1, maximum: 50 }
+        showOutOfStock: { type: boolean }
+        publishedAt: { type: [string, 'null'], format: date-time }
+        readiness:
+          type: object
+          description: Чек-лист на главной до публикации
+          required: [settingsFilled, productCount, productsWithoutPhoto, canPublish]
+          properties:
+            settingsFilled: { type: boolean }
+            productCount: { type: integer }
+            productsWithoutPhoto: { type: integer }
+            canPublish: { type: boolean, description: 'Есть название, адрес витрины, WhatsApp и хотя бы один видимый товар' }
+    ShopUpdate:
+      type: object
+      description: Только переданные поля. Логотип — отдельно через /shop/logo
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+        subdomain: { $ref: '#/components/schemas/SubdomainValue' }
+        description: { type: [string, 'null'], maxLength: 1000 }
+        whatsapp: { type: string, pattern: '^\+7\d{10}$' }
+        instagram: { type: [string, 'null'], maxLength: 60 }
+        address: { type: [string, 'null'], maxLength: 200 }
+        howToFind: { type: [string, 'null'], maxLength: 300 }
+        schedule: { $ref: '#/components/schemas/Schedule' }
+        stockDisplay: { $ref: '#/components/schemas/StockDisplay' }
+        lowStockThreshold: { type: integer, minimum: 1, maximum: 50 }
+        showOutOfStock: { type: boolean }
+        setupCompleted: { type: boolean, description: 'Мастер пройден' }
+
+    # ─── Загрузка ───
+    Upload:
+      type: object
+      required: [uploadId, url, method, headers, expiresAt]
+      properties:
+        uploadId: { type: string, format: uuid }
+        url: { type: string, format: uri }
+        method: { type: string, enum: [PUT] }
+        headers:
+          type: object
+          additionalProperties: { type: string }
+          description: Отправить с запросом как есть (Content-Type и т. п.)
+        expiresAt: { type: string, format: date-time }
+
+    # ─── Товары ───
+    ProductListItem:
+      type: object
+      required: [id, name, category, price, priceVaries, totalStock, variantCount, isVisible, cover, photoCount]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        sku: { type: [string, 'null'], description: 'Артикул, если вариант один' }
+        category:
+          oneOf:
+            - type: object
+              required: [id, name]
+              properties:
+                id: { type: string, format: uuid }
+                name: { type: string }
+            - type: 'null'
+        price: { $ref: '#/components/schemas/Money' }
+        priceVaries: { type: boolean }
+        totalStock: { type: integer }
+        variantCount: { type: integer }
+        isVisible: { type: boolean }
+        cover: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+        photoCount: { type: integer }
+    Product:
+      type: object
+      required: [id, shortId, slug, name, categoryId, isVisible, importedFields, photos, variants, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        shortId: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        description: { type: [string, 'null'] }
+        categoryId: { type: [string, 'null'], format: uuid }
+        isVisible: { type: boolean }
+        importedFields:
+          type: array
+          description: Поля, которые перезапишет следующий импорт — админка помечает их «из Excel»
+          items: { type: string, enum: [name, category, variants] }
+        photos:
+          type: array
+          items: { $ref: '#/components/schemas/Photo' }
+        variants:
+          type: array
+          items: { $ref: '#/components/schemas/Variant' }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    ProductCreate:
+      type: object
+      required: [name, variants]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 200 }
+        description: { type: [string, 'null'], maxLength: 5000 }
+        categoryId: { type: [string, 'null'], format: uuid }
+        isVisible: { type: boolean, default: true, description: 'false — «Сохранить черновик»' }
+        variants:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items: { $ref: '#/components/schemas/VariantInput' }
+    ProductUpdate:
+      type: object
+      properties:
+        name: { type: string, minLength: 1, maxLength: 200 }
+        description: { type: [string, 'null'], maxLength: 5000 }
+        categoryId: { type: [string, 'null'], format: uuid }
+        isVisible: { type: boolean }
+    Variant:
+      type: object
+      required: [id, sku, price, stock, values]
+      properties:
+        id: { type: string, format: uuid }
+        sku: { type: string }
+        barcode: { type: [string, 'null'] }
+        price: { $ref: '#/components/schemas/Money' }
+        stock: { type: integer, minimum: 0 }
+        values:
+          type: array
+          items:
+            type: object
+            required: [attributeId, attributeName, valueId, value]
+            properties:
+              attributeId: { type: string, format: uuid }
+              attributeName: { type: string }
+              valueId: { type: string, format: uuid }
+              value: { type: string }
+    VariantInput:
+      type: object
+      required: [price, stock, values]
+      properties:
+        id: { type: string, format: uuid, description: 'Есть — обновить; нет — создать' }
+        sku: { type: [string, 'null'], maxLength: 64, description: 'null — сгенерировать' }
+        barcode: { type: [string, 'null'], maxLength: 64 }
+        price: { $ref: '#/components/schemas/Money' }
+        stock: { type: integer, minimum: 0 }
+        values:
+          type: array
+          description: Пусто — товар без размеров. Значение по тексту создаётся, если его нет («Свой размер»)
+          items:
+            type: object
+            required: [attributeId, value]
+            properties:
+              attributeId: { type: string, format: uuid }
+              value: { type: string, minLength: 1, maxLength: 60 }
+    Photo:
+      type: object
+      required: [id, position, status, image]
+      properties:
+        id: { type: string, format: uuid }
+        position: { type: integer }
+        status: { type: string, enum: [processing, ready, failed] }
+        image: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }], description: 'null пока processing' }
+
+    # ─── Категории и свойства ───
+    Category:
+      type: object
+      required: [id, name, parentId, position, productCount, children]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        parentId: { type: [string, 'null'], format: uuid }
+        position: { type: integer }
+        productCount: { type: integer }
+        children:
+          type: array
+          items: { $ref: '#/components/schemas/Category' }
+    Attribute:
+      type: object
+      required: [id, name, position, inFilters, values]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        position: { type: integer }
+        inFilters: { type: boolean }
+        values:
+          type: array
+          items:
+            type: object
+            required: [id, value, position, usageCount]
+            properties:
+              id: { type: string, format: uuid }
+              value: { type: string }
+              position: { type: integer }
+              usageCount: { type: integer }
+
+    # ─── Импорт ───
+    ImportStatus:
+      type: string
+      enum: [parsing, mapping, previewing, previewed, applying, done, failed, cancelled]
+      description: |
+        parsing → mapping (заголовки не узнали, ждём сопоставление) → previewing → previewed → applying → done.
+        Если заголовки знакомы — parsing сразу ведёт в previewing.
+    ColumnMapping:
+      type: object
+      required: [column, target]
+      properties:
+        column: { type: string, description: 'Заголовок колонки в файле' }
+        target:
+          type: string
+          enum: [sku, name, price, stock, group_key, barcode, category, description, attribute, skip]
+        attributeName:
+          type: [string, 'null']
+          description: Для target=attribute — имя свойства (существующего или нового), например «Рост»
+    Import:
+      type: object
+      required: [id, status, fileName, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/ImportStatus' }
+        fileName: { type: string }
+        headers:
+          type: [array, 'null']
+          items: { type: string }
+        sampleRows:
+          type: [array, 'null']
+          description: Первые строки для экрана сопоставления — значения по заголовкам
+          items:
+            type: object
+            additionalProperties: { type: string }
+        mapping:
+          type: [array, 'null']
+          description: Предложенное или выбранное сопоставление
+          items: { $ref: '#/components/schemas/ColumnMapping' }
+        mappingRemembered: { type: boolean, description: 'Сопоставление взято из прошлого импорта' }
+        preview:
+          oneOf:
+            - type: object
+              required: [rows, create, update, errors, missingInFile]
+              properties:
+                rows: { type: integer }
+                create: { type: integer }
+                update: { type: integer }
+                errors: { type: integer }
+                missingInFile: { type: integer, description: 'Артикулы магазина, которых нет в файле' }
+            - type: 'null'
+        result:
+          oneOf:
+            - type: object
+              required: [created, updated, zeroed, skipped]
+              properties:
+                created: { type: integer }
+                updated: { type: integer }
+                zeroed: { type: integer }
+                skipped: { type: integer }
+            - type: 'null'
+        failureCode: { type: [string, 'null'], description: 'Для failed: unreadable_file, too_many_rows, no_required_columns…' }
+        createdAt: { type: string, format: date-time }
+        finishedAt: { type: [string, 'null'], format: date-time }
+    ImportRowError:
+      type: object
+      required: [row, code]
+      properties:
+        row: { type: integer, description: 'Номер строки в файле' }
+        column: { type: [string, 'null'] }
+        value: { type: [string, 'null'] }
+        code:
+          type: string
+          enum: [sku_missing, sku_duplicate, name_missing, price_invalid, stock_invalid, too_long]
+
+    # ─── Статистика ───
+    Stats:
+      type: object
+      required: [period, totals, previousTotals, byDay, topProducts]
+      properties:
+        period: { type: string, enum: ['7d', '30d', 'all'] }
+        totals:
+          type: object
+          required: [views, orderClicks]
+          properties:
+            views: { type: integer }
+            orderClicks: { type: integer }
+        previousTotals:
+          oneOf:
+            - type: object
+              required: [views, orderClicks]
+              properties:
+                views: { type: integer }
+                orderClicks: { type: integer }
+            - type: 'null'
+          description: За прошлый такой же период — для «+18% к прошлой неделе»; null для all
+        byDay:
+          type: array
+          items:
+            type: object
+            required: [date, views, orderClicks]
+            properties:
+              date: { type: string, format: date }
+              views: { type: integer }
+              orderClicks: { type: integer }
+        topProducts:
+          type: array
+          maxItems: 10
+          items:
+            type: object
+            required: [productId, name, views, cover]
+            properties:
+              productId: { type: string, format: uuid }
+              name: { type: string }
+              views: { type: integer }
+              cover: { oneOf: [{ $ref: '#/components/schemas/Image' }, { type: 'null' }] }
+
+    # ─── Суперадминка ───
+    StaffShopItem:
+      type: object
+      required: [id, name, subdomain, status, createdAt, productCount, orderClicks30d]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: [string, 'null'] }
+        subdomain: { type: [string, 'null'] }
+        email: { type: string, format: email }
+        status: { $ref: '#/components/schemas/ShopStatus' }
+        createdAt: { type: string, format: date-time }
+        productCount: { type: integer }
+        orderClicks30d: { type: integer }
