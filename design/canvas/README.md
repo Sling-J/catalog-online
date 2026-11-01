@@ -29,7 +29,7 @@
 
 ## Архив (не выбраны, для истории)
 - Лендинг, варианты A–M: `Main`, `Tag`, `Cord`, `Glass`, `Bento`, `Dark`, `Friendly`, `Magazine`, `Tactile`, `Swiss`, `Brutal`, `Clay`, `Aurora`.
-- Витрина: первая версия `StoreMobile`, `StoreDesktop`; варианты `StoreV1`–`StoreV5`; компьютер «вариант Б» `StoreV6DeskSide`; фильтры на компьютере, варианты А–В — `StoreFiltersDeskVariants` (выбран Г).
+- Витрина: первая версия `StoreMobile`, `StoreDesktop`; варианты `StoreV1`–`StoreV5`; компьютер «вариант Б» `StoreV6DeskSide`; фильтры на компьютере, варианты А–В — `StoreFiltersDeskVariants` (выбран Г); лендинг, телефон покупателя в примере, варианты А–Г — `LandingBuyerPhone` (генератор `gen-landing-buyer.cjs`; выбран Б со строкой наличия, он в `Duo*.dc.html`).
 
 В архивных макетах встречаются старые решения (номер заказа, подтверждение и списание остатка) — по ним не ориентируемся.
 

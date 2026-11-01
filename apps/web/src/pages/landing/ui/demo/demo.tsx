@@ -135,7 +135,11 @@ export function Demo() {
 function Device({ label, active, children }: { label: ReactNode; active: boolean; children: ReactNode }) {
   return (
     <div
-      className={cx('relative z-[1] flex max-w-full flex-col items-center gap-3.5', !active && 'max-[720px]:hidden')}
+      className={cx(
+        // на телефоне — во всю ширину, иначе корпус сжимается по содержимому (пустой чат уже сетки товаров)
+        'relative z-[1] flex max-w-full flex-col items-center gap-3.5 max-[720px]:w-full',
+        !active && 'max-[720px]:hidden',
+      )}
     >
       <div className="rounded-pill bg-white/50 px-4 py-2 text-[15px] font-bold backdrop-blur-[12px] max-[720px]:hidden">
         {label}

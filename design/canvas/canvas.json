@@ -305,6 +305,13 @@
       "w": 2030,
       "x": 3650,
       "y": 9980
+    },
+    "LandingBuyerPhone.dc.html": {
+      "h": 1880,
+      "title": "Лендинг — телефон покупателя, варианты А–Г (выбран Б)",
+      "w": 1640,
+      "x": 0,
+      "y": 51760
     }
   },
   "createdOnFiles": {
@@ -328,7 +335,8 @@
     "secArchive",
     "subArchLanding",
     "subArchStore",
-    "secCheck"
+    "secCheck",
+    "secCheck3"
   ],
   "notes": {
     "nChosen": {
@@ -434,6 +442,14 @@
       "w": 240,
       "x": 0,
       "y": 9720
+    },
+    "secCheck3": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Лендинг: телефон покупателя в примере, варианты А–Г (выбран Б со строкой наличия, 2026-11-02 — уже в макете лендинга)",
+      "w": 240,
+      "x": 0,
+      "y": 51500
     }
   },
   "order": [
@@ -451,6 +467,7 @@
     "AdminDesk.dc.html",
     "AdminPhone2.dc.html",
     "AdminDesk2.dc.html",
+    "LandingBuyerPhone.dc.html",
     "Main.dc.html",
     "Tag.dc.html",
     "Cord.dc.html",

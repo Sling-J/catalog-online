@@ -10,6 +10,8 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
   { name: 'Платье трикотажное', price: 9500, stock: 5, colors: ['#FFC3DD', '#E2508F'] },
   { name: 'Кроссовки', price: 14200, stock: 2, colors: ['#FFE19A', '#F0A22C'] },
   { name: 'Шапка вязаная', price: 4200, stock: 6, colors: ['#B8FFE1', '#26B985'] },
+  { name: 'Худи с капюшоном', price: 8900, stock: 4, colors: ['#C9BBFF', '#7C6CFF'] },
+  { name: 'Платье летнее', price: 8200, stock: 3, colors: ['#FFF0A8', '#E3AE00'] },
 ];
 
 /** shop — покупатель выбирает; flying — заказ летит; sent — пришёл в WhatsApp; answered — магазин ответил. */

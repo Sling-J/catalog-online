@@ -43,6 +43,7 @@ section{padding-top:64px !important}
 .du-hero{padding-top:44px !important}
 .du-hero-cta{display:block !important;width:100%;box-sizing:border-box;text-align:center}
 .du-tabs{display:flex !important}
+.du-dev{width:100%}
 .du-dev.is-off{display:none !important}
 .du-arrow{display:none !important}
 .du-devlabel{display:none !important}
@@ -106,24 +107,28 @@ section{padding-top:64px !important}
 <div class="du-dev {{buyerCls}}" style="display: flex; flex-direction: column; align-items: center; gap: 14px; position: relative; z-index: 1; max-width: 100%">
 <div class="du-devlabel" style="font-weight: 700; font-size: 15px; padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px)">Покупатель</div>
 <div class="du-phone" style="width: 330px; max-width: 100%; height: 660px; border-radius: 52px; padding: 12px; box-sizing: border-box; background: rgba(255,255,255,.4); backdrop-filter: blur(24px) saturate(170%); -webkit-backdrop-filter: blur(24px) saturate(170%); border: 1px solid rgba(255,255,255,.85); box-shadow: 0 40px 90px rgba(40,20,110,.28), inset 0 1px 0 #ffffff">
-<div style="height: 100%; border-radius: 41px; background: #FCFBFF; overflow: hidden; display: flex; flex-direction: column; position: relative">
-<div style="padding: 20px 18px 10px; display: flex; align-items: center; gap: 10px">
-<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(140deg, #FF9CC8, #7C6CFF); color: #ffffff; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center">АK</div>
-<div style="flex: 1"><div style="font-weight: 700; font-size: 15px">Айгерим Kids</div><div style="font-size: 12px; color: #6B6694">Рост 110 · в наличии</div></div>
+<div style="height: 100%; border-radius: 41px; background: #FBFAFF; overflow: hidden; position: relative; display: flex; flex-direction: column">
+<div style="flex: none; background: #FBFAFF; border-bottom: 1px solid #ECEAF5">
+<div style="display: flex; align-items: center; gap: 9px; padding: 16px 14px 0">
+<span style="width: 34px; height: 34px; flex: none; border-radius: 50%; background: linear-gradient(140deg, #FF9CC8, #7C6CFF); color: #ffffff; font-weight: 800; font-size: 12px; display: flex; align-items: center; justify-content: center">АK</span>
+<div style="flex: 1; min-width: 0"><div style="font-weight: 800; font-size: 14px">Айгерим Kids ›</div><div style="font-size: 11px; color: #4A4580">ТЦ «Мега» · <span style="color: #157A52; font-weight: 600">Открыто</span></div></div>
+<span style="width: 34px; height: 34px; flex: none; border-radius: 50%; background: #5EE6B0; box-shadow: 0 3px 0 #26B985"></span>
 </div>
-<div style="flex: 1; padding: 6px 14px 86px; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
-<sc-for list="{{items}}" as="p" hint-placeholder-count="4">
-<div style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 22px; background: #ffffff; box-shadow: 0 6px 16px rgba(40,30,110,.07)">
-<div style="{{p.sw}}" role="img" aria-label="{{p.alt}}"></div>
-<div style="flex: 1; min-width: 0">
-<div style="font-weight: 600; font-size: 14px; line-height: 1.25">{{p.name}}</div>
-<div style="font-weight: 800; font-size: 15px; margin-top: 2px; font-variant-numeric: tabular-nums">{{p.price}}</div>
-<div style="display: flex; align-items: center; gap: 5px; margin-top: 3px; font-size: 11px; font-weight: 600; color: {{p.tone}}"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{p.tone}}"></span>{{p.badge}}</div>
+<div style="display: flex; gap: 6px; padding: 10px 14px; overflow: hidden"><span style="flex: none; height: 30px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center; font-weight: 600; font-size: 12px; background: #17133D; color: #ffffff">Все</span><span style="flex: none; height: 30px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center; font-weight: 600; font-size: 12px; background: #E9E5FF; color: #3B2FD9">Рост 110</span><span style="flex: none; height: 30px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center; font-weight: 600; font-size: 12px; background: #EEECF8">Куртки</span><span style="flex: none; height: 30px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center; font-weight: 600; font-size: 12px; background: #EEECF8">Платья</span></div>
 </div>
+<div style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 12px 8px; padding: 10px 10px 90px">
+<sc-for list="{{items}}" as="p" hint-placeholder-count="6">
+<div>
+<div role="img" aria-label="{{p.alt}}" style="{{p.sw}}">
+<span style="position: absolute; left: 6px; bottom: 6px; padding: 4px 9px; border-radius: 999px; background: rgba(255,255,255,.92); font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums">{{p.price}}</span>
 <button class="du-puffy" type="button" onClick="{{p.add}}" disabled="{{p.disabled}}" aria-label="{{p.addLabel}}" style="{{p.btn}}">{{p.qty}}</button>
+</div>
+<div style="margin-top: 6px; padding: 0 4px; font-weight: 600; font-size: 12px; line-height: 1.25">{{p.name}}</div>
+<div style="display: flex; align-items: center; gap: 5px; margin-top: 3px; padding: 0 4px; font-size: 11px; font-weight: 600; color: {{p.tone}}"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{p.tone}}"></span>{{p.badge}}</div>
 </div>
 </sc-for>
 </div>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 100px; background: linear-gradient(rgba(251,250,255,0), #FBFAFF 55%); pointer-events: none"></div>
 <div style="position: absolute; left: 12px; right: 12px; bottom: 12px">
 <button class="du-puffy" type="button" onClick="{{send}}" disabled="{{sendDisabled}}" style="{{sendStyle}}">{{sendLabel}}</button>
 </div>
@@ -239,27 +244,28 @@ class Component extends DCLogic {
     var s = this.state;
     var self = this;
     var meta = [
-      { name: 'Куртка демисезонная', price: 18900, c1: '#9C90FF', c2: '#3B2FD9' },
-      { name: 'Платье трикотажное', price: 9500, c1: '#FFC3DD', c2: '#E2508F' },
-      { name: 'Кроссовки', price: 14200, c1: '#FFE19A', c2: '#F0A22C' },
-      { name: 'Шапка вязаная', price: 4200, c1: '#B8FFE1', c2: '#26B985' }
+      { name: 'Куртка демисезонная', price: 18900, stock: 1, c1: '#9C90FF', c2: '#3B2FD9' },
+      { name: 'Платье трикотажное', price: 9500, stock: 5, c1: '#FFC3DD', c2: '#E2508F' },
+      { name: 'Кроссовки', price: 14200, stock: 2, c1: '#FFE19A', c2: '#F0A22C' },
+      { name: 'Шапка вязаная', price: 4200, stock: 6, c1: '#B8FFE1', c2: '#26B985' },
+      { name: 'Худи с капюшоном', price: 8900, stock: 4, c1: '#C9BBFF', c2: '#7C6CFF' },
+      { name: 'Платье летнее', price: 8200, stock: 3, c1: '#FFF0A8', c2: '#E3AE00' }
     ];
     function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸'; }
     var total = 0, count = 0;
     var items = meta.map(function (m, i) {
       var q = s.cart[i] || 0;
       total += q * m.price; count += q;
-      var left = s.stock[i];
-      var canAdd = s.phase === 'shop' && q < left;
+      var canAdd = s.phase === 'shop' && q < m.stock;
       return {
         name: m.name, price: fmt(m.price), alt: 'Фото товара: ' + m.name,
         addLabel: 'Добавить: ' + m.name,
-        sw: 'width: 60px; height: 60px; flex: none; border-radius: 18px; background: radial-gradient(120% 120% at 30% 20%, ' + m.c1 + ', ' + m.c2 + ')',
-        badge: left === 0 ? 'Нет в наличии' : (left <= 2 ? 'Осталось ' + left : 'В наличии'),
-        tone: left === 0 ? '#7A7598' : (left <= 2 ? '#A35A00' : '#157A52'),
+        sw: 'position: relative; aspect-ratio: 1 / 1; border-radius: 18px; background: radial-gradient(120% 120% at 30% 20%, ' + m.c1 + ', ' + m.c2 + ')',
+        badge: m.stock <= 2 ? 'Осталось ' + m.stock : 'В наличии',
+        tone: m.stock <= 2 ? '#A35A00' : '#157A52',
         qty: q > 0 ? String(q) : '+',
         disabled: !canAdd,
-        btn: 'width: 44px; height: 44px; flex: none; border-radius: 50%; border: 0; font: 800 18px Geologica, sans-serif; cursor: pointer; ' + (q > 0 ? 'background: #FFD23F; color: #1D1B4B; box-shadow: 0 4px 0 #C79A00;' : (canAdd ? 'background: #1D1B4B; color: #ffffff; box-shadow: 0 4px 0 #0B0A26;' : 'background: #EEECF8; color: #B3AFD0; cursor: default;')),
+        btn: 'position: absolute; right: 6px; bottom: 6px; width: 34px; height: 34px; border-radius: 50%; border: 0; font: 800 17px Geologica, sans-serif; cursor: pointer; ' + (q > 0 ? 'background: #FFD23F; color: #1D1B4B; box-shadow: 0 3px 0 #C79A00;' : (canAdd ? 'background: #1D1B4B; color: #ffffff; box-shadow: 0 3px 0 #0B0A26;' : 'background: #EEECF8; color: #B3AFD0; cursor: default;')),
         add: function () {
           if (!canAdd) return;
           var c = Object.assign({}, self.state.cart); c[i] = (c[i] || 0) + 1;
@@ -282,8 +288,8 @@ class Component extends DCLogic {
         setTimeout(function () { self.setState({ phase: 'sent', view: 'shop' }); }, 1400);
       },
       sendDisabled: !canSend,
-      sendLabel: s.phase === 'shop' ? (count > 0 ? 'Заказать через WhatsApp · ' + fmt(total) : 'Добавьте товары в заказ') : 'Заказ отправлен',
-      sendStyle: 'width: 100%; border: 0; border-radius: 999px; padding: 16px; min-height: 52px; font: 700 15px Geologica, sans-serif; cursor: pointer; ' + (canSend ? 'background: #5EE6B0; color: #0B3A28; box-shadow: 0 5px 0 #26B985;' : 'background: #EEECF8; color: #6B6694; cursor: default;'),
+      sendLabel: s.phase === 'shop' ? (count > 0 ? 'Заказать в WhatsApp · ' + fmt(total) : 'Добавьте товары в заказ') : 'Заказ отправлен',
+      sendStyle: 'width: 100%; border: 0; border-radius: 999px; padding: 16px; min-height: 52px; font: 700 15px Geologica, sans-serif; white-space: nowrap; cursor: pointer; ' + (canSend ? 'background: #5EE6B0; color: #0B3A28; box-shadow: 0 5px 0 #26B985;' : 'background: #EEECF8; color: #6B6694; cursor: default;'),
       flying: s.phase === 'flying', notFlying: s.phase !== 'flying',
       noOrder: s.phase === 'shop' || s.phase === 'flying',
       hasOrder: s.phase === 'sent' || s.phase === 'confirmed',
