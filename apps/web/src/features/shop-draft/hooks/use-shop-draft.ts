@@ -5,8 +5,7 @@ import { useEffect } from 'react';
 
 import { shopQueryOptions } from '@/entities/shop';
 import { isPreviewMode } from '@/shared/api';
-
-import { adminOrigin } from '@/features/shop-draft/lib';
+import { serviceUrls } from '@/shared/lib';
 
 /**
  * Превью в админке (A7): витрина в iframe принимает несохранённые правки магазина через postMessage и
@@ -19,7 +18,8 @@ export function useShopDraft(subdomain: string): void {
 
   useEffect(() => {
     if (!isPreviewMode() || window.parent === window) return;
-    const origin = adminOrigin(window.location);
+    // админка — `https://app.<домен>` или VITE_ADMIN_ORIGIN
+    const origin = serviceUrls(window.location.origin).admin;
     const { queryKey } = shopQueryOptions(subdomain);
     queryClient.setQueryDefaults(queryKey, { staleTime: Infinity, refetchOnWindowFocus: false });
     // сохранённый магазин: правки каждый раз накладываем на него, так отменённая правка возвращает прежнее

@@ -1,0 +1,17 @@
+/**
+ * Адреса частей сервиса от адреса текущей страницы: админка на поддомене `app`, демо-магазин на своём поддомене
+ * (`aigerim-kids` по умолчанию), всё — того же основного домена, протокола и порта. Переопределяются
+ * VITE_ADMIN_ORIGIN и VITE_DEMO_SHOP (в разработке админка — на своём порту).
+ */
+export function serviceUrls(origin: string): { admin: string; register: string; demoShop: string } {
+  const { protocol, port } = new URL(origin);
+  const root = import.meta.env.VITE_ROOT_DOMAIN ?? 'localhost';
+  const host = (subdomain: string) => `${protocol}//${subdomain}.${root}${port ? `:${port}` : ''}`;
+  const admin = import.meta.env.VITE_ADMIN_ORIGIN || host('app');
+  return {
+    admin,
+    // регистрация в админке (FR-A1, T-302)
+    register: `${admin}/register`,
+    demoShop: host(import.meta.env.VITE_DEMO_SHOP || 'aigerim-kids'),
+  };
+}

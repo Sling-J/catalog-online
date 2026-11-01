@@ -23,6 +23,8 @@ import { markAppMounted } from '@/shared/lib';
 import { CartSheet } from '@/widgets/cart-sheet';
 
 import { getTenant } from '../lib';
+import geologicaCyrillic from '@fontsource-variable/geologica/files/geologica-cyrillic-wght-normal.woff2?url';
+
 import appCss from '../styles.css?url';
 
 /** Токен превью из админки (A7) — в адресе всех страниц витрины, пока она открыта превью. */
@@ -43,7 +45,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient; i18n
       // превью из админки и чужие адреса поисковикам не показываем
       ...(isPreviewMode() || getTenant().kind === 'unknown' ? [{ name: 'robots', content: 'noindex, nofollow' }] : []),
     ],
-    links: [{ rel: 'stylesheet', href: appCss }],
+    links: [
+      // кириллица нужна на первом экране — грузим сразу, не дожидаясь стилей
+      { rel: 'preload', href: geologicaCyrillic, as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+      { rel: 'stylesheet', href: appCss },
+    ],
   }),
   beforeLoad: () => {
     const tenant = getTenant();

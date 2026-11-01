@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+/* Geologica со своего сервера (решение основателя 2026-11-02): без запросов к Google, кириллица и казахские буквы */
+@import '@fontsource-variable/geologica';
 @import '@catalog/ui/tokens.css';
 @source '../../../../packages/ui/src';
 
@@ -32,5 +34,27 @@
   button:not(:disabled):active,
   .press:active {
     transform: translateY(2px);
+  }
+}
+
+/*
+ * Пухлые кнопки лендинга (макет N, du-puffy): при наведении приподнимаются на 3 px, при нажатии проседают
+ * на 4 px на подложку. Слой components идёт после base, поэтому перекрывает нажатие витрины выше.
+ */
+@layer components {
+  .puffy {
+    transition: transform 0.25s var(--ease-press);
+  }
+  @media (hover: hover) {
+    .puffy:not(:disabled):hover {
+      transform: translateY(-3px);
+    }
+  }
+  .puffy:not(:disabled):active {
+    transform: translateY(4px);
+  }
+  .puffy:focus-visible {
+    outline: 3px solid var(--color-ink-night);
+    outline-offset: 3px;
   }
 }
