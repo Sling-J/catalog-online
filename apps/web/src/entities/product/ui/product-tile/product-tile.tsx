@@ -1,7 +1,9 @@
 import type { StorefrontProductCard } from '@catalog/contract';
 import { cx } from '@catalog/ui';
 import { Trans } from '@lingui/react/macro';
+import { Link } from '@tanstack/react-router';
 
+import { productPath } from '@/entities/product/lib';
 import { formatPrice } from '@/shared/lib';
 
 /**
@@ -11,9 +13,9 @@ import { formatPrice } from '@/shared/lib';
 export function ProductTile({ card }: { card: StorefrontProductCard }) {
   const out = card.stockLevel === 'out';
   return (
-    // карточка товара — T-106; пока обычная ссылка на её будущий адрес
-    <a
-      href={`/${card.slug}-${card.shortId}`}
+    <Link
+      to="/$product"
+      params={{ product: productPath(card) }}
       aria-label={card.name}
       className="group relative block overflow-hidden bg-chip-haze"
     >
@@ -50,6 +52,6 @@ export function ProductTile({ card }: { card: StorefrontProductCard }) {
       <span className="absolute inset-x-0 top-0 hidden bg-linear-to-b from-ink-night/70 to-transparent px-2.5 pt-2 pb-5 text-[13px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 lg:block">
         {card.name}
       </span>
-    </a>
+    </Link>
   );
 }

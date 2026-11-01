@@ -1,7 +1,8 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext, HeadContent, notFound, Outlet, Scripts } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 
+import { cartMounted } from '@/entities/cart';
 import { NotFoundPage } from '@/pages/not-found';
 
 import { getTenant } from '../lib';
@@ -18,10 +19,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     if (tenant.kind === 'unknown') throw notFound();
     return { tenant };
   },
-  component: Outlet,
+  component: Root,
   notFoundComponent: NotFoundPage,
   shellComponent: RootDocument,
 });
+
+function Root() {
+  // корзину читаем из хранилища уже после гидратации, чтобы разметка сервера и браузера совпала
+  useEffect(() => {
+    cartMounted();
+  }, []);
+  return <Outlet />;
+}
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (

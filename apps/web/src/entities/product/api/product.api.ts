@@ -1,5 +1,9 @@
 import type { ListStorefrontProductsData } from '@catalog/contract';
-import { getStorefrontFacetsOptions, listStorefrontProductsInfiniteOptions } from '@catalog/contract/query';
+import {
+  getStorefrontFacetsOptions,
+  getStorefrontProductOptions,
+  listStorefrontProductsInfiniteOptions,
+} from '@catalog/contract/query';
 import { infiniteQueryOptions, type skipToken } from '@tanstack/react-query';
 
 export type ProductSort = NonNullable<NonNullable<ListStorefrontProductsData['query']>['sort']>;
@@ -48,3 +52,7 @@ export const productFacetsQueryOptions = (subdomain: string, params: ProductList
       priceMax: params.priceMax,
     },
   });
+
+/** Карточка товара по короткому коду из адреса. */
+export const productQueryOptions = (subdomain: string, shortId: string) =>
+  getStorefrontProductOptions({ path: { subdomain, shortId } });

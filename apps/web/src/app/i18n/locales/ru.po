@@ -18,6 +18,13 @@ msgstr "{0, plural, one {Показать # товар} few {Показать # 
 msgid "в воскресенье"
 msgstr "в воскресенье"
 
+msgid "В корзине · открыть"
+msgstr "В корзине · открыть"
+
+#. placeholder {0}: formatPrice(variant.price)
+msgid "В корзину · {0}"
+msgstr "В корзину · {0}"
+
 msgid "в понедельник"
 msgstr "в понедельник"
 
@@ -51,6 +58,18 @@ msgstr "Вт"
 msgid "Вторник"
 msgstr "Вторник"
 
+#. placeholder {0}: missingAttribute.toLowerCase()
+msgid "Выберите {0}"
+msgstr "Выберите {0}"
+
+#. placeholder {0}: missingAttribute.toLowerCase()
+msgid "Выберите {0}, чтобы увидеть наличие"
+msgstr "Выберите {0}, чтобы увидеть наличие"
+
+#. placeholder {0}: missingAttribute.toLowerCase()
+#~ msgid "Выберите: {0}"
+#~ msgstr "Выберите: {0}"
+
 msgid "Выходной"
 msgstr "Выходной"
 
@@ -73,6 +92,9 @@ msgstr "Дороже"
 msgid "Закрыто"
 msgstr "Закрыто"
 
+msgid "зачёркнутых нет в наличии"
+msgstr "зачёркнутых нет в наличии"
+
 msgid "Здесь пока нет товаров"
 msgstr "Здесь пока нет товаров"
 
@@ -85,11 +107,21 @@ msgstr "Магазин не найден"
 msgid "мало"
 msgstr "мало"
 
+#. placeholder {0}: shop.address
+msgid "Можно примерить в магазине: {0}. После заказа магазин подтвердит наличие в WhatsApp."
+msgstr "Можно примерить в магазине: {0}. После заказа магазин подтвердит наличие в WhatsApp."
+
+msgid "Назад к каталогу"
+msgstr "Назад к каталогу"
+
 msgid "Написать в WhatsApp"
 msgstr "Написать в WhatsApp"
 
 msgid "нет в наличии"
 msgstr "нет в наличии"
+
+msgid "Нет в наличии"
+msgstr "Нет в наличии"
 
 msgid "Ничего не нашлось"
 msgstr "Ничего не нашлось"
@@ -102,6 +134,7 @@ msgstr "О магазине: адрес, график, контакты"
 
 #. placeholder {0}: formatPrice(card.price)
 #. placeholder {0}: formatPrice(priceMin)
+#. placeholder {0}: formatPrice(range.min)
 msgid "от {0}"
 msgstr "от {0}"
 
@@ -136,6 +169,9 @@ msgstr "Очистить поиск"
 
 msgid "Пн"
 msgstr "Пн"
+
+msgid "Поделиться"
+msgstr "Поделиться"
 
 msgid "Поиск по магазину"
 msgstr "Поиск по магазину"
@@ -182,6 +218,9 @@ msgstr "Ср"
 
 msgid "Среда"
 msgstr "Среда"
+
+msgid "Ссылка скопирована"
+msgstr "Ссылка скопирована"
 
 msgid "Суббота"
 msgstr "Суббота"
