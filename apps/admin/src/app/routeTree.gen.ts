@@ -10,13 +10,44 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ShellRouteImport } from './routes/_shell'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as ShellIndexRouteImport } from './routes/_shell/index'
 import { Route as ShellImportRouteImport } from './routes/_shell/import'
 import { Route as ShellProductsRouteImport } from './routes/_shell/products'
 import { Route as ShellShopRouteImport } from './routes/_shell/shop'
+import { Route as ShellShopAccountRouteImport } from './routes/_shell/shop_.account'
 
 const ShellRoute = ShellRouteImport.update({
   id: '/_shell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShellIndexRoute = ShellIndexRouteImport.update({
@@ -39,43 +70,97 @@ const ShellShopRoute = ShellShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellShopAccountRoute = ShellShopAccountRouteImport.update({
+  id: '/shop_/account',
+  path: '/shop/account',
+  getParentRoute: () => ShellRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof ShellIndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/import': typeof ShellImportRoute
   '/products': typeof ShellProductsRoute
   '/shop': typeof ShellShopRoute
+  '/shop/account': typeof ShellShopAccountRoute
 }
 export interface FileRoutesByTo {
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/import': typeof ShellImportRoute
   '/products': typeof ShellProductsRoute
   '/shop': typeof ShellShopRoute
   '/': typeof ShellIndexRoute
+  '/shop/account': typeof ShellShopAccountRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_shell': typeof ShellRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/_shell/import': typeof ShellImportRoute
   '/_shell/products': typeof ShellProductsRoute
   '/_shell/shop': typeof ShellShopRoute
   '/_shell/': typeof ShellIndexRoute
+  '/_shell/shop_/account': typeof ShellShopAccountRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/import' | '/products' | '/shop'
+  fullPaths:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/reset-password'
+    | '/verify-email'
+    | '/import'
+    | '/products'
+    | '/shop'
+    | '/shop/account'
   fileRoutesByTo: FileRoutesByTo
-  to: '/import' | '/products' | '/shop' | '/'
+  to:
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/reset-password'
+    | '/verify-email'
+    | '/import'
+    | '/products'
+    | '/shop'
+    | '/'
+    | '/shop/account'
   id:
     | '__root__'
     | '/_shell'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/reset-password'
+    | '/verify-email'
     | '/_shell/import'
     | '/_shell/products'
     | '/_shell/shop'
     | '/_shell/'
+    | '/_shell/shop_/account'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   ShellRoute: typeof ShellRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,6 +170,41 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof ShellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_shell/': {
@@ -115,6 +235,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellShopRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/shop_/account': {
+      id: '/_shell/shop_/account'
+      path: '/shop/account'
+      fullPath: '/shop/account'
+      preLoaderRoute: typeof ShellShopAccountRouteImport
+      parentRoute: typeof ShellRoute
+    }
   }
 }
 
@@ -123,6 +250,7 @@ interface ShellRouteChildren {
   ShellProductsRoute: typeof ShellProductsRoute
   ShellShopRoute: typeof ShellShopRoute
   ShellIndexRoute: typeof ShellIndexRoute
+  ShellShopAccountRoute: typeof ShellShopAccountRoute
 }
 
 const ShellRouteChildren: ShellRouteChildren = {
@@ -130,12 +258,18 @@ const ShellRouteChildren: ShellRouteChildren = {
   ShellProductsRoute: ShellProductsRoute,
   ShellShopRoute: ShellShopRoute,
   ShellIndexRoute: ShellIndexRoute,
+  ShellShopAccountRoute: ShellShopAccountRoute,
 }
 
 const ShellRouteWithChildren = ShellRoute._addFileChildren(ShellRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   ShellRoute: ShellRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

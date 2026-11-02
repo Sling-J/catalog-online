@@ -19,7 +19,7 @@ const S = [];
 
 // 1. Регистрация
 S.push(["Регистрация", `<div style="padding: 40px 24px 0">
-<div style="display: flex; align-items: center; gap: 10px"><span style="width: 40px; height: 40px; border-radius: 14px; background: ${C.lilac}; display: flex; align-items: center; justify-content: center">${sv(P.shop, C.ink, 22)}</span><span style="font-weight: 800; font-size: 18px">[сервис]</span></div>
+<div style="display: flex; align-items: center; gap: 10px"><span style="width: 40px; height: 40px; border-radius: 14px; background: ${C.lilac}; display: flex; align-items: center; justify-content: center">${sv(P.shop, C.ink, 22)}</span><span style="font-weight: 800; font-size: 18px">catalog·online</span></div>
 <div style="font-weight: 800; font-size: 32px; letter-spacing: -0.03em; line-height: 1.1; margin-top: 40px">Создайте каталог магазина</div>
 <div style="font-size: 16px; line-height: 1.5; color: ${C.soft}; margin-top: 10px">Бесплатно на время пилота. Понадобятся почта и номер WhatsApp.</div>
 <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 30px">

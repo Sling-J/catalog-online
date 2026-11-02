@@ -30,4 +30,8 @@ declare module '@tanstack/react-router' {
   interface Register {
     router: ReturnType<typeof createAppRouter>;
   }
+  interface StaticDataRouteOption {
+    /** Вложенный экран раздела: на телефоне без шапки магазина и нижнего меню, своя «Назад» (макеты админки). */
+    subScreen?: boolean;
+  }
 }

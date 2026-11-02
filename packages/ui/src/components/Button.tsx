@@ -5,9 +5,10 @@ import { cx } from '../cx.js';
 export type ButtonVariant = 'primary' | 'dark' | 'confirm' | 'soft' | 'line';
 /**
  * md — 44 px; state — кнопки пустых и служебных состояний (50 px, на компьютере 52);
- * lg — кнопки в шторках (54 px); cta — главная кнопка карточки товара (56 px, на компьютере 58).
+ * lg — кнопки в шторках (54 px); cta — главная кнопка карточки товара (56 px, на компьютере 58);
+ * form — главная кнопка форм админки (52 px); compact — кнопки в строке заголовка админки на компьютере (44 px, 14 px).
  */
-export type ButtonSize = 'md' | 'state' | 'lg' | 'cta';
+export type ButtonSize = 'md' | 'state' | 'lg' | 'cta' | 'form' | 'compact';
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
@@ -45,6 +46,8 @@ const sizes: Record<ButtonSize, string> = {
   state: 'h-[50px] px-[22px] text-[15px] lg:h-[52px] lg:px-6',
   lg: 'h-[54px] px-6 text-[16px]',
   cta: 'h-14 px-6 text-[16px] lg:h-[58px] lg:text-[17px]',
+  form: 'h-[52px] px-[22px] text-[15px]',
+  compact: 'h-11 px-[22px] text-[14px]',
 };
 
 export function Button({

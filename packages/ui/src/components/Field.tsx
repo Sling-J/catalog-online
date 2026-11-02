@@ -10,7 +10,7 @@ export type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
   error?: ReactNode;
 };
 
-/** Поле ввода с подписью, подсказкой и ошибкой. Связи подписи и ошибки — через id. */
+/** Поле ввода с подписью, подсказкой и ошибкой (макеты админки: текст 15 px, подписи 13 px). Связи подписи и ошибки — через id. */
 export function Field({ label, note, hint, error, className, id, ...rest }: FieldProps) {
   const autoId = useId();
   const inputId = id ?? autoId;
@@ -26,18 +26,20 @@ export function Field({ label, note, hint, error, className, id, ...rest }: Fiel
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
         className={cx(
-          'h-12 rounded-field bg-white px-3.5 text-body text-ink-night ring-[1.5px] ring-inset',
-          'placeholder:text-ink-muted focus:ring-2 focus:ring-ink-night focus:outline-none',
-          error ? 'ring-coral-underside' : 'ring-[#e2dff0]',
+          // как в макете: отступы 13/14, строка 1.4, рамка 1.5 px — поле 50 px
+          'rounded-field border-[1.5px] bg-white px-3.5 py-[13px] text-[15px] leading-[1.4] text-ink-night',
+          // фокус — рамка ink-night 2 px (DESIGN.md): к рамке добавляем полпикселя кольцом внутрь, без сдвига
+          'placeholder:text-ink-muted focus:border-ink-night focus:ring-[0.5px] focus:ring-ink-night focus:ring-inset focus:outline-none',
+          error ? 'border-coral-underside' : 'border-[#e2dff0]',
         )}
         {...rest}
       />
       {error ? (
-        <p id={`${inputId}-error`} className="text-caption text-coral-underside">
+        <p id={`${inputId}-error`} className="text-[13px] text-coral-underside">
           {error}
         </p>
       ) : hint ? (
-        <p id={`${inputId}-hint`} className="text-caption text-ink-muted">
+        <p id={`${inputId}-hint`} className="text-[13px] text-ink-muted">
           {hint}
         </p>
       ) : null}

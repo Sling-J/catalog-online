@@ -141,10 +141,12 @@ ui/
 
 | Слой | Срезы |
 |---|---|
-| `entities` | `shop` (запрос магазина, аватар, статус витрины, адрес витрины), `product` (счётчики товаров) |
-| `features` | `copy-link` (скопировать ссылку с галочкой) |
-| `widgets` | `app-shell` (меню снизу / слева, шапка телефона, «Ваша витрина») |
-| `pages` | `products`, `import`, `shop` (пока заглушки), `not-found`, `error` |
+| `entities` | `session` (текущий аккаунт, `meQueryOptions`, `startSession` — кеш после входа), `shop` (запрос магазина, аватар, статус витрины, адрес витрины), `product` (счётчики товаров) |
+| `features` | `copy-link` (скопировать ссылку с галочкой), `register`, `login`, `forgot-password`, `reset-password`, `change-password` (формы входа и пароля), `resend-verification` (повторное письмо: кнопка и ссылка) |
+| `widgets` | `app-shell` (меню снизу / слева, шапка телефона, «Ваша витрина»), `auth-layout` (экраны без меню: форма слева, сиреневая колонка справа на компьютере) |
+| `pages` | `register`, `login`, `forgot-password`, `reset-password`, `verify-email`, `shop-account`, `products`, `import`, `shop` (пока заглушки), `not-found`, `error` |
+
+> Примечание (2026-11-02, T-302): разбор ошибок API (статус, код, ошибки полей, `isUnauthorized`) — `shared/api/api-error.ts`; рабочее название сервиса — `shared/constants/service.ts`. Проверка сессии — `beforeLoad` макета `app/routes/_shell.tsx` (401 → `/login`). Общие куски форм — `shared/ui` (`FormNote`, `FormFooter`, `FormError`, `PasswordNote`, `SendAgain`, `ButtonLink`, `BackBar`), проверки почты и пароля — `shared/lib/credentials.ts`, тексты ошибок форм — `shared/hooks/use-form-messages.ts`. Вложенный экран раздела (на телефоне без шапки и меню) помечается в маршруте `staticData: { subScreen: true }` (тип — `app/router.tsx`), его читает `widgets/app-shell`.
 
 ## 9. Проверка правил
 

@@ -1,0 +1,1 @@
+export { ShopAccountPage } from './ui';

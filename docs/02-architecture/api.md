@@ -24,6 +24,7 @@ updated: 2026-11-02
 - **Фоновые операции** (импорт, сжатие фото) отвечают `202` / статусом в объекте; фронт опрашивает `GET`.
 - **Вход:** cookie `sid` (HttpOnly, Secure, SameSite=Lax, родительский домен). Изменяющие запросы обязаны слать заголовок `X-Requested-With` — простая защита от CSRF. Суперадминка — отдельный cookie `staff_sid`.
 - **Ограничение частоты** на вход, регистрацию, письма и события витрины — ответ `429` с `Retry-After`.
+- **Ссылки из писем** (2026-11-02, T-302): ведут в админку — подтверждение почты `https://app.<домен>/verify-email?token=…` (→ `POST /v1/auth/email/verify`), новый пароль `https://app.<домен>/reset-password?token=…` (→ `POST /v1/auth/password/reset`). Устаревший токен — `410 token_expired`, админка показывает «Ссылка устарела».
 - **Превью неопубликованной витрины** (A7): `POST /v1/admin/preview-token` → токен в `?preview=` у запросов витрины.
   > Примечание (2026-11-02, T-113): несохранённые правки админка передаёт витрине через `postMessage`; формат сообщений — `packages/contract/src/preview.ts` (`@catalog/contract/preview`), описание — `04-design/storefront.md`, «Превью из админки». `PreviewToken` добавлен и в `checkStorefrontCart`.
 
