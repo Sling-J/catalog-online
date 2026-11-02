@@ -1,8 +1,6 @@
-import { cx } from '@catalog/ui';
+import { cx, formatPrice } from '@catalog/ui';
 import { Trans } from '@lingui/react/macro';
 import type { Dispatch } from 'react';
-
-import { formatPrice } from '@/shared/lib';
 
 import { orderLines, orderTotal, type DemoAction, type DemoState } from '@/pages/landing/lib';
 

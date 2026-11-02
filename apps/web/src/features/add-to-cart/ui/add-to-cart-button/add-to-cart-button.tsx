@@ -1,12 +1,11 @@
 import type { StorefrontProduct } from '@catalog/contract';
-import { Button } from '@catalog/ui';
+import { Button, formatPrice } from '@catalog/ui';
 import { Trans } from '@lingui/react/macro';
 import { useUnit } from 'effector-react';
 
 import { $items, variantAdded } from '@/entities/cart';
 import { isInStock } from '@/entities/product';
 import { buildCartItem } from '@/features/add-to-cart/lib';
-import { formatPrice } from '@/shared/lib';
 
 /**
  * Главная кнопка карточки товара. Жёлтая «В корзину · цена» — только при выбранном варианте в наличии;

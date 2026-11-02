@@ -218,6 +218,12 @@ const stockOf = (rowKey: number, index: number): number => {
   return 3 + ((rowKey * 7 + index) % 6);
 };
 
+// остаток в штуках витрина не показывает (уровни), но он нужен админке
+const quantities = new Map<string, number>();
+
+/** Остаток варианта демо-магазина в штуках (для списка товаров админки). */
+export const demoQuantityOf = (variantId: string): number => quantities.get(variantId) ?? 0;
+
 const stockInfo = (quantity: number): StockInfo => ({
   level: quantity === 0 ? 'out' : quantity <= LOW_STOCK ? 'low' : 'in',
   quantity: null,
@@ -237,6 +243,7 @@ const buildProduct = (row: Row, assetBase: string): StorefrontProduct => {
           price: row.price,
           stock: stockInfo(stockOf(row.key, index)),
         }));
+  variants.forEach((variant, index) => quantities.set(variant.id, stockOf(row.key, sized.length === 0 ? 1 : index)));
   return {
     id: id(500 + row.key),
     shortId: shortIdOf(row.key),

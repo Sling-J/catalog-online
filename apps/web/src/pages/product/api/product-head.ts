@@ -1,9 +1,10 @@
+import { formatPrice } from '@catalog/ui';
 import type { StorefrontProduct, StorefrontShop } from '@catalog/contract';
 import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 
 import { getPriceRange, isInStock, productPath } from '@/entities/product';
-import { buildPageHead, clipDescription, formatPrice, type PageHead } from '@/shared/lib';
+import { buildPageHead, clipDescription, type PageHead } from '@/shared/lib';
 
 /**
  * Заголовок и превью ссылки товара (NFR-5, US-B10): «Куртка — 18 900 ₸ · Айгерим Kids», первое фото,

@@ -1,7 +1,7 @@
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import type { Me, Problem, Shop } from '../gen/types.gen.js';
+import type { Me, Problem, Product, ProductListItem, Shop } from '../gen/types.gen.js';
 import { DEMO_ADMIN_PASSWORD, demoAdminHandlers, EXPIRED_EMAIL_TOKEN } from './admin-handlers.js';
 import { createDemoShopData } from './demo-shop.js';
 
@@ -31,9 +31,10 @@ describe('моки админки', () => {
     fresh();
     const [shop, counts] = await Promise.all([
       getJson<Shop>('/admin/shop'),
-      getJson<{ all: number; noPhoto: number }>('/admin/products/counts'),
+      getJson<{ all: number; noPhoto: number; hidden: number }>('/admin/products/counts'),
     ]);
-    expect(counts.all).toBe(createDemoShopData().products.length);
+    // на витрине — только товары с фото и не скрытые
+    expect(counts.all - counts.noPhoto - counts.hidden).toBe(createDemoShopData().products.length);
     expect(shop.readiness).toMatchObject({ productCount: counts.all, productsWithoutPhoto: counts.noPhoto });
   });
 
@@ -165,5 +166,76 @@ describe('моки админки: публикация', () => {
     const res = await call('/admin/shop/publish', {});
     expect(res.status).toBe(409);
     expect(((await res.json()) as Problem).code).toBe('shop_not_ready');
+  });
+});
+
+type Page = { items: ProductListItem[]; nextCursor: string | null };
+
+describe('моки админки: товары', () => {
+  it('список листается курсором, вкладки совпадают со счётчиками', async () => {
+    fresh();
+    const counts = await getJson<{ all: number; noPhoto: number; outOfStock: number; hidden: number }>(
+      '/admin/products/counts',
+    );
+    const first = await getJson<Page>('/admin/products?limit=20');
+    expect(first.items).toHaveLength(20);
+    const rest = await getJson<Page>(`/admin/products?limit=100&cursor=${first.nextCursor}`);
+    expect(first.items.length + rest.items.length).toBe(counts.all);
+    expect(rest.nextCursor).toBeNull();
+    for (const [filter, count] of [
+      ['no_photo', counts.noPhoto],
+      ['out_of_stock', counts.outOfStock],
+      ['hidden', counts.hidden],
+    ] as const) {
+      expect((await getJson<Page>(`/admin/products?filter=${filter}&limit=100`)).items).toHaveLength(count);
+    }
+    expect(first.items[0]).toMatchObject({ name: 'Куртка демисезонная', photoCount: 2, isVisible: true });
+  });
+
+  it('поиск — по названию, артикулу и штрихкоду', async () => {
+    fresh();
+    const { items } = await getJson<Page>('/admin/products?limit=1');
+    const product = await getJson<Product>(`/admin/products/${items[0]!.id}`);
+    const variant = product.variants[1]!;
+    for (const q of ['куртка демисез', variant.sku.toLowerCase(), variant.barcode!]) {
+      const found = await getJson<Page>(`/admin/products?q=${encodeURIComponent(q)}`);
+      expect(found.items.map((item) => item.id)).toContain(product.id);
+    }
+    expect((await getJson<Page>('/admin/products?q=пуховик')).items).toHaveLength(0);
+  });
+
+  it('массовые действия: скрыть, показать, сменить категорию', async () => {
+    fresh();
+    const { items } = await getJson<Page>('/admin/products?limit=3');
+    const productIds = items.map((item) => item.id);
+    const hide = await call('/admin/products/bulk', { productIds, action: 'hide' });
+    expect(await hide.json()).toEqual({ updated: 3 });
+    const hidden = await getJson<Page>('/admin/products?filter=hidden&limit=100');
+    expect(hidden.items.map((item) => item.id)).toEqual(expect.arrayContaining(productIds));
+    await call('/admin/products/bulk', { productIds, action: 'show' });
+    const [category] = await getJson<{ id: string; name: string }[]>('/admin/categories');
+    await call('/admin/products/bulk', {
+      productIds: [productIds[2]],
+      action: 'set_category',
+      categoryId: category!.id,
+    });
+    const moved = await getJson<Page>(`/admin/products?categoryId=${category!.id}&limit=100`);
+    expect(moved.items.find((item) => item.id === productIds[2])).toMatchObject({
+      isVisible: true,
+      category: { id: category!.id, name: category!.name },
+    });
+  });
+
+  it('«Витрина» у товара — PATCH isVisible', async () => {
+    fresh();
+    const { items } = await getJson<Page>('/admin/products?limit=1');
+    const res = await fetch(`http://api.test/v1/admin/products/${items[0]!.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isVisible: false }),
+    });
+    expect(((await res.json()) as Product).isVisible).toBe(false);
+    const counts = await getJson<{ hidden: number }>('/admin/products/counts');
+    expect(counts.hidden).toBe(4);
   });
 });

@@ -61,4 +61,4 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - Сообщения превью админка ↔ витрина (`postMessage`) — `@catalog/contract/preview` (Zod), не в `openapi.yaml`.
 - Код `apps/web` и `apps/admin` — по FSD (`docs/02-architecture/frontend-structure.md`): слои `app → pages → widgets → features → entities → shared`, без импортов между срезами одного слоя, снаружи среза только через его `index.ts`, алиас `@/*` → `src/*`. Границы проверяет `pnpm lint` (`eslint.fsd.js`).
 - Токены дизайн-системы — `packages/ui/src/tokens.css` (Tailwind v4 `@theme`), источник — `DESIGN.md`.
-- Общее для витрины и админки без бизнес-контекста (базовые компоненты, `Icon`, `useIsDesktop`) — в `@catalog/ui`, не копией в каждом приложении.
+- Общее для витрины и админки без бизнес-контекста (базовые компоненты, `Icon`, `useIsDesktop`, `useLoadMore`, `formatPrice`) — в `@catalog/ui`, не копией в каждом приложении.

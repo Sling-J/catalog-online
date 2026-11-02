@@ -1,9 +1,8 @@
-import { cx, Icon } from '@catalog/ui';
+import { cx, Icon, formatPrice } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useUnit } from 'effector-react';
 
 import { $count, $open, $total, cartOpened } from '@/entities/cart';
-import { formatPrice } from '@/shared/lib';
 
 /**
  * Кнопка корзины в шапке компьютера: «Корзина» или «3 · 31 700 ₸», открывает выпадающую панель корзины (S8);

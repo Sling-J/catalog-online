@@ -1,8 +1,6 @@
-import { cx } from '@catalog/ui';
+import { cx, formatAmount } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
-
-import { formatAmount } from '@/shared/lib';
 
 import { parsePrice } from '@/features/product-filters/lib';
 

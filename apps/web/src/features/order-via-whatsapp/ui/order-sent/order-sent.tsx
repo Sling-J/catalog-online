@@ -1,8 +1,7 @@
-import { Button } from '@catalog/ui';
+import { Button, formatPrice } from '@catalog/ui';
 import { Plural, Trans } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
 
-import { formatPrice } from '@/shared/lib';
 import { ClayBubble } from '@/shared/ui';
 
 import type { SentOrder } from '@/features/order-via-whatsapp/types';

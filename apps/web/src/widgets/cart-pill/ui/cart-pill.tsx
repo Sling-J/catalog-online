@@ -1,8 +1,8 @@
+import { formatPrice } from '@catalog/ui';
 import { Plural, Trans } from '@lingui/react/macro';
 import { useUnit } from 'effector-react';
 
 import { $count, $total, cartOpened } from '@/entities/cart';
-import { formatPrice } from '@/shared/lib';
 
 /**
  * Плавающая плашка корзины внизу каталога: «N товара в корзине · сумма → В корзину».

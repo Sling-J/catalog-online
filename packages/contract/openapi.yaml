@@ -563,12 +563,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [items, nextCursor]
+                required: [items, nextCursor, total]
                 properties:
                   items:
                     type: array
                     items: { $ref: '#/components/schemas/ProductListItem' }
                   nextCursor: { $ref: '#/components/schemas/NextCursor' }
+                  total: { type: integer, description: 'Сколько товаров в выборке — «Показано N из M»' }
     post:
       tags: [products]
       operationId: createProduct
@@ -1715,11 +1716,11 @@ components:
     # ─── Товары ───
     ProductListItem:
       type: object
-      required: [id, name, category, price, priceVaries, totalStock, variantCount, isVisible, cover, photoCount]
+      required: [id, name, sku, category, price, priceVaries, totalStock, variantCount, isVisible, cover, photoCount]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
-        sku: { type: [string, 'null'], description: 'Артикул, если вариант один' }
+        sku: { type: string, description: 'Артикул первого варианта — его показывает список товаров (A18)' }
         category:
           oneOf:
             - type: object

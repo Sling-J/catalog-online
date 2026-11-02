@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatPrice } from '../format-price';
+import { formatPrice } from '../format-price.js';
 
 describe('formatPrice', () => {
   it('разделяет разряды и добавляет тенге неразрывными пробелами', () => {

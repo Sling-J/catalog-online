@@ -1,3 +1,4 @@
+import { useLoadMore } from '@catalog/ui';
 import { Plural } from '@lingui/react/macro';
 import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 
@@ -5,7 +6,6 @@ import { productFacetsQueryOptions, productsQueryOptions, ProductTile } from '@/
 import type { ProductListParams, ProductSort } from '@/entities/product';
 import { CatalogSort } from '@/features/catalog-sort';
 
-import { useLoadMore } from '../hooks';
 import { EmptyState } from './empty-state';
 
 /** Строка «N товаров · сортировка» и сетка: 3 колонки на телефоне, 5 на компьютере; страницы подгружаются при прокрутке. */

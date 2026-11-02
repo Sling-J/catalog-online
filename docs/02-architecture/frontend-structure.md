@@ -59,6 +59,8 @@ app → pages → widgets → features → entities → shared
 
 > Примечание (2026-11-02, T-301): админка (`apps/admin`) — SPA на Vite + TanStack Router без Start. Точка входа — `app/main.tsx` (сначала моки, потом `RouterProvider`), роутер, QueryClient и Lingui — `app/router.tsx`; маршруты файловые — `app/routes` (плагин `@tanstack/router-plugin`), дерево `app/routeTree.gen.ts` генерирует плагин и хранится в git. Рабочие разделы лежат под макетом `app/routes/_shell.tsx` (загрузчик магазина и счётчиков, оболочка `widgets/app-shell`); вход и мастер (T-302, T-303) будут вне его. Моки — `app/mocks` (`demoAdminHandlers` из `@catalog/contract/msw`). Запросы идут с cookie (`credentials: 'include'`, `shared/api`).
 
+> Примечание (2026-11-02, T-305): «Товары» админки — страница `pages/products` (выбор в адресе: `?q=&filter=&category=`, разбор — `pages/products/lib`), виджет `widgets/product-list` (список на телефоне, таблица на компьютере, выбор строк), фичи `features/product-search`, `features/toggle-product-visibility` (переключатель «Витрина» сразу, без ожидания ответа), `features/bulk-edit-products` (полоса массовых действий); сущности `entities/product` (список по курсору, `invalidateProducts`, `ProductThumb`) и `entities/category`. `formatPrice` и `useLoadMore` нужны обоим приложениям и переехали в `@catalog/ui`; `useLoadMore` теперь отдаёт ref-колбэк (маркер может смениться после `useIsDesktop`). Выбор строк держит страница: на телефоне он меняет её шапку («Выбрано N») и закрывает меню панелью действий (`PhoneBulkBar`); само действие и текст сообщения — хук `useBulkProducts` фичи, сообщение показывает страница (`shared/ui/toast`).
+
 ## 2. Структура среза (feature / widget / entity / page)
 
 ```

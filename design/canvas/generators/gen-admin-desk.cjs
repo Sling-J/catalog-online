@@ -53,12 +53,12 @@ ${h1("Товары", smallBtn(sv(P.import, C.ink, 18) + "Загрузить Exce
 <div style="margin-top: 16px; border-radius: 24px; background: #ffffff; box-shadow: 0 1px 0 ${C.line}, 0 6px 16px rgba(40,30,110,.05); overflow: hidden">
 <div style="display: flex; align-items: center; gap: 14px; padding: 12px 18px; background: ${C.ink}; color: #ffffff; font-size: 14px; font-weight: 600">${cb(true).replace(C.ink, C.sun).replace("#ffffff", C.ink)}Выбрано 3<span style="flex: 1"></span><span style="padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.14)">Скрыть</span><span style="padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.14)">Показать</span><span style="padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.14)">Сменить категорию</span><span style="opacity: .7">Снять выбор</span></div>
 <div style="display: grid; grid-template-columns: ${COLS}; gap: 12px; padding: 12px 18px; font-size: 12px; font-weight: 600; color: ${C.quiet}"><span></span><span>Фото</span><span>Название</span><span>Категория</span><span>Варианты</span><span>Цена</span><span>Остаток</span><span>Витрина</span></div>
-${trow(true, "jacket", "Куртка демисезонная", "KD-1001", "Куртки", "7 ростов", "18 900 ₸", ["24 шт.", C.inS], true)}
-${trow(true, null, "Комбинезон зимний", "KM-2210", "Куртки", "6 ростов", "29 500 ₸", ["11 шт.", C.inS], true, "без фото")}
-${trow(true, "raincoat", "Дождевик жёлтый", "DZ-0412", "Куртки", "5 ростов", "7 900 ₸", ["9 шт.", C.inS], true)}
-${trow(false, "sneakers", "Кроссовки на липучках", "SN-0027", "Обувь", "8 размеров", "14 200 ₸", ["мало: 3", C.lowS], true)}
-${trow(false, "coat", "Пальто шерстяное", "PL-3001", "Куртки", "7 ростов", "24 900 ₸", ["нет", C.outS], false)}
-${trow(false, "dressY", "Платье летнее", "PT-0815", "Платья", "6 ростов", "8 200 ₸", ["4 шт.", C.inS], true)}
+${trow(true, "jacket", "Куртка демисезонная", "KD-1001", "Куртки", "7 вариантов", "18 900 ₸", ["24 шт.", C.inS], true)}
+${trow(true, null, "Комбинезон зимний", "KM-2210", "Куртки", "6 вариантов", "29 500 ₸", ["11 шт.", C.inS], true, "без фото")}
+${trow(true, "raincoat", "Дождевик жёлтый", "DZ-0412", "Куртки", "5 вариантов", "7 900 ₸", ["9 шт.", C.inS], true)}
+${trow(false, "sneakers", "Кроссовки на липучках", "SN-0027", "Обувь", "8 вариантов", "14 200 ₸", ["мало: 3", C.lowS], true)}
+${trow(false, "coat", "Пальто шерстяное", "PL-3001", "Куртки", "7 вариантов", "24 900 ₸", ["нет", C.outS], false)}
+${trow(false, "dressY", "Платье летнее", "PT-0815", "Платья", "6 вариантов", "8 200 ₸", ["4 шт.", C.inS], true)}
 ${trow(false, null, "Варежки детские", "VR-0101", "Шапки", "1 вариант", "2 900 ₸", ["30 шт.", C.inS], true, "без фото")}
 <div style="display: flex; justify-content: space-between; padding: 14px 18px; border-top: 1px solid #F0EEF7; font-size: 13px; color: ${C.quiet}"><span>Показано 7 из 214</span><span>Подгружаются при прокрутке</span></div>
 </div></div>`)]);

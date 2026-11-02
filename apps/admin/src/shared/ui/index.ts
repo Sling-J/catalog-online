@@ -8,3 +8,4 @@ export { FormNote } from './form-note';
 export { PageTitle } from './page-title';
 export { PasswordNote } from './password-note';
 export { SendAgain } from './send-again';
+export { Toast } from './toast';

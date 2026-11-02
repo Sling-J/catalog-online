@@ -1,5 +1,5 @@
+import { formatPrice } from '@catalog/ui';
 import type { CartItem } from '@/entities/cart';
-import { formatPrice } from '@/shared/lib';
 
 // в сообщении WhatsApp неразрывные пробелы цен ни к чему
 const NBSP = String.fromCharCode(0xa0);

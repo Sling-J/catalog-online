@@ -4,7 +4,8 @@
 // любой другой — действует. Мастер (T-303): название, адрес и WhatsApp помнятся в сессии, логотип — только в памяти
 // (картинка в хранилище браузера не влезает); адреса `aigerim-kids` и `skrytyj-magazin` заняты, служебные —
 // зарезервированы. Публикация (T-304): снятие переводит демо-магазин в черновик — так видна главная с чек-листом;
-// опубликовать можно, когда есть товары и почта подтверждена (иначе 409 `shop_not_ready`).
+// опубликовать можно, когда есть товары и почта подтверждена (иначе 409 `shop_not_ready`). Товары (T-305): список
+// с поиском, вкладками, категорией и сортировкой, «Витрина» у товара и массовые действия; правки живут в памяти.
 // Остальные разделы добавляются со своими экранами.
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 
@@ -14,9 +15,13 @@ import {
   handleCreateUpload,
   handleDeleteShopLogo,
   handleForgotPassword,
+  handleBulkUpdateProducts,
   handleGetMe,
+  handleGetProduct,
   handleGetProductCounts,
   handleGetShop,
+  handleListCategories,
+  handleListProducts,
   handleLogin,
   handleLogout,
   handlePublishShop,
@@ -25,12 +30,22 @@ import {
   handleResendVerificationEmail,
   handleResetPassword,
   handleSetShopLogo,
+  handleUpdateProduct,
   handleUpdateShop,
   handleVerifyEmail,
   type RequestHandlerOptions,
 } from '../gen/msw.gen.js';
-import type { Image, Me, Problem, Shop } from '../gen/types.gen.js';
-import { createDemoShopData, demoShop, HIDDEN_DEMO_SUBDOMAIN } from './demo-shop.js';
+import type { Image, Me, Problem, Product, Shop } from '../gen/types.gen.js';
+import {
+  type AdminFilter,
+  type AdminSort,
+  countProducts,
+  createDemoAdminProducts,
+  demoAdminCategories,
+  selectAdminProducts,
+  toListItem,
+} from './admin-products.js';
+import { demoShop, HIDDEN_DEMO_SUBDOMAIN } from './demo-shop.js';
 
 const SHOP_ID = '0192d000-0000-7000-8000-00000000a001';
 const NEW_SHOP_ID = '0192d000-0000-7000-8000-00000000a002';
@@ -42,14 +57,8 @@ export const DEMO_ADMIN_PASSWORD = 'demo-password';
 export const EXPIRED_EMAIL_TOKEN = 'expired';
 const MIN_PASSWORD = 8;
 
-const { products } = createDemoShopData();
-
-const counts = {
-  all: products.length,
-  noPhoto: products.filter((product) => product.photos.length === 0).length,
-  outOfStock: products.filter((product) => product.variants.every((variant) => variant.stock.level === 'out')).length,
-  hidden: 0,
-};
+const counts = countProducts(createDemoAdminProducts());
+const PAGE_SIZE = 30;
 
 export const demoMe: Me = {
   account: {
@@ -148,6 +157,8 @@ export type DemoAdminStorage = Pick<Storage, 'getItem' | 'setItem'>;
 export type DemoAdminHandlersOptions = RequestHandlerOptions & {
   /** Где помнить сессию между перезагрузками (в браузере — `localStorage`). */
   storage?: DemoAdminStorage;
+  /** Откуда приложение отдаёт фото (`<assetBase>/demo/<имя>.jpg`). Пустая строка — адреса от корня страницы. */
+  assetBase?: string;
 };
 
 const SESSION_KEY = 'catalog-admin-mock-session';
@@ -185,7 +196,7 @@ const meOf = (session: Exclude<Session, { kind: 'out' }>): Me =>
         },
       };
 
-export const demoAdminHandlers = ({ storage, ...options }: DemoAdminHandlersOptions = {}): HttpHandler[] => {
+export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminHandlersOptions = {}): HttpHandler[] => {
   let memory: Session = { kind: 'demo' };
   const read = (): Session => {
     const saved = storage?.getItem(SESSION_KEY);
@@ -198,6 +209,13 @@ export const demoAdminHandlers = ({ storage, ...options }: DemoAdminHandlersOpti
   // загруженные файлы и логотип нового магазина — data: URL в памяти
   const uploads = new Map<string, string>();
   let logo: Image | null = null;
+  // товары демо-магазина: правки из списка живут, пока открыта страница
+  let demoProducts: Product[] | null = null;
+  const productsOf = (session: Session, request: Request): Product[] => {
+    if (session.kind !== 'demo') return [];
+    demoProducts ??= createDemoAdminProducts(assetBase ?? globalThis.location?.origin ?? new URL(request.url).origin);
+    return demoProducts;
+  };
   const shopOf = (session: Extract<Session, { kind: 'new' }>): Shop => ({
     ...newShop,
     name: session.shop?.name ?? null,
@@ -355,10 +373,71 @@ export const demoAdminHandlers = ({ storage, ...options }: DemoAdminHandlersOpti
       write(next);
       return HttpResponse.json(demoShopOf(next));
     }, options),
-    handleGetProductCounts(() => {
+    handleGetProductCounts(({ request }) => {
       const session = read();
       if (session.kind === 'out') return problem(401, 'unauthorized');
-      return HttpResponse.json(session.kind === 'demo' ? counts : { all: 0, noPhoto: 0, outOfStock: 0, hidden: 0 });
+      return HttpResponse.json(countProducts(productsOf(session, request)));
+    }, options),
+    handleListProducts(async ({ request }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      // небольшая пауза — чтобы было видно загрузку
+      await delay(300);
+      const query = new URL(request.url).searchParams;
+      const products = productsOf(session, request);
+      const found = selectAdminProducts(products, {
+        q: query.get('q') ?? undefined,
+        categoryId: query.get('categoryId') ?? undefined,
+        filter: (query.get('filter') as AdminFilter | null) ?? undefined,
+        sort: (query.get('sort') as AdminSort | null) ?? undefined,
+      });
+      const offset = Number(query.get('cursor') ?? 0) || 0;
+      const limit = Number(query.get('limit') ?? PAGE_SIZE) || PAGE_SIZE;
+      const categories = demoAdminCategories(products);
+      return HttpResponse.json({
+        items: found.slice(offset, offset + limit).map((product) => toListItem(product, categories)),
+        nextCursor: offset + limit < found.length ? String(offset + limit) : null,
+        total: found.length,
+      });
+    }, options),
+    handleListCategories(({ request }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      return HttpResponse.json(session.kind === 'demo' ? demoAdminCategories(productsOf(session, request)) : []);
+    }, options),
+    handleGetProduct(({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const product = productsOf(session, request).find((item) => item.id === params.productId);
+      return product ? HttpResponse.json(product) : problem(404, 'not_found');
+    }, options),
+    handleUpdateProduct(async ({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const products = productsOf(session, request);
+      const index = products.findIndex((item) => item.id === params.productId);
+      if (index < 0) return problem(404, 'not_found');
+      const body = await request.json();
+      const changes = Object.fromEntries(Object.entries(body).filter(([, value]) => value !== undefined));
+      products[index] = { ...products[index]!, ...changes, updatedAt: new Date().toISOString() };
+      return HttpResponse.json(products[index]);
+    }, options),
+    handleBulkUpdateProducts(async ({ request }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { productIds, action, categoryId } = await request.json();
+      const products = productsOf(session, request);
+      const ids = new Set(productIds);
+      let updated = 0;
+      products.forEach((product, index) => {
+        if (!ids.has(product.id)) return;
+        updated += 1;
+        products[index] =
+          action === 'set_category'
+            ? { ...product, categoryId: categoryId ?? null }
+            : { ...product, isVisible: action === 'show' };
+      });
+      return HttpResponse.json({ updated });
     }, options),
   ];
 };
