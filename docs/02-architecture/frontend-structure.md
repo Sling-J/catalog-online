@@ -1,7 +1,7 @@
 ---
 status: accepted
 owner: founder
-updated: 2026-11-01
+updated: 2026-11-02
 ---
 
 # Структура кода фронтенда (FSD)
@@ -51,7 +51,9 @@ app → pages → widgets → features → entities → shared
 
 > Примечание (2026-11-01, T-107): шторка корзины (`widgets/cart-sheet`) открывается и из каталога, и с карточки товара, поэтому рендерится один раз в корне приложения (`app/routes/__root.tsx`), а открывается событием `cartOpened(поддомен)` из `entities/cart`; плашка `widgets/cart-pill` — только на странице каталога. Перепроверка цен и наличия — эффект модели корзины, результат применяется к корзине на момент ответа.
 
-> Примечание (2026-11-01, T-105): в `shared` появился сегмент `hooks` (общие React-хуки без бизнес-контекста, например `useSheetPlacement` — шторка снизу на телефоне и окно по центру на компьютере); импортируется через индекс (`@/shared/hooks`). Поиск и фильтры — отдельные срезы `features/product-search` и `features/product-filters`, друг о друге не знают: их связывает страница `pages/catalog`, а выбор хранится в адресе.
+> Примечание (2026-11-01, T-105): в `shared` появился сегмент `hooks` (общие React-хуки без бизнес-контекста, например `useSheetPlacement` — шторка снизу на телефоне и окно по центру на компьютере); импортируется через индекс (`@/shared/hooks`). Поправка (2026-11-02): `useSheetPlacement` удалён при сверке с макетами (T-114), размещение шторки выбирает сам виджет через `useIsDesktop`. Поиск и фильтры — отдельные срезы `features/product-search` и `features/product-filters`, друг о друге не знают: их связывает страница `pages/catalog`, а выбор хранится в адресе.
+
+> Примечание (2026-11-02, T-111–T-113, E2): превью и события — в `shared/api` (`preview.ts`: токен из адреса и перехватчик SDK; `track-event.ts`); адрес сайта и теги страницы — `shared/lib` (`site-origin.ts`, `page-head.ts`, `service-urls.ts`); просмотры — `features/track-view`, правки из админки в превью — `features/shop-draft`; `sitemap.xml` и `robots.txt` — файлы маршрутов в `app/routes`, сборка карты — `app/lib/sitemap.ts`; заголовки страниц собирают загрузчики (`pages/*/api/*-head.ts`). Лендинг — `pages/landing` (секции в `ui/`, логика примера — `lib/demo-order.ts`). Корзина помнит последнюю убранную позицию для «Вернуть» (`$removed`, `itemRestored` в `entities/cart`).
 
 ## 2. Структура среза (feature / widget / entity / page)
 
