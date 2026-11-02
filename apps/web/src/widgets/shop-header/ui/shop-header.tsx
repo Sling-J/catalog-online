@@ -1,9 +1,9 @@
 import type { StorefrontShop } from '@catalog/contract';
+import { Icon } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { ReactNode } from 'react';
 
 import { OpenStatus, ShopAvatar, whatsappLink } from '@/entities/shop';
-import { Icon } from '@/shared/ui';
 
 /**
  * Шапка магазина, закреплена при прокрутке. Нажатие на название открывает «О магазине».

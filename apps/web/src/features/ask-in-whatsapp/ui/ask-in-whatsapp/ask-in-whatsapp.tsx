@@ -1,8 +1,7 @@
-import { cx } from '@catalog/ui';
+import { cx, Icon } from '@catalog/ui';
 import type { ReactNode } from 'react';
 
 import { whatsappLink } from '@/entities/shop';
-import { Icon } from '@/shared/ui';
 
 /**
  * «Спросить в WhatsApp» / «Спросить о поступлении»: ссылка на чат магазина с готовым текстом (S9).

@@ -1,10 +1,10 @@
+import { useIsDesktop } from '@catalog/ui';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { Suspense } from 'react';
 
 import { validateCatalogSearch } from '@/entities/product';
 import { CatalogPage } from '@/pages/catalog';
 import { loadProduct, ProductPage } from '@/pages/product';
-import { useIsDesktop } from '@/shared/hooks';
 import { NOINDEX_HEAD } from '@/shared/lib';
 
 // Адрес товара: `/<slug>-<shortId>`. Товары есть только у магазина, на основном домене — «не найден».

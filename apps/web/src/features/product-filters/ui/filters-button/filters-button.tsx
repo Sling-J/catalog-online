@@ -1,6 +1,5 @@
+import { Icon } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
-
-import { Icon } from '@/shared/ui';
 
 /** Квадратная кнопка рядом с поиском; со счётчиком включённых фильтров. */
 export function FiltersButton({ count, onClick }: { count: number; onClick: () => void }) {

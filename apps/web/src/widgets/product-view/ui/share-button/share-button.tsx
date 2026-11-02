@@ -1,7 +1,6 @@
+import { Icon } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
-
-import { Icon } from '@/shared/ui';
 
 /** «Поделиться»: системное окно, где оно есть, иначе копируем ссылку. Превью с фото и ценой — Open Graph (T-111). */
 export function ShareButton({ title, className }: { title: string; className?: string }) {

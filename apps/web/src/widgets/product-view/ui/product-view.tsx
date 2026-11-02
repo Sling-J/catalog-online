@@ -1,14 +1,12 @@
 import type { StorefrontProduct, StorefrontProductCard, StorefrontShop } from '@catalog/contract';
-import { cx } from '@catalog/ui';
+import { cx, Icon, useIsDesktop } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
 
 import { findVariant, getPriceRange, isInStock, ProductTile, type Selection } from '@/entities/product';
 import { AddToCartButton } from '@/features/add-to-cart';
 import { AskInWhatsApp } from '@/features/ask-in-whatsapp';
-import { useIsDesktop } from '@/shared/hooks';
 import { formatPrice, isClientNavigation } from '@/shared/lib';
-import { Icon } from '@/shared/ui';
 
 import { ProductGallery } from './product-gallery';
 import { ShareButton } from './share-button';

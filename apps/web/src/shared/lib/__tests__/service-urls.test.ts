@@ -6,6 +6,7 @@ describe('адреса сервиса', () => {
   afterEach(() => vi.unstubAllEnvs());
 
   it('по умолчанию — поддомены основного домена с тем же протоколом и портом', () => {
+    vi.stubEnv('DEV', false);
     vi.stubEnv('VITE_ADMIN_ORIGIN', '');
     vi.stubEnv('VITE_DEMO_SHOP', '');
     vi.stubEnv('VITE_ROOT_DOMAIN', 'katalog.kz');
@@ -15,6 +16,13 @@ describe('адреса сервиса', () => {
       demoShop: 'https://aigerim-kids.katalog.kz',
     });
     expect(serviceUrls('http://localhost:3000').admin).toBe('http://app.katalog.kz:3000');
+  });
+
+  it('в разработке админка — на своём порту', () => {
+    vi.stubEnv('DEV', true);
+    vi.stubEnv('VITE_ADMIN_ORIGIN', '');
+    vi.stubEnv('VITE_ROOT_DOMAIN', 'localhost');
+    expect(serviceUrls('http://aigerim-kids.localhost:3000').admin).toBe('http://app.localhost:3002');
   });
 
   it('админку и демо-магазин можно задать явно', () => {

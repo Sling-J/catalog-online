@@ -1,8 +1,6 @@
-import { cx } from '@catalog/ui';
+import { cx, Icon } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect, useRef, useState } from 'react';
-
-import { Icon } from '@/shared/ui';
 
 const DEBOUNCE_MS = 350;
 

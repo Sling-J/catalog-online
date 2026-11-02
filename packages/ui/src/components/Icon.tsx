@@ -15,9 +15,14 @@ export type IconName =
   | 'close'
   | 'share'
   | 'bag'
-  | 'chevron-down';
+  | 'chevron-down'
+  | 'tag'
+  | 'upload'
+  | 'store'
+  | 'external'
+  | 'copy-square';
 
-// Контурные иконки 24×24, штрих берут от `currentColor`.
+// Контурные иконки 24×24, штрих берут от `currentColor`. Общие для витрины и админки.
 const glyphs: Record<IconName, ReactNode> = {
   'chevron-right': <path d="M9 6l6 6-6 6" />,
   'chevron-down': <path d="M7 10l5 5 5-5" />,
@@ -82,20 +87,51 @@ const glyphs: Record<IconName, ReactNode> = {
   close: <path d="M6 6l12 12M18 6L6 18" />,
   'chevron-left': <path d="M15 6l-6 6 6 6" />,
   share: <path d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6" />,
+  // меню админки: товары, импорт, магазин; «Открыть витрину»
+  tag: (
+    <>
+      <path d="M3 12V4h8l10 10-8 8z" />
+      <circle cx="7.5" cy="8.5" r="1.5" />
+    </>
+  ),
+  upload: (
+    <>
+      <path d="M12 15V4M8 8l4-4 4 4" />
+      <path d="M4 14v6h16v-6" />
+    </>
+  ),
+  store: (
+    <>
+      <path d="M4 9l1.5-5h13L20 9" />
+      <path d="M4 9v11h16V9" />
+      <path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0" />
+      <path d="M10 20v-5h4v5" />
+    </>
+  ),
+  // копирование в админке — квадратами (макеты админки), на витрине — `copy`
+  'copy-square': (
+    <>
+      <rect x="8" y="8" width="12" height="12" rx="2" />
+      <path d="M16 8V4H4v12h4" />
+    </>
+  ),
+  external: (
+    <>
+      <path d="M14 4h6v6M20 4l-9 9" />
+      <path d="M18 14v6H4V6h6" />
+    </>
+  ),
 };
 
-export function Icon({
-  name,
-  size = 20,
-  strokeWidth = 2,
-  className,
-}: {
+export interface IconProps {
   name: IconName;
   size?: number;
   /** Стрелки и крестики в макетах толще — 2.4. */
   strokeWidth?: number;
   className?: string;
-}) {
+}
+
+export function Icon({ name, size = 20, strokeWidth = 2, className }: IconProps) {
   return (
     <svg
       aria-hidden="true"

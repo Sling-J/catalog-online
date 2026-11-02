@@ -1,4 +1,4 @@
-import { Sheet } from '@catalog/ui';
+import { Sheet, useIsDesktop } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useQuery } from '@tanstack/react-query';
 import { useUnit } from 'effector-react';
@@ -22,7 +22,6 @@ import {
 } from '@/entities/cart';
 import { shopQueryOptions } from '@/entities/shop';
 import { $sentOrder, OrderButton, OrderSent } from '@/features/order-via-whatsapp';
-import { useIsDesktop } from '@/shared/hooks';
 import { formatPrice } from '@/shared/lib';
 
 import { CartLine } from './cart-line';

@@ -55,6 +55,10 @@ app → pages → widgets → features → entities → shared
 
 > Примечание (2026-11-02, T-111–T-113, E2): превью и события — в `shared/api` (`preview.ts`: токен из адреса и перехватчик SDK; `track-event.ts`); адрес сайта и теги страницы — `shared/lib` (`site-origin.ts`, `page-head.ts`, `service-urls.ts`); просмотры — `features/track-view`, правки из админки в превью — `features/shop-draft`; `sitemap.xml` и `robots.txt` — файлы маршрутов в `app/routes`, сборка карты — `app/lib/sitemap.ts`; заголовки страниц собирают загрузчики (`pages/*/api/*-head.ts`). Лендинг — `pages/landing` (секции в `ui/`, логика примера — `lib/demo-order.ts`). Корзина помнит последнюю убранную позицию для «Вернуть» (`$removed`, `itemRestored` в `entities/cart`).
 
+> Примечание (2026-11-02, T-301, с согласия основателя): иконки (`Icon`) и `useIsDesktop` нужны и витрине, и админке, поэтому переехали в `@catalog/ui`; сегмент `shared/hooks` витрины удалён, `shared/ui/icon` — тоже. Упоминания `shared/hooks` и `shared/ui/icon` в примечаниях выше относятся к прошлому устройству.
+
+> Примечание (2026-11-02, T-301): админка (`apps/admin`) — SPA на Vite + TanStack Router без Start. Точка входа — `app/main.tsx` (сначала моки, потом `RouterProvider`), роутер, QueryClient и Lingui — `app/router.tsx`; маршруты файловые — `app/routes` (плагин `@tanstack/router-plugin`), дерево `app/routeTree.gen.ts` генерирует плагин и хранится в git. Рабочие разделы лежат под макетом `app/routes/_shell.tsx` (загрузчик магазина и счётчиков, оболочка `widgets/app-shell`); вход и мастер (T-302, T-303) будут вне его. Моки — `app/mocks` (`demoAdminHandlers` из `@catalog/contract/msw`). Запросы идут с cookie (`credentials: 'include'`, `shared/api`).
+
 ## 2. Структура среза (feature / widget / entity / page)
 
 ```
@@ -112,7 +116,7 @@ ui/
 ## 6. Алиас
 
 - Алиас один: `@/*` → `src/*` (`@/shared/lib`, `@/features/add-to-cart`). Относительные пути только внутри одной папки (`./order-form`).
-- `shared/types`, `shared/constants` импортируются по файлу (`@/shared/constants/breakpoints`), остальные сегменты `shared` — через индекс (`@/shared/api`, `@/shared/hooks`, `@/shared/lib`, `@/shared/ui`).
+- `shared/types`, `shared/constants` импортируются по файлу (`@/shared/constants/breakpoints`), остальные сегменты `shared` — через индекс (`@/shared/api`, `@/shared/lib`, `@/shared/ui`).
 - Пакеты монорепо — по имени: `@catalog/ui`, `@catalog/contract`.
 
 ## 7. Состояние и данные (как FSD сочетается со стеком)
@@ -132,6 +136,15 @@ ui/
 | `features` | `product-search`, `product-filters`, `catalog-sort`, `add-to-cart`, `order-via-whatsapp`, `ask-in-whatsapp` (ссылка на чат с готовым текстом, S9) |
 | `widgets` | `shop-header`, `about-shop-sheet`, `category-bar`, `catalog-grid`, `product-view`, `cart-pill`, `cart-sheet` |
 | `pages` | `catalog`, `product`, `landing`, `not-found`, `error`, `shop-unavailable` |
+
+### Админка (по состоянию на T-301)
+
+| Слой | Срезы |
+|---|---|
+| `entities` | `shop` (запрос магазина, аватар, статус витрины, адрес витрины), `product` (счётчики товаров) |
+| `features` | `copy-link` (скопировать ссылку с галочкой) |
+| `widgets` | `app-shell` (меню снизу / слева, шапка телефона, «Ваша витрина») |
+| `pages` | `products`, `import`, `shop` (пока заглушки), `not-found`, `error` |
 
 ## 9. Проверка правил
 

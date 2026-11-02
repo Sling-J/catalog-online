@@ -1,6 +1,4 @@
-import { cx } from '@catalog/ui';
-
-import { Icon } from '@/shared/ui';
+import { cx, Icon } from '@catalog/ui';
 
 // значки соцсетей в фирменных цветах, чтобы узнавались с первого взгляда (макет «О магазине»: контакты)
 const brands = {

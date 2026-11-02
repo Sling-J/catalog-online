@@ -1,11 +1,10 @@
-import { cx } from '@catalog/ui';
+import { cx, Icon } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 
 import { isBlocked, MAX_ITEM_QUANTITY, type CartItem, type CartNotice } from '@/entities/cart';
 import { productPath } from '@/entities/product';
 import { formatPrice } from '@/shared/lib';
-import { Icon } from '@/shared/ui';
 
 /**
  * Строка корзины: миниатюра, название, вариант, сумма, справа количество «− N +» (на единице вместо «−» значок

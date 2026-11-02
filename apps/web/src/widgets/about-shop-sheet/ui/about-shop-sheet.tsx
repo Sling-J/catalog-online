@@ -1,10 +1,8 @@
 import type { StorefrontShop } from '@catalog/contract';
-import { Sheet } from '@catalog/ui';
+import { Icon, Sheet, useIsDesktop } from '@catalog/ui';
 import { Trans } from '@lingui/react/macro';
 
 import { formatPhone, instagramLink, ShopAvatar, twoGisLink, whatsappLink } from '@/entities/shop';
-import { useIsDesktop } from '@/shared/hooks';
-import { Icon } from '@/shared/ui';
 
 import { ContactLink } from './contact-link';
 import { CopyAddressButton } from './copy-address-button';

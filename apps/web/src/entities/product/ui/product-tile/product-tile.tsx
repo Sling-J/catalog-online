@@ -1,10 +1,9 @@
 import type { StorefrontProductCard } from '@catalog/contract';
-import { cx } from '@catalog/ui';
+import { cx, useIsDesktop } from '@catalog/ui';
 import { Trans } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 
 import { productPath } from '@/entities/product/lib';
-import { useIsDesktop } from '@/shared/hooks';
 import { formatPrice } from '@/shared/lib';
 
 /**

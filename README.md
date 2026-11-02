@@ -19,7 +19,7 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 | `apps/web` | Лендинг и витрины магазинов — TanStack Start (SSR); код по FSD |
 | `apps/admin` | Админка магазина — Vite + React SPA; код по FSD |
 | `apps/api` | API — NestJS + PostgreSQL (Drizzle) |
-| `packages/ui` | Токены дизайн-системы и общие компоненты |
+| `packages/ui` | Токены дизайн-системы, общие компоненты, иконки и хуки витрины и админки |
 | `packages/contract` | Контракт API `openapi.yaml` и сгенерированный код |
 
 ## Что нужно для разработки
@@ -33,7 +33,7 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 | `pnpm install` | Установить зависимости |
 | `pnpm generate` | Код из `packages/contract/openapi.yaml` (Hey API): типы, SDK, хуки Query, Zod, MSW, типы для Nest |
 | `pnpm check` | Линтеры (включая контракт и границы FSD), типы, тесты и сборка всех пакетов |
-| `pnpm dev` | Запустить приложения: `apps/web` на http://localhost:3000 с моками API (admin и api появятся в E3, E4). Витрина демо-магазина — http://aigerim-kids.localhost:3000, лендинг — http://localhost:3000, превью скрытого магазина (как из админки) — http://skrytyj-magazin.localhost:3000/?preview=demo. Переменные фронта (`VITE_ROOT_DOMAIN`, `VITE_ADMIN_ORIGIN`, `VITE_DEMO_SHOP`, `VITE_API_URL`) — в `.env.example` |
+| `pnpm dev` | Запустить приложения: `apps/web` на http://localhost:3000 и `apps/admin` на http://app.localhost:3002, оба с моками API (api появится в E4). Витрина демо-магазина — http://aigerim-kids.localhost:3000, лендинг — http://localhost:3000, превью скрытого магазина (как из админки) — http://skrytyj-magazin.localhost:3000/?preview=demo. Переменные фронтов (`VITE_ROOT_DOMAIN`, `VITE_ADMIN_ORIGIN`, `VITE_STOREFRONT_PORT`, `VITE_DEMO_SHOP`, `VITE_API_URL`) — в `.env.example` |
 | `pnpm format` | Prettier |
-| `pnpm i18n:extract` | Строки Lingui в каталоги `.po` (`apps/web`: `src/app/i18n/locales`, общий каталог — `packages/ui/src/locales`; каталоги в git, после правки строк запустить и закоммитить) |
+| `pnpm i18n:extract` | Строки Lingui в каталоги `.po` (`apps/web` и `apps/admin`: `src/app/i18n/locales`, общий каталог — `packages/ui/src/locales`; каталоги в git, после правки строк запустить и закоммитить) |
 | `docker compose up -d` | PostgreSQL и S3-хранилище для разработки (настройки — `.env.example`) |

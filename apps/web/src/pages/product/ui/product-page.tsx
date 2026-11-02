@@ -1,3 +1,4 @@
+import { useIsDesktop } from '@catalog/ui';
 import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
@@ -13,7 +14,6 @@ import {
 } from '@/entities/product';
 import { shopQueryOptions } from '@/entities/shop';
 import { useTrackView } from '@/features/track-view';
-import { useIsDesktop } from '@/shared/hooks';
 import { ProductView } from '@/widgets/product-view';
 
 /**

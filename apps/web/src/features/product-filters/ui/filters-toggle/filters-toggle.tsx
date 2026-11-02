@@ -1,7 +1,5 @@
-import { cx } from '@catalog/ui';
+import { cx, Icon } from '@catalog/ui';
 import { Trans } from '@lingui/react/macro';
-
-import { Icon } from '@/shared/ui';
 
 /**
  * Кнопка «Фильтры» в строке категорий на компьютере: открывает и закрывает панель фильтров, «Фильтры · N».

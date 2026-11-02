@@ -1,8 +1,8 @@
 import type { StorefrontFacets } from '@catalog/contract';
+import { Icon } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
 
 import { formatPrice } from '@/shared/lib';
-import { Icon } from '@/shared/ui';
 
 import { getActiveValueFilters, toggleValue } from '@/features/product-filters/lib';
 import type { FilterState } from '@/features/product-filters/types';

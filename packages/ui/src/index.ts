@@ -6,3 +6,5 @@ export { Sheet, type SheetPlacement, type SheetProps } from './components/Sheet.
 export { StockPill, type StockLevel, type StockPillProps } from './components/StockPill.js';
 export { Switch, type SwitchProps } from './components/Switch.js';
 export { cx } from './cx.js';
+export { Icon, type IconName, type IconProps } from './components/Icon.js';
+export { useIsDesktop } from './hooks/useIsDesktop.js';
