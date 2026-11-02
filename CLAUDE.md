@@ -54,6 +54,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - `pnpm format` / `pnpm format:check` — Prettier.
 - `pnpm i18n:extract` — строки Lingui в каталоги `.po`.
 - `docker compose up -d` — PostgreSQL и S3-хранилище для разработки (`.env.example`).
+- `pnpm design:compare --board <доска> --frame <экран> --url <адрес>` — сверка экрана с макетом (`tools/design-compare/README.md`); после вёрстки по макету — обязательно, вместо ручных замеров в браузере. Админку сверяем на http://localhost:3012 (`admin-check`).
 
 ## Код
 - Контракт API правится только в `openapi.yaml`, затем `pnpm generate`; сгенерированное (`*.gen.ts`) руками не трогаем.

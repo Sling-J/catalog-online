@@ -21,6 +21,7 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 | `apps/api` | API — NestJS + PostgreSQL (Drizzle) |
 | `packages/ui` | Токены дизайн-системы, общие компоненты, иконки и хуки витрины и админки |
 | `packages/contract` | Контракт API `openapi.yaml` и сгенерированный код |
+| `tools/design-compare` | Сверка экрана приложения с артбордом холста (`pnpm design:compare`, описание — README папки) |
 
 ## Что нужно для разработки
 - Node.js 22 LTS или новее (версиями удобно управлять через nvm; на Windows — nvm-windows)
@@ -34,6 +35,7 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 | `pnpm generate` | Код из `packages/contract/openapi.yaml` (Hey API): типы, SDK, хуки Query, Zod, MSW, типы для Nest |
 | `pnpm check` | Линтеры (включая контракт и границы FSD), типы, тесты и сборка всех пакетов |
 | `pnpm dev` | Запустить приложения: `apps/web` на http://localhost:3000 и `apps/admin` на http://app.localhost:3002, оба с моками API (api появится в E4). В админке на моках по умолчанию вошёл владелец демо-магазина; сессия моков — в `localStorage` (`catalog-admin-mock-session`: `{"kind":"out"}` — вышли), вход демо-владельца — `aigerim.kids@example.com` / `demo-password` (`DEMO_ADMIN_PASSWORD` в `packages/contract/src/fixtures/admin-handlers.ts`). Ссылки из писем на моках: http://app.localhost:3002/verify-email?token=abc и http://app.localhost:3002/reset-password?token=abc; токен `expired` — ссылка устарела. Мастер на моках: адреса `aigerim-kids` и `skrytyj-magazin` заняты, служебные (`www`, `app`, `api`, `admin`…) зарезервированы; логотип живёт только до перезагрузки. Главная до публикации на демо-данных: `localStorage.setItem('catalog-admin-mock-session', '{"kind":"demo","draft":true}')`; новый магазин на моках опубликовать нельзя (товаров нет). Витрина демо-магазина — http://aigerim-kids.localhost:3000, лендинг — http://localhost:3000, превью скрытого магазина (как из админки) — http://skrytyj-magazin.localhost:3000/?preview=demo. Переменные фронтов (`VITE_ROOT_DOMAIN`, `VITE_ADMIN_ORIGIN`, `VITE_STOREFRONT_PORT`, `VITE_DEMO_SHOP`, `VITE_API_URL`) — в `.env.example` |
+| `pnpm design:compare` | Сверка экрана с макетом: `--board <доска> --frame <экран> --url <адрес>` — расхождения положения, размера, шрифта, цвета и подложки по тексту (нужен установленный Google Chrome и запущенный дев-сервер; `tools/design-compare/README.md`). Админку сверяем на http://localhost:3012 (конфигурация `admin-check` в `.claude/launch.json`): на `app.localhost` во встроенном браузере service worker моков не регистрируется |
 | `pnpm format` | Prettier |
 | `pnpm i18n:extract` | Строки Lingui в каталоги `.po` (`apps/web` и `apps/admin`: `src/app/i18n/locales`, общий каталог — `packages/ui/src/locales`; каталоги в git, после правки строк запустить и закоммитить) |
 | `docker compose up -d` | PostgreSQL и S3-хранилище для разработки (настройки — `.env.example`) |

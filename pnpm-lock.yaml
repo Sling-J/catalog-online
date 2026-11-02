@@ -278,6 +278,15 @@ importers:
         specifier: 8.3.5
         version: 8.3.5(@types/node@24.19.2)(jiti@2.7.0)
 
+  tools/design-compare:
+    devDependencies:
+      '@catalog/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      playwright-core:
+        specifier: 1.64.1
+        version: 1.64.1
+
 packages:
 
   '@asamuzakjp/css-color@7.1.9':
@@ -2380,6 +2389,11 @@ packages:
 
   pkg-types@2.4.0:
     resolution: {integrity: sha512-07Fys7iVx0X6TcviMOgogM1Lk33ZyqOezMnU79S+kffWqwolG/5W9V8EgQSeYCIfFTYVgssRbnH630Oa2+soBA==}
+
+  playwright-core@1.64.1:
+    resolution: {integrity: sha512-BC4s8y6SEVA6Q1rSxZTto8hI1KUI3xXlHGZgvGqP4IqPdI/a6FX9H29IDNz7vKo9l21b6LfYosScPL6M3xxyDQ==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   pofile-ts@4.0.3:
     resolution: {integrity: sha512-sz1pnjgEfPyZ+QvaeX3NtCmbYnEvG01LZRLoN/uXoLtPZtxCIH5IctL7yXXc0fFyk/fqV6K8g3hlNfr6IJwupA==}
@@ -4898,6 +4912,8 @@ snapshots:
       confbox: 0.3.2
       exsolve: 1.2.0
       pathe: 2.0.3
+
+  playwright-core@1.64.1: {}
 
   pofile-ts@4.0.3: {}
 

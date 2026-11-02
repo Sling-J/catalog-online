@@ -1,0 +1,41 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@catalog/web",
+        "dev"
+      ],
+      "port": 3000,
+      "url": "http://aigerim-kids.localhost:3000"
+    },
+    {
+      "name": "admin",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@catalog/admin",
+        "dev"
+      ],
+      "port": 3002,
+      "url": "http://app.localhost:3002"
+    },
+    {
+      "name": "admin-check",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@catalog/admin",
+        "exec",
+        "vite",
+        "--port",
+        "3012"
+      ],
+      "port": 3012,
+      "url": "http://localhost:3012"
+    }
+  ]
+}

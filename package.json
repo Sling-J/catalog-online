@@ -16,7 +16,8 @@
     "i18n:extract": "turbo run i18n:extract",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "turbo run lint typecheck test build"
+    "check": "turbo run lint typecheck test build",
+    "design:compare": "node tools/design-compare/src/cli.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
