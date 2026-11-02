@@ -5,6 +5,9 @@ export type IconName =
   | 'chevron-left'
   | 'pin'
   | 'whatsapp'
+  | 'instagram'
+  | 'arrow-up-right'
+  | 'trash'
   | 'copy'
   | 'check'
   | 'search'
@@ -18,6 +21,26 @@ export type IconName =
 const glyphs: Record<IconName, ReactNode> = {
   'chevron-right': <path d="M9 6l6 6-6 6" />,
   'chevron-down': <path d="M7 10l5 5 5-5" />,
+  instagram: (
+    <>
+      <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+    </>
+  ),
+  trash: (
+    <>
+      <path d="M4 7h16" />
+      <path d="M9 7V4.5h6V7" />
+      <path d="M6.5 7l1 12.5h9l1-12.5" />
+    </>
+  ),
+  'arrow-up-right': (
+    <>
+      <path d="M7 17L17 7" />
+      <path d="M9 7h8v8" />
+    </>
+  ),
   bag: (
     <>
       <path d="M5 8h14l-1.2 11H6.2z" />

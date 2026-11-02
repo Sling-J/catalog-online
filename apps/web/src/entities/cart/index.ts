@@ -7,6 +7,7 @@ export {
   $notices,
   $open,
   $payable,
+  $removed,
   $total,
   cartCleared,
   cartClosed,
@@ -14,8 +15,11 @@ export {
   cartOpened,
   commentChanged,
   itemRemoved,
+  itemRestored,
   MAX_COMMENT_LENGTH,
   quantityChanged,
+  UNDO_MS,
   variantAdded,
+  type RemovedItem,
 } from './model';
 export type { CartItem, CartNotice, CartNotices, CheckState } from './types';

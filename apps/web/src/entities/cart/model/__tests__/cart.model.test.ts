@@ -10,6 +10,7 @@ import {
   $items,
   $notices,
   $open,
+  $removed,
   $total,
   cartCleared,
   cartClosed,
@@ -17,9 +18,12 @@ import {
   cartOpened,
   checkCartFx,
   commentChanged,
+  forgetRemovedFx,
   itemRemoved,
+  itemRestored,
   quantityChanged,
   variantAdded,
+  type RemovedItem,
 } from '../cart.model';
 
 const item = (overrides: Partial<CartItem> = {}): CartItem => ({
@@ -52,7 +56,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('корзина (Effector)', () => {
   it('добавляет, меняет количество и удаляет', async () => {
-    const scope = fork();
+    const scope = fork({ handlers: [[forgetRemovedFx, async (removed: RemovedItem) => removed]] });
     await allSettled(variantAdded, { scope, params: item() });
     await allSettled(variantAdded, { scope, params: item({ variantId: 'v2', price: 500 }) });
     await allSettled(variantAdded, { scope, params: item() });
@@ -180,5 +184,58 @@ describe('корзина (Effector)', () => {
     // покупатель успел добавить товар до монтирования: запись не должна затереть сохранённое
     await allSettled(variantAdded, { scope, params: item({ variantId: 'new' }) });
     expect(storage.data.get('catalog:cart:v1')).toBe(saved);
+  });
+
+  it('убранную позицию можно вернуть на прежнее место, пока не истекло время', async () => {
+    let expire: () => void = () => {};
+    const scope = fork({
+      handlers: [
+        [
+          forgetRemovedFx,
+          (removed: RemovedItem) => new Promise<RemovedItem>((resolve) => (expire = () => resolve(removed))),
+        ],
+      ],
+    });
+    await allSettled(variantAdded, { scope, params: item({ variantId: 'a' }) });
+    await allSettled(variantAdded, { scope, params: item({ variantId: 'b', quantity: 2 }) });
+    await allSettled(variantAdded, { scope, params: item({ variantId: 'c' }) });
+
+    void allSettled(itemRemoved, { scope, params: 'b' });
+    await Promise.resolve();
+    expect(scope.getState($items).map((i) => i.variantId)).toEqual(['a', 'c']);
+    expect(scope.getState($removed)).toMatchObject({ index: 1, item: { variantId: 'b', quantity: 2 } });
+
+    // таймер ещё идёт, поэтому не ждём allSettled — он дождался бы и таймера
+    const restoring = allSettled(itemRestored, { scope });
+    await Promise.resolve();
+    expect(scope.getState($items).map((i) => [i.variantId, i.quantity])).toEqual([
+      ['a', 1],
+      ['b', 2],
+      ['c', 1],
+    ]);
+    expect(scope.getState($removed)).toBeNull();
+    expire();
+    await restoring;
+  });
+
+  it('по истечении времени «Вернуть» пропадает', async () => {
+    let expire: () => void = () => {};
+    const scope = fork({
+      handlers: [
+        [
+          forgetRemovedFx,
+          (removed: RemovedItem) => new Promise<RemovedItem>((resolve) => (expire = () => resolve(removed))),
+        ],
+      ],
+    });
+    await allSettled(variantAdded, { scope, params: item() });
+    const removal = allSettled(itemRemoved, { scope, params: 'v1' });
+    await Promise.resolve();
+    expect(scope.getState($removed)).not.toBeNull();
+    expire();
+    await removal;
+    expect(scope.getState($removed)).toBeNull();
+    await allSettled(itemRestored, { scope });
+    expect(scope.getState($items)).toEqual([]);
   });
 });

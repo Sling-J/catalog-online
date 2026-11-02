@@ -19,6 +19,8 @@
 | `StoreV6DeskModal.dc.html` | Витрина, компьютер: товар окном поверх сетки | там же, S8 |
 | `StoreFiltersDesk.dc.html` | Витрина, компьютер: фильтры панелью поверх сетки (генератор `gen-filters-desk.cjs`) | там же, «Фильтры на компьютере» |
 | `StorePreview.dc.html` | Витрина в превью из админки: плашка «Черновик» над шапкой, телефон и компьютер (генератор `gen-preview-banner.cjs`) | там же, «Превью из админки» |
+| `StoreContacts.dc.html` | Витрина: контакты в «О магазине» со значками WhatsApp и Instagram — короткий и длинный логин, без Instagram, компьютер и телефон (генератор `gen-contacts.cjs`) | `docs/04-design/storefront.md`, «О магазине» |
+| `StoreCartRemove.dc.html` | Витрина: корзина — счётчик «− N +» со значком корзины на единице, «Вернуть» после удаления, комментарий в панели компьютера (генератор `gen-cart-remove.cjs`) | `docs/04-design/storefront.md`, «Корзина» |
 | `StoreStates.dc.html`, `StoreStatesDesk.dc.html` | Пустые и служебные состояния витрины (генераторы `gen-states*.cjs`) | там же |
 
 ## На проверке (ждут решения основателя)
@@ -29,7 +31,7 @@
 
 ## Архив (не выбраны, для истории)
 - Лендинг, варианты A–M: `Main`, `Tag`, `Cord`, `Glass`, `Bento`, `Dark`, `Friendly`, `Magazine`, `Tactile`, `Swiss`, `Brutal`, `Clay`, `Aurora`.
-- Витрина: первая версия `StoreMobile`, `StoreDesktop`; варианты `StoreV1`–`StoreV5`; компьютер «вариант Б» `StoreV6DeskSide`; фильтры на компьютере, варианты А–В — `StoreFiltersDeskVariants` (выбран Г); лендинг, телефон покупателя в примере, варианты А–Г — `LandingBuyerPhone` (генератор `gen-landing-buyer.cjs`; выбран Б со строкой наличия, он в `Duo*.dc.html`).
+- Витрина: первая версия `StoreMobile`, `StoreDesktop`; варианты `StoreV1`–`StoreV5`; компьютер «вариант Б» `StoreV6DeskSide`; фильтры на компьютере, варианты А–В — `StoreFiltersDeskVariants` (выбран Г); лендинг, телефон покупателя в примере, варианты А–Г — `LandingBuyerPhone` (генератор `gen-landing-buyer.cjs`; выбран Б со строкой наличия, он в `Duo*.dc.html`); корзина, невыбранные варианты удаления — `StoreCartRemoveVariants` (тот же генератор).
 
 В архивных макетах встречаются старые решения (номер заказа, подтверждение и списание остатка) — по ним не ориентируемся.
 

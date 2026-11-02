@@ -10,6 +10,7 @@ import {
   isBlocked,
   parseCart,
   removeItem,
+  restoreItem,
   serializeCart,
   setQuantity,
 } from '@/entities/cart/lib';
@@ -20,11 +21,18 @@ import type { CartItem, CartNotices, CheckState } from '@/entities/cart/types';
 // гидратации (`cartMounted`), чтобы разметка сервера и клиента совпала.
 
 export const MAX_COMMENT_LENGTH = 500;
+/** Сколько после удаления видна плашка «… — убрано · Вернуть», мс. */
+export const UNDO_MS = 5000;
+
+/** Последняя убранная позиция и её место в списке — для «Вернуть». */
+export type RemovedItem = { item: CartItem; index: number };
 
 export const cartMounted = createEvent();
 export const variantAdded = createEvent<CartItem>();
 export const quantityChanged = createEvent<{ variantId: string; quantity: number }>();
 export const itemRemoved = createEvent<string>();
+/** «Вернуть» последнюю убранную позицию — пока не прошло UNDO_MS. */
+export const itemRestored = createEvent();
 export const cartCleared = createEvent();
 /** Открыть корзину; цены и наличие перепроверяются для магазина с этим поддоменом (FR-V7). */
 export const cartOpened = createEvent<string>();
@@ -57,8 +65,40 @@ export const $items = createStore<CartItem[]>([], { name: 'cart.items' })
   .on(readCartFx.doneData, (_, restored) => restored)
   .on(variantAdded, addItem)
   .on(quantityChanged, (items, { variantId, quantity }) => setQuantity(items, variantId, quantity))
-  .on(itemRemoved, removeItem)
   .reset(cartCleared);
+
+// убираем позицию и запоминаем её с местом в списке, чтобы можно было вернуть
+const removedWithPlace = sample({
+  clock: itemRemoved,
+  source: $items,
+  filter: (items, variantId) => items.some((item) => item.variantId === variantId),
+  fn: (items, variantId): RemovedItem => {
+    const index = items.findIndex((item) => item.variantId === variantId);
+    return { item: items[index]!, index };
+  },
+});
+$items.on(removedWithPlace, (items, { item }) => removeItem(items, item.variantId));
+
+// плашка «Вернуть» живёт UNDO_MS, потом позиция забывается
+export const forgetRemovedFx = createEffect(
+  (removed: RemovedItem) => new Promise<RemovedItem>((resolve) => setTimeout(() => resolve(removed), UNDO_MS)),
+);
+sample({ clock: removedWithPlace, target: forgetRemovedFx });
+
+export const $removed = createStore<RemovedItem | null>(null, { name: 'cart.removed' })
+  .on(removedWithPlace, (_, removed) => removed)
+  // забываем только ту позицию, для которой шёл таймер, а не убранную позже
+  .on(forgetRemovedFx.doneData, (current, expired) => (current === expired ? null : current))
+  .reset(cartCleared);
+
+// «Вернуть»: позиция встаёт на прежнее место, плашка исчезает
+const restored = sample({
+  clock: itemRestored,
+  source: { items: $items, removed: $removed },
+  filter: (source): source is { items: CartItem[]; removed: RemovedItem } => source.removed !== null,
+});
+$items.on(restored, (_, { items, removed }) => restoreItem(items, removed));
+$removed.on(restored, () => null);
 
 /** Корзина прочитана из хранилища; до этого записывать нельзя — затрём сохранённое пустой. */
 const $restored = createStore(false, { name: 'cart.restored' }).on(readCartFx.finally, () => true);

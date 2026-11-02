@@ -6,12 +6,14 @@ import { formatPhone, instagramLink, ShopAvatar, twoGisLink, whatsappLink } from
 import { useIsDesktop } from '@/shared/hooks';
 import { Icon } from '@/shared/ui';
 
+import { ContactLink } from './contact-link';
 import { CopyAddressButton } from './copy-address-button';
 import { ScheduleList } from './schedule-list';
 
 /**
  * «О магазине»: как найти, график, контакты. Телефон: шторка с логотипом, разделами и описанием.
  * Компьютер: выпадающая панель под названием слева — только адрес, график и контакты строкой (макет S8).
+ * Контакты — со значками WhatsApp и Instagram (макет «О магазине: контакты», 2026-11-02).
  */
 export function AboutShopSheet({ shop, open, onClose }: { shop: StorefrontShop; open: boolean; onClose: () => void }) {
   const desktop = useIsDesktop();
@@ -44,24 +46,10 @@ export function AboutShopSheet({ shop, open, onClose }: { shop: StorefrontShop; 
           </>
         )}
         <ScheduleList schedule={shop.schedule} timezone={shop.timezone} compact />
-        <div className="mt-3 flex gap-2 text-[14px]">
-          <a
-            href={whatsappLink(shop.whatsapp)}
-            target="_blank"
-            rel="noreferrer"
-            className="press flex-1 rounded-[14px] bg-mint-soft px-3 py-2.5 text-mint-ink tabular-nums hover:bg-mint-soft-hover"
-          >
-            WhatsApp {formatPhone(shop.whatsapp)}
-          </a>
+        <div className="mt-3 flex gap-2">
+          <ContactLink kind="whatsapp" href={whatsappLink(shop.whatsapp)} value={formatPhone(shop.whatsapp)} compact />
           {shop.instagram && (
-            <a
-              href={instagramLink(shop.instagram)}
-              target="_blank"
-              rel="noreferrer"
-              className="press rounded-[14px] bg-[#f6f5fb] px-3 py-2.5 hover:bg-chip-haze"
-            >
-              {shop.instagram}
-            </a>
+            <ContactLink kind="instagram" href={instagramLink(shop.instagram)} value={shop.instagram} compact />
           )}
         </div>
       </Sheet>
@@ -113,26 +101,8 @@ export function AboutShopSheet({ shop, open, onClose }: { shop: StorefrontShop; 
         <Trans>Связаться</Trans>
       </h3>
       <div className="mt-2 flex flex-col gap-2">
-        <a
-          href={whatsappLink(shop.whatsapp)}
-          target="_blank"
-          rel="noreferrer"
-          className="press flex h-[52px] items-center justify-between rounded-field bg-mint-soft px-4 text-mint-ink hover:bg-mint-soft-hover"
-        >
-          <span className="text-[15px] font-semibold">WhatsApp</span>
-          <span className="text-[14px] tabular-nums">{formatPhone(shop.whatsapp)}</span>
-        </a>
-        {shop.instagram && (
-          <a
-            href={instagramLink(shop.instagram)}
-            target="_blank"
-            rel="noreferrer"
-            className="press flex h-[52px] items-center justify-between rounded-field bg-[#f6f5fb] px-4 hover:bg-chip-haze"
-          >
-            <span className="text-[15px] font-semibold">Instagram</span>
-            <span className="text-[14px] text-ink-quiet">{shop.instagram}</span>
-          </a>
-        )}
+        <ContactLink kind="whatsapp" href={whatsappLink(shop.whatsapp)} value={formatPhone(shop.whatsapp)} />
+        {shop.instagram && <ContactLink kind="instagram" href={instagramLink(shop.instagram)} value={shop.instagram} />}
       </div>
 
       {shop.description && <p className="mt-4 text-[14px] leading-[1.55] text-ink-soft">{shop.description}</p>}

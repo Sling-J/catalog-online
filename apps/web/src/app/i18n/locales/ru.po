@@ -31,22 +31,25 @@ msgstr "{0} — {name}"
 
 #. placeholder {0}: item.variantLabel
 #. placeholder {1}: item.quantity
-msgid "{0} · {1} шт."
-msgstr "{0} · {1} шт."
+#~ msgid "{0} · {1} шт."
+#~ msgstr "{0} · {1} шт."
 
 #. placeholder {0}: item.variantLabel
 msgid "{0} закончился"
 msgstr "{0} закончился"
 
 #. placeholder {0}: item.quantity
-msgid "{0} шт."
-msgstr "{0} шт."
+#~ msgid "{0} шт."
+#~ msgstr "{0} шт."
 
 msgid "{count, plural, one {# товар в корзине} few {# товара в корзине} many {# товаров в корзине} other {# товара в корзине}}"
 msgstr "{count, plural, one {# товар в корзине} few {# товара в корзине} many {# товаров в корзине} other {# товара в корзине}}"
 
 msgid "{name} — каталог с ценами и наличием"
 msgstr "{name} — каталог с ценами и наличием"
+
+msgid "{name} — убрано"
+msgstr "{name} — убрано"
 
 msgid "{productName} — {price} · {shopName}"
 msgstr "{productName} — {price} · {shopName}"
@@ -117,6 +120,9 @@ msgstr "Ваш WhatsApp"
 
 msgid "Ваш WhatsApp · 1"
 msgstr "Ваш WhatsApp · 1"
+
+msgid "Вернуть"
+msgstr "Вернуть"
 
 msgid "Вернуться в каталог"
 msgstr "Вернуться в каталог"

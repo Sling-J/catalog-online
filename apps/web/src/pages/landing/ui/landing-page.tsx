@@ -15,8 +15,8 @@ export function LandingPage({ registerUrl, demoShopUrl }: { registerUrl: string;
     <div className="relative min-h-dvh overflow-hidden bg-lilac-field font-sans text-ink-night selection:bg-sun selection:text-ink-night">
       {/* световые пятна фона медленно плывут */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute top-[200px] -left-[10%] size-[700px] rounded-full bg-[radial-gradient(circle,rgb(255_255_255/0.55),rgb(255_255_255/0)_65%)] motion-safe:animate-blob" />
-        <div className="absolute top-[900px] -right-[12%] size-[760px] rounded-full bg-[radial-gradient(circle,rgb(255_210_63/0.35),rgb(255_210_63/0)_65%)] motion-safe:animate-blob" />
+        <div className="absolute top-50 left-[-10%] size-175 rounded-full bg-[radial-gradient(circle,rgb(255_255_255/0.55),rgb(255_255_255/0)_65%)] motion-safe:animate-blob" />
+        <div className="absolute top-225 right-[-12%] size-190 rounded-full bg-[radial-gradient(circle,rgb(255_210_63/0.35),rgb(255_210_63/0)_65%)] motion-safe:animate-blob" />
       </div>
       <div className="relative">
         <LandingHeader registerUrl={registerUrl} />

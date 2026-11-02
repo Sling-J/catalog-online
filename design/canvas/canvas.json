@@ -312,6 +312,27 @@
       "w": 1640,
       "x": 0,
       "y": 51760
+    },
+    "StoreContacts.dc.html": {
+      "h": 1380,
+      "title": "Витрина — «О магазине»: контакты со значками WhatsApp и Instagram",
+      "w": 1560,
+      "x": 5760,
+      "y": 9980
+    },
+    "StoreCartRemove.dc.html": {
+      "h": 1660,
+      "title": "Витрина — корзина: счётчик «− N +», «Вернуть», комментарий на компьютере",
+      "w": 1040,
+      "x": 7400,
+      "y": 9980
+    },
+    "StoreCartRemoveVariants.dc.html": {
+      "h": 3260,
+      "title": "Корзина — невыбранные варианты удаления",
+      "w": 1040,
+      "x": 0,
+      "y": 54000
     }
   },
   "createdOnFiles": {
@@ -336,7 +357,8 @@
     "subArchLanding",
     "subArchStore",
     "secCheck",
-    "secCheck3"
+    "secCheck3",
+    "secCheck5"
   ],
   "notes": {
     "nChosen": {
@@ -450,6 +472,14 @@
       "w": 240,
       "x": 0,
       "y": 51500
+    },
+    "secCheck5": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Витрина: корзина — невыбранные варианты удаления (выбран счётчик со значком корзины, 2026-11-02)",
+      "w": 240,
+      "x": 0,
+      "y": 53740
     }
   },
   "order": [
@@ -461,6 +491,8 @@
     "StoreV6DeskModal.dc.html",
     "StoreFiltersDesk.dc.html",
     "StorePreview.dc.html",
+    "StoreContacts.dc.html",
+    "StoreCartRemove.dc.html",
     "StoreStates.dc.html",
     "StoreStatesDesk.dc.html",
     "AdminPhone.dc.html",
@@ -489,7 +521,8 @@
     "StoreV3.dc.html",
     "StoreV4.dc.html",
     "StoreV5.dc.html",
-    "StoreFiltersDeskVariants.dc.html"
+    "StoreFiltersDeskVariants.dc.html",
+    "StoreCartRemoveVariants.dc.html"
   ],
   "pages": [],
   "title": "catalog-online — дизайн"

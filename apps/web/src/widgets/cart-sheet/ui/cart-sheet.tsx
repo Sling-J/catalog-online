@@ -2,6 +2,7 @@ import { Sheet } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useQuery } from '@tanstack/react-query';
 import { useUnit } from 'effector-react';
+import { Fragment } from 'react';
 
 import {
   $checkState,
@@ -10,10 +11,12 @@ import {
   $notices,
   $open,
   $payable,
+  $removed,
   $total,
   cartClosed,
   commentChanged,
   itemRemoved,
+  itemRestored,
   MAX_COMMENT_LENGTH,
   quantityChanged,
 } from '@/entities/cart';
@@ -23,6 +26,7 @@ import { useIsDesktop } from '@/shared/hooks';
 import { formatPrice } from '@/shared/lib';
 
 import { CartLine } from './cart-line';
+import { UndoLine } from './undo-line';
 
 /**
  * Корзина шторкой снизу на телефоне, выпадающей панелью под кнопкой корзины на компьютере. При открытии цены
@@ -34,7 +38,7 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
   const { t } = useLingui();
   const desktop = useIsDesktop();
   const { data: shop } = useQuery(shopQueryOptions(subdomain));
-  const { open, items, payable, notices, checkState, total, comment, sentOrder } = useUnit({
+  const { open, items, payable, notices, checkState, total, comment, sentOrder, removed } = useUnit({
     open: $open,
     items: $items,
     payable: $payable,
@@ -43,11 +47,13 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
     total: $total,
     comment: $comment,
     sentOrder: $sentOrder,
+    removed: $removed,
   });
-  const { close, setQuantity, remove, setComment } = useUnit({
+  const { close, setQuantity, remove, restore, setComment } = useUnit({
     close: cartClosed,
     setQuantity: quantityChanged,
     remove: itemRemoved,
+    restore: itemRestored,
     setComment: commentChanged,
   });
   const hasChanges = Object.keys(notices).length > 0;
@@ -74,55 +80,63 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
             </p>
           )}
 
-          {items.length === 0 ? (
+          {items.length === 0 && !removed ? (
             <p className="text-[14px] text-ink-quiet">
               <Trans>Пока пусто. Откройте товар и выберите размер.</Trans>
             </p>
           ) : (
             <>
               <ul className="flex flex-col gap-3">
-                {items.map((item) => (
-                  <CartLine
-                    key={item.variantId}
-                    item={item}
-                    notices={notices[item.variantId]}
-                    compact={desktop}
-                    onQuantity={(quantity) => setQuantity({ variantId: item.variantId, quantity })}
-                    onRemove={() => remove(item.variantId)}
-                    onNavigate={close}
-                  />
+                {items.map((item, index) => (
+                  <Fragment key={item.variantId}>
+                    {removed?.index === index && <UndoLine name={removed.item.name} onRestore={restore} />}
+                    <CartLine
+                      item={item}
+                      notices={notices[item.variantId]}
+                      compact={desktop}
+                      onQuantity={(quantity) => setQuantity({ variantId: item.variantId, quantity })}
+                      onRemove={() => remove(item.variantId)}
+                      onNavigate={close}
+                    />
+                  </Fragment>
                 ))}
+                {removed && removed.index >= items.length && <UndoLine name={removed.item.name} onRestore={restore} />}
               </ul>
 
-              <input
-                value={comment}
-                onChange={(event) => setComment(event.target.value)}
-                maxLength={MAX_COMMENT_LENGTH}
-                placeholder={t`Комментарий для магазина`}
-                aria-label={t`Комментарий для магазина`}
-                className="mt-4 h-12 w-full rounded-field bg-[#f6f5fb] px-3.5 text-[15px] text-ink-night outline-none placeholder:text-ink-muted focus:ring-2 focus:ring-ink-night lg:mt-3.5 lg:h-[46px] lg:rounded-[14px] lg:text-[14px]"
-              />
+              {/* убрали последний товар — пока видна «Вернуть», итога и кнопки нет */}
+              {items.length > 0 && (
+                <>
+                  <input
+                    value={comment}
+                    onChange={(event) => setComment(event.target.value)}
+                    maxLength={MAX_COMMENT_LENGTH}
+                    placeholder={t`Комментарий для магазина`}
+                    aria-label={t`Комментарий для магазина`}
+                    className="mt-4 h-12 w-full rounded-field bg-[#f6f5fb] px-3.5 text-[15px] text-ink-night outline-none placeholder:text-ink-muted focus:ring-2 focus:ring-ink-night lg:mt-3.5 lg:h-11 lg:rounded-[14px] lg:text-[14px]"
+                  />
 
-              <div className="mt-[18px] flex items-baseline justify-between lg:mt-4">
-                <span className="text-[15px] text-ink-soft lg:text-[14px]">
-                  <Trans>Итого</Trans>
-                </span>
-                <span className="text-[22px] font-extrabold tabular-nums lg:text-[20px]">{formatPrice(total)}</span>
-              </div>
+                  <div className="mt-[18px] flex items-baseline justify-between lg:mt-3.5">
+                    <span className="text-[15px] text-ink-soft lg:text-[14px]">
+                      <Trans>Итого</Trans>
+                    </span>
+                    <span className="text-[22px] font-extrabold tabular-nums lg:text-[20px]">{formatPrice(total)}</span>
+                  </div>
 
-              <div className="mt-3.5 lg:mt-3">
-                <OrderButton
-                  subdomain={subdomain}
-                  shop={shop ?? { name: '', whatsapp: '' }}
-                  items={payable}
-                  total={total}
-                  comment={comment}
-                  disabled={!shop || checkState === 'loading'}
-                />
-                <p className="mt-2.5 text-center text-[12px] text-ink-muted lg:hidden">
-                  <Trans>Откроется WhatsApp с готовым сообщением для магазина</Trans>
-                </p>
-              </div>
+                  <div className="mt-3.5 lg:mt-3">
+                    <OrderButton
+                      subdomain={subdomain}
+                      shop={shop ?? { name: '', whatsapp: '' }}
+                      items={payable}
+                      total={total}
+                      comment={comment}
+                      disabled={!shop || checkState === 'loading'}
+                    />
+                    <p className="mt-2.5 text-center text-[12px] text-ink-muted lg:hidden">
+                      <Trans>Откроется WhatsApp с готовым сообщением для магазина</Trans>
+                    </p>
+                  </div>
+                </>
+              )}
             </>
           )}
         </>

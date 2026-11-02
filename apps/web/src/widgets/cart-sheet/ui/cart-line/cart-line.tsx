@@ -5,11 +5,12 @@ import { Link } from '@tanstack/react-router';
 import { isBlocked, MAX_ITEM_QUANTITY, type CartItem, type CartNotice } from '@/entities/cart';
 import { productPath } from '@/entities/product';
 import { formatPrice } from '@/shared/lib';
+import { Icon } from '@/shared/ui';
 
 /**
- * Строка корзины: миниатюра, название, вариант, сумма и плашки изменений под строкой.
- * Телефон: количество «− N +», на единице «−» убирает позицию. Компьютер (`compact`): как в макете выпадающей
- * панели — «вариант · N шт.» и сумма справа, без изменения количества.
+ * Строка корзины: миниатюра, название, вариант, сумма, справа количество «− N +» (на единице вместо «−» значок
+ * корзины — убрать позицию), под строкой плашки изменений. На компьютере (`compact`) всё чуть мельче
+ * (макет «Витрина — корзина», 2026-11-02).
  */
 export function CartLine({
   item,
@@ -31,6 +32,7 @@ export function CartLine({
   const blocked = isBlocked(notices);
   const limit = Math.min(item.maxQuantity ?? MAX_ITEM_QUANTITY, MAX_ITEM_QUANTITY);
   const sum = formatPrice(item.price * item.quantity);
+  const stepper = compact ? 'size-[30px] text-[16px]' : 'size-[34px] text-[17px]';
 
   return (
     <li className="flex flex-col gap-2">
@@ -52,49 +54,42 @@ export function CartLine({
 
         <div className="min-w-0 flex-1">
           <p className={cx('truncate font-semibold', compact ? 'text-[14px]' : 'text-[15px]')}>{item.name}</p>
-          <p className="text-[13px] text-ink-quiet">
-            {compact && !blocked ? (
-              item.variantLabel ? (
-                <Trans>
-                  {item.variantLabel} · {item.quantity} шт.
-                </Trans>
-              ) : (
-                <Trans>{item.quantity} шт.</Trans>
-              )
-            ) : (
-              item.variantLabel
-            )}
+          <p className="text-[13px] text-ink-quiet">{item.variantLabel}</p>
+          <p className={cx('mt-px font-extrabold tabular-nums', compact ? 'text-[14px]' : 'mt-0.5 text-[15px]')}>
+            {sum}
           </p>
-          {!compact && <p className="mt-0.5 text-[15px] font-extrabold tabular-nums">{sum}</p>}
         </div>
 
-        {compact ? (
-          <p className="flex-none text-[14px] font-extrabold tabular-nums">{sum}</p>
-        ) : (
-          !blocked && (
-            <div className="flex flex-none items-center gap-0.5 rounded-pill bg-[#f1effa] p-[3px]">
-              <button
-                type="button"
-                aria-label={item.quantity > 1 ? t`Меньше` : t`Убрать из корзины`}
-                onClick={() => (item.quantity > 1 ? onQuantity(item.quantity - 1) : onRemove())}
-                className="size-[34px] rounded-full bg-white text-[17px] font-bold hover:bg-chip-haze"
-              >
-                −
-              </button>
-              <span aria-live="polite" className="min-w-6 text-center text-[15px] font-bold tabular-nums">
-                {item.quantity}
-              </span>
-              <button
-                type="button"
-                aria-label={t`Больше`}
-                disabled={item.quantity >= limit}
-                onClick={() => onQuantity(item.quantity + 1)}
-                className="size-[34px] rounded-full bg-white text-[17px] font-bold hover:bg-chip-haze disabled:opacity-40"
-              >
-                +
-              </button>
-            </div>
-          )
+        {!blocked && (
+          <div className="flex flex-none items-center gap-0.5 rounded-pill bg-[#f1effa] p-[3px]">
+            {/* на единице «−» становится корзиной: видно, что нажатие уберёт товар */}
+            <button
+              type="button"
+              aria-label={item.quantity > 1 ? t`Меньше` : t`Убрать из корзины`}
+              onClick={() => (item.quantity > 1 ? onQuantity(item.quantity - 1) : onRemove())}
+              className={cx(
+                'flex items-center justify-center rounded-full bg-white font-bold hover:bg-chip-haze',
+                stepper,
+              )}
+            >
+              {item.quantity > 1 ? '−' : <Icon name="trash" size={compact ? 15 : 17} />}
+            </button>
+            <span
+              aria-live="polite"
+              className={cx('min-w-[22px] text-center font-bold tabular-nums', compact ? 'text-[14px]' : 'text-[15px]')}
+            >
+              {item.quantity}
+            </span>
+            <button
+              type="button"
+              aria-label={t`Больше`}
+              disabled={item.quantity >= limit}
+              onClick={() => onQuantity(item.quantity + 1)}
+              className={cx('rounded-full bg-white font-bold hover:bg-chip-haze disabled:opacity-40', stepper)}
+            >
+              +
+            </button>
+          </div>
         )}
       </div>
       <Notices item={item} notices={notices} compact={compact} onRemove={onRemove} />

@@ -25,6 +25,16 @@ export function setQuantity(items: CartItem[], variantId: string, quantity: numb
 export const removeItem = (items: CartItem[], variantId: string): CartItem[] =>
   items.filter((item) => item.variantId !== variantId);
 
+/**
+ * «Вернуть» убранную позицию на прежнее место. Если тот же вариант за это время снова положили в корзину,
+ * количества складываются (не больше остатка).
+ */
+export function restoreItem(items: CartItem[], removed: { item: CartItem; index: number }): CartItem[] {
+  if (items.some((item) => item.variantId === removed.item.variantId)) return addItem(items, removed.item);
+  const index = Math.min(removed.index, items.length);
+  return [...items.slice(0, index), removed.item, ...items.slice(index)];
+}
+
 export const cartCount = (items: CartItem[]): number => items.reduce((sum, item) => sum + item.quantity, 0);
 
 export const cartTotal = (items: CartItem[]): number =>

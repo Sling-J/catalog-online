@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { CartItem } from '../../types';
-import { addItem, cartCount, cartTotal, removeItem, setQuantity } from '../cart-items';
+import { addItem, cartCount, cartTotal, removeItem, restoreItem, setQuantity } from '../cart-items';
 import { parseCart, serializeCart } from '../cart-storage';
 
 const item = (overrides: Partial<CartItem> = {}): CartItem => ({
@@ -72,5 +72,22 @@ describe('parseCart', () => {
   it('битые позиции отбрасываются, остальные остаются', () => {
     const raw = JSON.stringify([item(), { variantId: 'x' }, item({ variantId: 'v3', quantity: 0 }), 42, null]);
     expect(parseCart(raw).map((i) => i.variantId)).toEqual(['v1']);
+  });
+});
+
+describe('вернуть убранную позицию', () => {
+  it('ставит на прежнее место', () => {
+    const items = [item({ variantId: 'a' }), item({ variantId: 'c' })];
+    expect(restoreItem(items, { item: item({ variantId: 'b' }), index: 1 }).map((i) => i.variantId)).toEqual([
+      'a',
+      'b',
+      'c',
+    ]);
+    expect(restoreItem([], { item: item({ variantId: 'b' }), index: 3 }).map((i) => i.variantId)).toEqual(['b']);
+  });
+
+  it('складывает количество, если вариант снова положили в корзину', () => {
+    const restored = restoreItem([item({ quantity: 1 })], { item: item({ quantity: 2 }), index: 0 });
+    expect(restored.map((i) => [i.variantId, i.quantity])).toEqual([['v1', 3]]);
   });
 });

@@ -138,8 +138,8 @@ body{margin:0;background:#FBFAFF}
 </div>
 <div style="margin-top: 14px; font-weight: 700; font-size: 15px">Связаться</div>
 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px">
-<div style="display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 16px; border-radius: 16px; background: #E6FBF2"><span style="font-weight: 600; font-size: 15px; color: #0B3A28">WhatsApp</span><span style="font-size: 14px; color: #0B3A28; font-variant-numeric: tabular-nums">+7 700 000 00 00</span></div>
-<div style="display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 16px; border-radius: 16px; background: #F6F5FB"><span style="font-weight: 600; font-size: 15px">Instagram</span><span style="font-size: 14px; color: #4A4580">@aigerim.kids</span></div>
+<div style="display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 14px; border-radius: 16px; background: #E6FBF2"><span style="width: 36px; height: 36px; flex: none; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"></path><path d="M9.5 9.5c.3 1.8 1.7 3.6 4 4.6l1.2-1.2 1.8.8-.4 1.6c-3.4.2-7.4-3.4-7.6-7l1.6-.4.8 1.8z"></path></svg></span><div style="flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap"><span style="font-weight: 600; font-size: 15px">WhatsApp</span><span style="font-size: 13px; color: #4A4580; font-variant-numeric: tabular-nums; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">+7 700 000 00 00</span></div><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B6694" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M7 17L17 7"></path><path d="M9 7h8v8"></path></svg></div>
+<div style="display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 14px; border-radius: 16px; background: #F6F5FB"><span style="width: 36px; height: 36px; flex: none; border-radius: 11px; background: radial-gradient(circle at 30% 107%, #FDF497 0%, #FDF497 5%, #FD5949 45%, #D6249F 60%, #285AEB 90%); display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r="1" fill="#ffffff" stroke="none"></circle></svg></span><div style="flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap"><span style="font-weight: 600; font-size: 15px">Instagram</span><span style="font-size: 13px; color: #4A4580; font-variant-numeric: tabular-nums; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">@aigerim.kids</span></div><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B6694" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M7 17L17 7"></path><path d="M9 7h8v8"></path></svg></div>
 </div>
 <p style="margin: 16px 0 0; font-size: 14px; line-height: 1.55; color: #3A3672">Одежда и обувь для детей от 1 до 10 лет. Новые поступления каждую неделю. Если нужного размера нет — напишите, привезём под заказ.</p>
 </sc-if>
@@ -159,15 +159,12 @@ body{margin:0;background:#FBFAFF}
 <sc-if value="{{sheetCart}}" hint-placeholder-val="{{ false }}">
 <div style="font-weight: 800; font-size: 20px">Корзина</div>
 <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px">
+<sc-if value="{{hasUndo}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 14px; border-radius: 16px; background: #F6F5FB; font-size: 14px; color: #4A4580"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{undoName}} — убрано</span><button class="s6-btn" type="button" onClick="{{undo}}" style="flex: none; margin-left: 12px; border: 0; background: transparent; padding: 6px 0; font: 700 14px Geologica, sans-serif; color: #3B2FD9">Вернуть</button></div></sc-if>
 <sc-for list="{{cartItems}}" as="it" hint-placeholder-count="2">
 <div style="display: flex; gap: 12px; align-items: center">
 <img src="{{it.img}}" alt="" style="width: 64px; height: 64px; border-radius: 16px; object-fit: cover; background: #EEECF8; flex: none">
 <div style="flex: 1; min-width: 0"><div style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.name}}</div><div style="font-size: 13px; color: #4A4580">{{it.size}}</div><div style="font-weight: 800; font-size: 15px; margin-top: 2px; font-variant-numeric: tabular-nums">{{it.price}}</div></div>
-<div style="display: flex; align-items: center; gap: 2px; border-radius: 999px; background: #F1EFFA; padding: 3px">
-<button class="s6-btn" type="button" onClick="{{it.minus}}" aria-label="Меньше" style="width: 34px; height: 34px; border: 0; border-radius: 50%; background: #ffffff; font: 700 17px Geologica, sans-serif; color: #17133D">−</button>
-<span style="min-width: 24px; text-align: center; font-weight: 700; font-size: 15px">{{it.qty}}</span>
-<button class="s6-btn" type="button" onClick="{{it.plus}}" aria-label="Больше" style="width: 34px; height: 34px; border: 0; border-radius: 50%; background: #ffffff; font: 700 17px Geologica, sans-serif; color: #17133D">+</button>
-</div>
+<div style="flex: none; display: flex; align-items: center; gap: 2px; border-radius: 999px; background: #F1EFFA; padding: 3px"><button class="s6-btn" type="button" onClick="{{it.minus}}" aria-label="{{it.minusLabel}}" style="border: 0; width: 34px; height: 34px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; font: 700 17px Geologica, sans-serif; color: #17133D"><sc-if value="{{it.single}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#17133D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5h6V7"></path><path d="M6.5 7l1 12.5h9l1-12.5"></path></svg></sc-if><sc-if value="{{it.many}}" hint-placeholder-val="{{ true }}">−</sc-if></button><span style="min-width: 22px; text-align: center; font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums">{{it.qty}}</span><button class="s6-btn" type="button" onClick="{{it.plus}}" aria-label="Больше" style="border: 0; width: 34px; height: 34px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; font: 700 17px Geologica, sans-serif; color: #17133D">+</button></div>
 </div>
 </sc-for>
 </div>
@@ -193,7 +190,7 @@ body{margin:0;background:#FBFAFF}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { cat: 'all', sort: 0, open: -1, photo: 0, size: null, sheet: null, cart: [], fs: [], inStock: true, order: 127 };
+    this.state = { cat: 'all', sort: 0, open: -1, photo: 0, size: null, sheet: null, cart: [], fs: [], inStock: true, order: 127, removed: null };
   }
   renderVals() {
     var s = this.state, self = this, B = '/_blob/';
@@ -276,10 +273,20 @@ class Component extends DCLogic {
       var p = P[c.i];
       return {
         img: B + p[3][0], name: p[0], size: c.size === 'Один размер' ? c.size : (p[1] === 'shoes' ? 'Размер ' : 'Рост ') + c.size, price: fmt(p[2] * c.qty), qty: c.qty,
+        single: c.qty === 1, many: c.qty > 1, minusLabel: c.qty > 1 ? 'Меньше' : 'Убрать из корзины',
         plus: function () { var n = s.cart.slice(); n[k] = { i: c.i, size: c.size, qty: Math.min(c.qty + 1, p[4]) }; set({ cart: n }); },
-        minus: function () { var n = s.cart.slice(); if (c.qty > 1) n[k] = { i: c.i, size: c.size, qty: c.qty - 1 }; else n.splice(k, 1); set({ cart: n, sheet: n.length ? 'cart' : null }); }
+        minus: function () {
+          var n = s.cart.slice();
+          if (c.qty > 1) { n[k] = { i: c.i, size: c.size, qty: c.qty - 1 }; set({ cart: n }); return; }
+          n.splice(k, 1);
+          var token = Date.now();
+          set({ cart: n, removed: { k: k, c: c, token: token } });
+          setTimeout(function () { if (self.state.removed && self.state.removed.token === token) set({ removed: null, sheet: self.state.cart.length ? self.state.sheet : (self.state.sheet === 'cart' ? null : self.state.sheet) }); }, 5000);
+        }
       };
     });
+    v.hasUndo = !!s.removed; v.undoName = s.removed ? P[s.removed.c.i][0] : '';
+    v.undo = function () { if (!s.removed) return; var n = s.cart.slice(); n.splice(Math.min(s.removed.k, n.length), 0, s.removed.c); set({ cart: n, removed: null }); };
     v.sendOrder = function () { set({ sheet: 'sent', cart: [], order: s.order + 1 }); };
     v.orderNo = s.order;
     v.sheetInfo = s.sheet === 'info'; v.sheetFilters = s.sheet === 'filters'; v.sheetCart = s.sheet === 'cart'; v.sheetSent = s.sheet === 'sent';
