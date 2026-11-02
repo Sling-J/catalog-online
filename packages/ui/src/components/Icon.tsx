@@ -22,7 +22,9 @@ export type IconName =
   | 'external'
   | 'copy-square'
   | 'mail'
-  | 'warning';
+  | 'warning'
+  | 'camera'
+  | 'image';
 
 // Контурные иконки 24×24, штрих берут от `currentColor`. Общие для витрины и админки.
 const glyphs: Record<IconName, ReactNode> = {
@@ -128,6 +130,20 @@ const glyphs: Record<IconName, ReactNode> = {
     <>
       <path d="M12 4l9 16H3z" />
       <path d="M12 10v4M12 17.5v.01" />
+    </>
+  ),
+  // мастер, шаг 4: снять логотип или выбрать из галереи
+  camera: (
+    <>
+      <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </>
+  ),
+  image: (
+    <>
+      <rect x="4" y="4" width="16" height="16" rx="3" />
+      <circle cx="9" cy="9" r="1.6" />
+      <path d="M20 16l-5-5-9 9" />
     </>
   ),
   external: (

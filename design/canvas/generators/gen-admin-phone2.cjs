@@ -51,7 +51,7 @@ S.push(["Настройка, шаг 2 из 4: адрес витрины", `<div 
 <div style="margin-top: 8px; font-size: 13px; font-weight: 600; color: ${C.inS}">Адрес свободен</div>
 <div style="margin-top: 14px; font-size: 13px; line-height: 1.5; color: ${C.muted}">Латиница, цифры и дефис, от 3 до 30 символов. Придумали по названию — можно поменять.</div>
 <div style="margin-top: 26px; padding: 14px; border-radius: 20px; background: ${C.mist}"><div style="font-size: 13px; font-weight: 600; color: ${C.quiet}">Так ссылка будет выглядеть в WhatsApp</div>
-<div style="display: flex; gap: 10px; margin-top: 10px; padding: 10px; border-radius: 14px; background: #ffffff">${thumb("jacket", 52, 10)}<div style="font-size: 13px; line-height: 1.4"><b>Айгерим Kids — каталог</b><div style="color: ${C.quiet}">aigerim-kids.[сервис].kz</div></div></div></div>
+<div style="display: flex; gap: 10px; margin-top: 10px; padding: 10px; border-radius: 14px; background: #ffffff"><span style="width: 52px; height: 52px; border-radius: 10px; flex: none; background: linear-gradient(140deg, #FF9CC8, #7C6CFF); color: #ffffff; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center">АK</span><div style="font-size: 13px; line-height: 1.4"><b>Айгерим Kids — каталог</b><div style="color: ${C.quiet}">aigerim-kids.[сервис].kz</div></div></div></div>
 </div>` + bottom(`<div style="display: flex; gap: 10px">${btn(sv(P.back, C.ink, 18, 2.4), "soft", "width: 52px; padding: 0")}${btn("Дальше", "dark", "flex: 1")}</div>`)]);
 
 // 3. Мастер, шаг 3 — WhatsApp

@@ -100,3 +100,53 @@ describe('моки админки: почта и пароль', () => {
     ).toBe(204);
   });
 });
+
+describe('моки админки: мастер', () => {
+  const patch = (body: unknown) =>
+    fetch('http://api.test/v1/admin/shop', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+  it('проверка адреса: свободен, занят, зарезервирован, неверный', async () => {
+    fresh();
+    const check = (value: string) =>
+      getJson<{ available: boolean; reason: string | null }>(`/admin/shop/subdomain-availability?value=${value}`);
+    expect(await check('my-shop')).toEqual({ available: true, reason: null });
+    expect(await check('aigerim-kids')).toEqual({ available: false, reason: 'taken' });
+    expect(await check('admin')).toEqual({ available: false, reason: 'reserved' });
+    expect(await check('-x')).toEqual({ available: false, reason: 'invalid' });
+  });
+
+  it('шаги мастера сохраняются в магазине и в me; занятый адрес — 409', async () => {
+    fresh();
+    await call('/auth/register', { email: 'new@shop.kz', password: '12345678' });
+    expect((await patch({ name: 'Моя лавка' })).status).toBe(200);
+    expect((await patch({ subdomain: 'aigerim-kids' })).status).toBe(409);
+    expect((await patch({ subdomain: 'moya-lavka', whatsapp: '+77001234567' })).status).toBe(200);
+    expect((await patch({ setupCompleted: true })).status).toBe(200);
+    const shop = await getJson<Shop>('/admin/shop');
+    expect(shop).toMatchObject({ name: 'Моя лавка', subdomain: 'moya-lavka', whatsapp: '+77001234567' });
+    expect((await getJson<Me>('/auth/me')).shop).toMatchObject({ subdomain: 'moya-lavka', setupCompleted: true });
+  });
+
+  it('логотип: ссылка на загрузку → PUT файла → логотип у магазина', async () => {
+    fresh();
+    await call('/auth/register', { email: 'new@shop.kz', password: '12345678' });
+    const upload = (await (
+      await call('/admin/uploads', { purpose: 'logo', fileName: 'logo.png', contentType: 'image/png', size: 3 })
+    ).json()) as { uploadId: string; url: string };
+    await fetch(upload.url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'image/png' },
+      body: new Uint8Array([1, 2, 3]),
+    });
+    const res = await fetch('http://api.test/v1/admin/shop/logo', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uploadId: upload.uploadId }),
+    });
+    expect(((await res.json()) as Shop).logo?.sizes['320']).toMatch(/^data:image\/png;base64,/);
+  });
+});

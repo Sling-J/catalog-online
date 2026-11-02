@@ -6,9 +6,10 @@ export type ButtonVariant = 'primary' | 'dark' | 'confirm' | 'soft' | 'line';
 /**
  * md — 44 px; state — кнопки пустых и служебных состояний (50 px, на компьютере 52);
  * lg — кнопки в шторках (54 px); cta — главная кнопка карточки товара (56 px, на компьютере 58);
- * form — главная кнопка форм админки (52 px); compact — кнопки в строке заголовка админки на компьютере (44 px, 14 px).
+ * form — главная кнопка форм админки (52 px); compact — кнопки в строке заголовка админки на компьютере (44 px, 14 px);
+ * small — кнопки внутри карточек админки («Снять», «Из галереи»: 44 px, отступы 16 px).
  */
-export type ButtonSize = 'md' | 'state' | 'lg' | 'cta' | 'form' | 'compact';
+export type ButtonSize = 'md' | 'state' | 'lg' | 'cta' | 'form' | 'compact' | 'small';
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
@@ -25,7 +26,8 @@ const variants: Record<ButtonVariant, string> = {
   dark: 'bg-ink-night text-white hover:bg-ink-hover',
   confirm: 'bg-mint text-mint-ink hover:bg-mint-hover',
   soft: 'bg-chip-haze text-ink-night hover:bg-haze-hover',
-  line: 'bg-white text-ink-night ring-[1.5px] ring-line ring-inset hover:ring-line-hover',
+  // рамка — настоящая, как в макетах (она входит в ширину кнопки)
+  line: 'border-[1.5px] border-line bg-white text-ink-night hover:border-line-hover',
 };
 
 const press: Partial<Record<ButtonVariant, string>> = {
@@ -48,6 +50,7 @@ const sizes: Record<ButtonSize, string> = {
   cta: 'h-14 px-6 text-[16px] lg:h-[58px] lg:text-[17px]',
   form: 'h-[52px] px-[22px] text-[15px]',
   compact: 'h-11 px-[22px] text-[14px]',
+  small: 'h-11 px-4 text-[14px]',
 };
 
 export function Button({

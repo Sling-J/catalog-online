@@ -1,1 +1,1 @@
-export { shopQueryOptions } from './shop.api';
+export { applyShop, shopQueryOptions } from './shop.api';

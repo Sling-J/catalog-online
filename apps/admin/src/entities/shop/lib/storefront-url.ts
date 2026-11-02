@@ -5,7 +5,7 @@
  */
 export function storefrontUrl(subdomain: string, pageOrigin: string): string {
   const { protocol } = new URL(pageOrigin);
-  const root = import.meta.env.VITE_ROOT_DOMAIN ?? 'localhost';
+  const root = storefrontRootDomain();
   const port = import.meta.env.VITE_STOREFRONT_PORT ?? (import.meta.env.DEV ? '3000' : '');
   return `${protocol}//${subdomain}.${root}${port ? `:${port}` : ''}`;
 }
@@ -13,4 +13,9 @@ export function storefrontUrl(subdomain: string, pageOrigin: string): string {
 /** Адрес для показа человеку: без протокола и порта. */
 export function storefrontHost(url: string): string {
   return new URL(url).hostname;
+}
+
+/** Основной домен витрин для подписи «<адрес>.<домен>» в мастере. */
+export function storefrontRootDomain(): string {
+  return import.meta.env.VITE_ROOT_DOMAIN ?? 'localhost';
 }

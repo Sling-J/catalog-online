@@ -31,7 +31,7 @@ export function SideNav({
         <ShopAvatar name={name} logo={logo} />
         <div className="min-w-0">
           <div className="truncate text-[15px] font-bold">{name}</div>
-          <ShopStatus status={status} />
+          <ShopStatus status={status} stacked />
         </div>
       </div>
       <nav aria-label={t`Разделы`} className="mt-[22px] flex flex-col gap-1">

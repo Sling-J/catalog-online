@@ -1,11 +1,16 @@
 // Обработчики MSW админки на данных демо-магазина. По умолчанию владелец «Айгерим Kids» уже вошёл и прошёл мастер;
 // регистрация открывает сессию нового магазина-черновика, выход — закрывает. Сессию можно хранить между
 // перезагрузками страницы (`storage`), иначе она живёт в памяти. Ссылки из писем: токен `expired` — устарела (410),
-// любой другой — действует. Остальные разделы добавляются со своими экранами.
-import { HttpResponse, type HttpHandler } from 'msw';
+// любой другой — действует. Мастер (T-303): название, адрес и WhatsApp помнятся в сессии, логотип — только в памяти
+// (картинка в хранилище браузера не влезает); адреса `aigerim-kids` и `skrytyj-magazin` заняты, служебные —
+// зарезервированы. Остальные разделы добавляются со своими экранами.
+import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 
 import {
   handleChangePassword,
+  handleCheckSubdomain,
+  handleCreateUpload,
+  handleDeleteShopLogo,
   handleForgotPassword,
   handleGetMe,
   handleGetProductCounts,
@@ -15,11 +20,13 @@ import {
   handleRegister,
   handleResendVerificationEmail,
   handleResetPassword,
+  handleSetShopLogo,
+  handleUpdateShop,
   handleVerifyEmail,
   type RequestHandlerOptions,
 } from '../gen/msw.gen.js';
-import type { Me, Problem, Shop } from '../gen/types.gen.js';
-import { createDemoShopData, demoShop } from './demo-shop.js';
+import type { Image, Me, Problem, Shop } from '../gen/types.gen.js';
+import { createDemoShopData, demoShop, HIDDEN_DEMO_SUBDOMAIN } from './demo-shop.js';
 
 const SHOP_ID = '0192d000-0000-7000-8000-00000000a001';
 const NEW_SHOP_ID = '0192d000-0000-7000-8000-00000000a002';
@@ -110,9 +117,27 @@ const newShop: Shop = {
   readiness: { settingsFilled: false, productCount: 0, productsWithoutPhoto: 0, canPublish: false },
 };
 
+/** Что новый магазин успел заполнить в мастере. */
+type NewShopFields = { name?: string; subdomain?: string; whatsapp?: string; setupCompleted?: boolean };
+
 /** Сессия на моках: демо-владелец, только что зарегистрированный магазин или никто. */
 type Session =
-  { kind: 'demo' } | { kind: 'new'; email: string; password: string; verified?: boolean } | { kind: 'out' };
+  | { kind: 'demo' }
+  | { kind: 'new'; email: string; password: string; verified?: boolean; shop?: NewShopFields }
+  | { kind: 'out' };
+
+const SUBDOMAIN_PATTERN = /^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])$/;
+const TAKEN_SUBDOMAINS = [demoShop.subdomain, HIDDEN_DEMO_SUBDOMAIN];
+// служебные имена (FR-A2): в API список будет полнее
+const RESERVED_SUBDOMAINS = ['www', 'app', 'api', 'admin', 'mail', 'static', 'cdn', 'help', 'support'];
+const UPLOAD_ORIGIN = 'https://uploads.mock';
+
+const subdomainProblem = (value: string): 'invalid' | 'reserved' | 'taken' | null => {
+  if (!SUBDOMAIN_PATTERN.test(value)) return 'invalid';
+  if (RESERVED_SUBDOMAINS.includes(value)) return 'reserved';
+  if (TAKEN_SUBDOMAINS.includes(value)) return 'taken';
+  return null;
+};
 
 export type DemoAdminStorage = Pick<Storage, 'getItem' | 'setItem'>;
 
@@ -143,7 +168,13 @@ const meOf = (session: Exclude<Session, { kind: 'out' }>): Me =>
           emailVerified: session.verified ?? false,
           impersonated: false,
         },
-        shop: { id: NEW_SHOP_ID, name: null, subdomain: null, status: 'draft', setupCompleted: false },
+        shop: {
+          id: NEW_SHOP_ID,
+          name: session.shop?.name ?? null,
+          subdomain: session.shop?.subdomain ?? null,
+          status: 'draft',
+          setupCompleted: session.shop?.setupCompleted ?? false,
+        },
       };
 
 export const demoAdminHandlers = ({ storage, ...options }: DemoAdminHandlersOptions = {}): HttpHandler[] => {
@@ -156,6 +187,16 @@ export const demoAdminHandlers = ({ storage, ...options }: DemoAdminHandlersOpti
     memory = session;
     storage?.setItem(SESSION_KEY, JSON.stringify(session));
   };
+  // загруженные файлы и логотип нового магазина — data: URL в памяти
+  const uploads = new Map<string, string>();
+  let logo: Image | null = null;
+  const shopOf = (session: Extract<Session, { kind: 'new' }>): Shop => ({
+    ...newShop,
+    name: session.shop?.name ?? null,
+    subdomain: session.shop?.subdomain ?? null,
+    whatsapp: session.shop?.whatsapp ?? null,
+    logo,
+  });
 
   return [
     handleRegister(async ({ request }) => {
@@ -217,7 +258,77 @@ export const demoAdminHandlers = ({ storage, ...options }: DemoAdminHandlersOpti
     handleGetShop(() => {
       const session = read();
       if (session.kind === 'out') return problem(401, 'unauthorized');
-      return HttpResponse.json(session.kind === 'demo' ? demoAdminShop : newShop);
+      return HttpResponse.json(session.kind === 'demo' ? demoAdminShop : shopOf(session));
+    }, options),
+    handleUpdateShop(async ({ request }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const body = await request.json();
+      if (body.subdomain !== undefined) {
+        const reason = subdomainProblem(body.subdomain);
+        if (reason === 'invalid')
+          return problem(422, 'validation_failed', { errors: [{ field: 'subdomain', code: 'invalid_format' }] });
+        if (reason) return problem(409, reason === 'taken' ? 'subdomain_taken' : 'subdomain_reserved');
+      }
+      if (body.whatsapp !== undefined && !/^\+7\d{10}$/.test(body.whatsapp)) {
+        return problem(422, 'validation_failed', { errors: [{ field: 'whatsapp', code: 'invalid_format' }] });
+      }
+      // демо-магазин настроен заранее: правки не сохраняем
+      if (session.kind === 'demo') return HttpResponse.json({ ...demoAdminShop, ...body });
+      // только переданные поля (PATCH)
+      const { name, subdomain, whatsapp, setupCompleted } = body;
+      const changes = Object.fromEntries(
+        Object.entries({ name, subdomain, whatsapp, setupCompleted }).filter(([, value]) => value !== undefined),
+      ) as NewShopFields;
+      const next = { ...session, shop: { ...session.shop, ...changes } };
+      write(next);
+      return HttpResponse.json(shopOf(next));
+    }, options),
+    handleCheckSubdomain(async ({ request }) => {
+      // небольшая пауза — чтобы в мастере было видно «Проверяем…»
+      await delay(400);
+      const value = new URL(request.url).searchParams.get('value') ?? '';
+      const session = read();
+      const own = session.kind === 'new' && session.shop?.subdomain === value;
+      const reason = own ? null : subdomainProblem(value);
+      return HttpResponse.json({ available: reason === null, reason });
+    }, options),
+    handleCreateUpload(async () => {
+      const uploadId = crypto.randomUUID();
+      return HttpResponse.json(
+        {
+          uploadId,
+          url: `${UPLOAD_ORIGIN}/${uploadId}`,
+          method: 'PUT' as const,
+          headers: {},
+          expiresAt: new Date(Date.now() + 10 * 60_000).toISOString(),
+        },
+        { status: 201 },
+      );
+    }, options),
+    // «хранилище»: файл приходит PUT по ссылке из createUpload
+    http.put(`${UPLOAD_ORIGIN}/:uploadId`, async ({ request, params }) => {
+      const type = request.headers.get('Content-Type') ?? 'application/octet-stream';
+      const bytes = new Uint8Array(await request.arrayBuffer());
+      let binary = '';
+      for (const byte of bytes) binary += String.fromCharCode(byte);
+      uploads.set(String(params.uploadId), `data:${type};base64,${btoa(binary)}`);
+      return new HttpResponse(null, { status: 200 });
+    }),
+    handleSetShopLogo(async ({ request }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { uploadId } = await request.json();
+      const url = uploads.get(uploadId);
+      if (!url) return problem(422, 'upload_not_found');
+      const image: Image = { width: 400, height: 400, sizes: { '320': url, '640': url, '1280': url } };
+      if (session.kind === 'demo') return HttpResponse.json({ ...demoAdminShop, logo: image });
+      logo = image;
+      return HttpResponse.json(shopOf(session));
+    }, options),
+    handleDeleteShopLogo(() => {
+      logo = null;
+      return new HttpResponse(null, { status: 204 });
     }, options),
     handleGetProductCounts(() => {
       const session = read();

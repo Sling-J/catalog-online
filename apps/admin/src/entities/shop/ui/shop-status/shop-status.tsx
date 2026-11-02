@@ -8,13 +8,34 @@ const tones: Record<Status, { text: string; dot: string }> = {
   blocked: { text: 'text-coral-underside', dot: 'bg-coral-underside' },
 };
 
-/** Статус витрины точкой и словом (макеты админки): «Опубликован» / «Черновик — витрина скрыта». */
-export function ShopStatus({ status, className }: { status: Status; className?: string }) {
+/**
+ * Статус витрины точкой и словом (макеты админки): «Опубликован» / «Черновик — витрина скрыта».
+ * `stacked` — узкая карточка в колонке компьютера (макет AdminSideDraft): «Черновик», с новой строки «Витрина скрыта»,
+ * точка у первой строки.
+ */
+export function ShopStatus({ status, stacked, className }: { status: Status; stacked?: boolean; className?: string }) {
+  const twoLines = stacked && status === 'draft';
   return (
-    <span className={cx('flex items-center gap-[5px] text-[12px] font-semibold', tones[status].text, className)}>
-      <span aria-hidden="true" className={cx('size-2 flex-none rounded-full', tones[status].dot)} />
+    <span
+      className={cx(
+        'flex gap-[5px] text-[12px] font-semibold',
+        twoLines ? 'items-start' : 'items-center',
+        tones[status].text,
+        className,
+      )}
+    >
+      <span aria-hidden="true" className={cx('size-2 flex-none rounded-full', twoLines && 'mt-1', tones[status].dot)} />
       {status === 'published' && <Trans>Опубликован</Trans>}
-      {status === 'draft' && <Trans>Черновик — витрина скрыта</Trans>}
+      {status === 'draft' &&
+        (twoLines ? (
+          <span>
+            <Trans>Черновик</Trans>
+            <br />
+            <Trans>Витрина скрыта</Trans>
+          </span>
+        ) : (
+          <Trans>Черновик — витрина скрыта</Trans>
+        ))}
       {status === 'blocked' && <Trans>Заблокирован</Trans>}
     </span>
   );

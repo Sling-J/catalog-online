@@ -1,2 +1,3 @@
 export { getInitials } from './shop-initials';
-export { storefrontHost, storefrontUrl } from './storefront-url';
+export { storefrontHost, storefrontRootDomain, storefrontUrl } from './storefront-url';
+export { SUBDOMAIN_PATTERN, subdomainFromName } from './subdomain';

@@ -142,11 +142,13 @@ ui/
 | Слой | Срезы |
 |---|---|
 | `entities` | `session` (текущий аккаунт, `meQueryOptions`, `startSession` — кеш после входа), `shop` (запрос магазина, аватар, статус витрины, адрес витрины), `product` (счётчики товаров) |
-| `features` | `copy-link` (скопировать ссылку с галочкой), `register`, `login`, `forgot-password`, `reset-password`, `change-password` (формы входа и пароля), `resend-verification` (повторное письмо: кнопка и ссылка) |
-| `widgets` | `app-shell` (меню снизу / слева, шапка телефона, «Ваша витрина»), `auth-layout` (экраны без меню: форма слева, сиреневая колонка справа на компьютере) |
-| `pages` | `register`, `login`, `forgot-password`, `reset-password`, `verify-email`, `shop-account`, `products`, `import`, `shop` (пока заглушки), `not-found`, `error` |
+| `features` | `copy-link` (скопировать ссылку с галочкой), `register`, `login`, `forgot-password`, `reset-password`, `change-password` (формы входа и пароля), `resend-verification` (повторное письмо: кнопка и ссылка), `setup-name`, `setup-address`, `setup-whatsapp`, `setup-logo` (шаги мастера) |
+| `widgets` | `app-shell` (меню снизу / слева, шапка телефона, «Ваша витрина»), `auth-layout` (экраны без меню: форма слева, сиреневая колонка справа на компьютере), `setup-layout` (экран мастера: шаги, кнопки), `setup-preview` (живое превью витрины в мастере) |
+| `pages` | `setup`, `register`, `login`, `forgot-password`, `reset-password`, `verify-email`, `shop-account`, `products`, `import`, `shop` (пока заглушки), `not-found`, `error` |
 
 > Примечание (2026-11-02, T-302): разбор ошибок API (статус, код, ошибки полей, `isUnauthorized`) — `shared/api/api-error.ts`; рабочее название сервиса — `shared/constants/service.ts`. Проверка сессии — `beforeLoad` макета `app/routes/_shell.tsx` (401 → `/login`). Общие куски форм — `shared/ui` (`FormNote`, `FormFooter`, `FormError`, `PasswordNote`, `SendAgain`, `ButtonLink`, `BackBar`), проверки почты и пароля — `shared/lib/credentials.ts`, тексты ошибок форм — `shared/hooks/use-form-messages.ts`. Вложенный экран раздела (на телефоне без шапки и меню) помечается в маршруте `staticData: { subScreen: true }` (тип — `app/router.tsx`), его читает `widgets/app-shell`.
+
+> Примечание (2026-11-02, T-303): картинки, нужные одному срезу, лежат в его сегменте `assets/` и импортируются как модули (`widgets/setup-preview/assets` — фото-пример для превью, 240 px). Магазин в кеш после сохранения — `applyShop` из `entities/shop` (перечитывает и `me`, даже без подписчиков: по нему маршруты решают, пройден ли мастер). Мастер — `app/routes/setup.tsx`, шаг в адресе (`?step=`); `_shell` ведёт в мастер, пока `setupCompleted` ложно.
 
 ## 9. Проверка правил
 

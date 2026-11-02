@@ -1,7 +1,8 @@
 import { cx } from '@catalog/ui';
 import type { ReactNode } from 'react';
 
-import { Brand } from './brand';
+import { Brand } from '@/shared/ui';
+
 import { Pitch } from './pitch';
 import { StateBadge, type StateBadgeKind } from './state-badge';
 
