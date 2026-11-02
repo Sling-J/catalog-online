@@ -31,7 +31,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         {children}
       </main>
-      {!subScreen && <BottomNav />}
+      {!subScreen && <BottomNav status={shop.status} />}
     </div>
   );
 }

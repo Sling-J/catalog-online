@@ -150,3 +150,20 @@ describe('моки админки: мастер', () => {
     expect(((await res.json()) as Shop).logo?.sizes['320']).toMatch(/^data:image\/png;base64,/);
   });
 });
+
+describe('моки админки: публикация', () => {
+  it('снятие переводит демо-магазин в черновик, публикация — обратно', async () => {
+    fresh();
+    expect(((await (await call('/admin/shop/unpublish', {})).json()) as Shop).status).toBe('draft');
+    expect((await getJson<Me>('/auth/me')).shop.status).toBe('draft');
+    expect(((await (await call('/admin/shop/publish', {})).json()) as Shop).status).toBe('published');
+  });
+
+  it('новый магазин без товаров опубликовать нельзя — 409 shop_not_ready', async () => {
+    fresh();
+    await call('/auth/register', { email: 'new@shop.kz', password: '12345678' });
+    const res = await call('/admin/shop/publish', {});
+    expect(res.status).toBe(409);
+    expect(((await res.json()) as Problem).code).toBe('shop_not_ready');
+  });
+});

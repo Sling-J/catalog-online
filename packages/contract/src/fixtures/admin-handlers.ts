@@ -3,7 +3,9 @@
 // перезагрузками страницы (`storage`), иначе она живёт в памяти. Ссылки из писем: токен `expired` — устарела (410),
 // любой другой — действует. Мастер (T-303): название, адрес и WhatsApp помнятся в сессии, логотип — только в памяти
 // (картинка в хранилище браузера не влезает); адреса `aigerim-kids` и `skrytyj-magazin` заняты, служебные —
-// зарезервированы. Остальные разделы добавляются со своими экранами.
+// зарезервированы. Публикация (T-304): снятие переводит демо-магазин в черновик — так видна главная с чек-листом;
+// опубликовать можно, когда есть товары и почта подтверждена (иначе 409 `shop_not_ready`).
+// Остальные разделы добавляются со своими экранами.
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 
 import {
@@ -17,6 +19,8 @@ import {
   handleGetShop,
   handleLogin,
   handleLogout,
+  handlePublishShop,
+  handleUnpublishShop,
   handleRegister,
   handleResendVerificationEmail,
   handleResetPassword,
@@ -122,7 +126,7 @@ type NewShopFields = { name?: string; subdomain?: string; whatsapp?: string; set
 
 /** Сессия на моках: демо-владелец, только что зарегистрированный магазин или никто. */
 type Session =
-  | { kind: 'demo' }
+  | { kind: 'demo'; draft?: boolean }
   | { kind: 'new'; email: string; password: string; verified?: boolean; shop?: NewShopFields }
   | { kind: 'out' };
 
@@ -158,9 +162,13 @@ const tooShort = (field: string): Response =>
   problem(422, 'validation_failed', { errors: [{ field, code: 'too_short', params: { min: MIN_PASSWORD } }] });
 const gone = (): Response => problem(410, 'token_expired');
 
+/** Демо-магазин в сессии: опубликован или снят с публикации. */
+const demoShopOf = (session: Extract<Session, { kind: 'demo' }>): Shop =>
+  session.draft ? { ...demoAdminShop, status: 'draft', publishedAt: null } : demoAdminShop;
+
 const meOf = (session: Exclude<Session, { kind: 'out' }>): Me =>
   session.kind === 'demo'
-    ? demoMe
+    ? { ...demoMe, shop: { ...demoMe.shop, status: session.draft ? 'draft' : 'published' } }
     : {
         account: {
           id: NEW_ACCOUNT_ID,
@@ -258,7 +266,7 @@ export const demoAdminHandlers = ({ storage, ...options }: DemoAdminHandlersOpti
     handleGetShop(() => {
       const session = read();
       if (session.kind === 'out') return problem(401, 'unauthorized');
-      return HttpResponse.json(session.kind === 'demo' ? demoAdminShop : shopOf(session));
+      return HttpResponse.json(session.kind === 'demo' ? demoShopOf(session) : shopOf(session));
     }, options),
     handleUpdateShop(async ({ request }) => {
       const session = read();
@@ -274,7 +282,7 @@ export const demoAdminHandlers = ({ storage, ...options }: DemoAdminHandlersOpti
         return problem(422, 'validation_failed', { errors: [{ field: 'whatsapp', code: 'invalid_format' }] });
       }
       // демо-магазин настроен заранее: правки не сохраняем
-      if (session.kind === 'demo') return HttpResponse.json({ ...demoAdminShop, ...body });
+      if (session.kind === 'demo') return HttpResponse.json({ ...demoShopOf(session), ...body });
       // только переданные поля (PATCH)
       const { name, subdomain, whatsapp, setupCompleted } = body;
       const changes = Object.fromEntries(
@@ -322,13 +330,30 @@ export const demoAdminHandlers = ({ storage, ...options }: DemoAdminHandlersOpti
       const url = uploads.get(uploadId);
       if (!url) return problem(422, 'upload_not_found');
       const image: Image = { width: 400, height: 400, sizes: { '320': url, '640': url, '1280': url } };
-      if (session.kind === 'demo') return HttpResponse.json({ ...demoAdminShop, logo: image });
+      if (session.kind === 'demo') return HttpResponse.json({ ...demoShopOf(session), logo: image });
       logo = image;
       return HttpResponse.json(shopOf(session));
     }, options),
     handleDeleteShopLogo(() => {
       logo = null;
       return new HttpResponse(null, { status: 204 });
+    }, options),
+    handlePublishShop(() => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      // у нового магазина на моках товаров нет — опубликовать нельзя
+      if (session.kind === 'new') return problem(409, 'shop_not_ready');
+      const next = { kind: 'demo' as const, draft: false };
+      write(next);
+      return HttpResponse.json(demoShopOf(next));
+    }, options),
+    handleUnpublishShop(() => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      if (session.kind === 'new') return HttpResponse.json(shopOf(session));
+      const next = { kind: 'demo' as const, draft: true };
+      write(next);
+      return HttpResponse.json(demoShopOf(next));
     }, options),
     handleGetProductCounts(() => {
       const session = read();

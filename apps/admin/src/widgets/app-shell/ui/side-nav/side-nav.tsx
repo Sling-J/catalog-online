@@ -4,8 +4,7 @@ import { useLingui } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 
 import { ShopAvatar, ShopStatus } from '@/entities/shop';
-import { NAV_ITEMS } from '@/widgets/app-shell/constants';
-import { useNavLabels } from '@/widgets/app-shell/hooks';
+import { useNavLabels, useNavSections } from '@/widgets/app-shell/hooks';
 
 import { StorefrontCard } from '../storefront-card';
 
@@ -25,6 +24,7 @@ export function SideNav({
 }) {
   const { t } = useLingui();
   const labels = useNavLabels();
+  const sections = useNavSections(status);
   return (
     <aside className="fixed inset-y-0 left-0 z-20 hidden w-[248px] flex-col bg-lilac-field px-4 py-[22px] lg:flex">
       <div className="flex items-center gap-2.5 rounded-[20px] bg-glass p-2.5">
@@ -35,24 +35,24 @@ export function SideNav({
         </div>
       </div>
       <nav aria-label={t`Разделы`} className="mt-[22px] flex flex-col gap-1">
-        {NAV_ITEMS.map((item) => (
+        {sections.map((item) => (
           <Link key={item.key} to={item.to} className="press">
-            {({ isActive }) => (
-              <span
-                className={cx(
-                  'flex h-12 items-center gap-3 rounded-2xl px-3.5 text-[15px]',
-                  isActive ? 'bg-white font-bold shadow-[0_3px_0_rgb(90_70_190/0.25)]' : 'font-semibold hover:bg-glass',
-                )}
-              >
-                <Icon name={item.icon} size={20} strokeWidth={isActive ? 2.2 : 1.8} />
-                <span className="flex-1">{labels[item.key]}</span>
-                {item.key === 'products' && (
-                  <span className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-pill bg-white/60 px-[7px] text-[12px] font-bold tabular-nums">
-                    {productCount}
-                  </span>
-                )}
-              </span>
-            )}
+            <span
+              className={cx(
+                'flex h-12 items-center gap-3 rounded-2xl px-3.5 text-[15px]',
+                item.active
+                  ? 'bg-white font-bold shadow-[0_3px_0_rgb(90_70_190/0.25)]'
+                  : 'font-semibold hover:bg-glass',
+              )}
+            >
+              <Icon name={item.icon} size={20} strokeWidth={item.active ? 2.2 : 1.8} />
+              <span className="flex-1">{labels[item.key]}</span>
+              {item.key === 'products' && (
+                <span className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-pill bg-white/60 px-[7px] text-[12px] font-bold tabular-nums">
+                  {productCount}
+                </span>
+              )}
+            </span>
           </Link>
         ))}
       </nav>
