@@ -3,12 +3,12 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import {
   DeleteProduct,
   ExcelMark,
-  PhotoStrip,
   SaveBar,
   SelectField,
   VariantsCard,
   VisibilitySwitch,
 } from '@/features/product-form';
+import { PhotoStrip } from '@/features/product-photos';
 import { BackBar } from '@/shared/ui';
 
 import type { ProductView } from '../../types';
@@ -16,6 +16,7 @@ import type { ProductView } from '../../types';
 /** Карточка товара на телефоне (макет AdminPhone, экран 3): фото строкой, поля, «Варианты», «Сохранить» внизу. */
 export function PhoneEditor({
   product,
+  photos,
   form,
   categories,
   attributeName,
@@ -39,10 +40,7 @@ export function PhoneEditor({
       >
         {product.name}
       </BackBar>
-      <PhotoStrip photos={product.photos} size="edit" />
-      <p className="px-4 pt-[3px] text-[12px] text-ink-muted">
-        <Trans>Первое фото — обложка. Порядок меняется перетаскиванием.</Trans>
-      </p>
+      <PhotoStrip photos={photos} size="edit" hint={t`Первое фото — обложка. Порядок меняется перетаскиванием.`} />
       <div className="flex flex-col gap-3 px-4 pt-3.5">
         <form.AppField name="name">
           {(field) => <field.TextField label={t`Название`} note={imported('name') && <ExcelMark />} maxLength={200} />}

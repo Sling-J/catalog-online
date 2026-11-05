@@ -1772,6 +1772,11 @@ components:
           minItems: 1
           maxItems: 200
           items: { $ref: '#/components/schemas/VariantInput' }
+        photoUploadIds:
+          type: array
+          maxItems: 10
+          items: { type: string, format: uuid }
+          description: Фото, уже загруженные по `createUpload` (`product_photo`), в этом порядке; первое — обложка
     ProductUpdate:
       type: object
       properties:

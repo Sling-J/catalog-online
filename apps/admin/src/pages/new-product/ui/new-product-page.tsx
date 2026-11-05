@@ -12,6 +12,7 @@ import {
   useLeaveGuard,
   useProductForm,
 } from '@/features/product-form';
+import { PhotosNotUploadedError, useNewProductPhotos } from '@/features/product-photos';
 import { attributesQueryOptions } from '@/entities/attribute';
 import { categoriesQueryOptions, flattenCategories } from '@/entities/category';
 import { fieldErrors } from '@/shared/api';
@@ -38,25 +39,32 @@ export function NewProductPage() {
   const { data: tree } = useSuspenseQuery(categoriesQueryOptions());
   const { data: attributes } = useSuspenseQuery(attributesQueryOptions());
   const create = useCreateProduct();
+  const photos = useNewProductPhotos();
   // исходные значения — один раз: свежий объект на каждой отрисовке форма приняла бы за новые
   const [defaultValues] = useState(() => newProductDraft(attributes));
   const form = useProductForm({
     defaultValues,
     onSubmit: async (draft, { visible }, formApi) => {
       try {
-        await create.mutateAsync({ draft, visible });
+        // загружаемые фото дожидаемся; не загрузилось — товар не сохраняем, ошибка под фото
+        const photoUploadIds = await photos.uploadIds();
+        await create.mutateAsync({ draft, visible, photoUploadIds });
         guard.allow();
         await navigate({ to: '/products' });
       } catch (error) {
-        if (fieldErrors(error).name) setServerError(formApi, 'name', draftMessage('required'));
+        if (error instanceof PhotosNotUploadedError)
+          setFormError(formApi, t`Не все фото загрузились — повторите или удалите их`);
+        else if (fieldErrors(error).name) setServerError(formApi, 'name', draftMessage('required'));
         else setFormError(formApi, messages.failed);
       }
     },
   });
-  const guard = useLeaveGuard(useIsDirty(form));
+  // загруженные фото пропадут при уходе так же, как поля
+  const guard = useLeaveGuard(useIsDirty(form) || photos.tiles.length > 0);
 
   const view: NewProductView = {
     form,
+    photos,
     attributes,
     categories: [
       { value: '', label: t`Без категории` },

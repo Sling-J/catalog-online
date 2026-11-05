@@ -8,18 +8,22 @@
 // с поиском, вкладками, категорией и сортировкой, «Витрина» у товара и массовые действия; правки живут в памяти.
 // Редактор (T-306): товар, таблица размеров целиком, новый товар вручную, удаление, свойства; «Свой размер» добавляет
 // значение.
+// Фото (T-307): прикрепить загруженное (в новом товаре — сразу при создании), порядок, удаление; сжатие изображается
+// паузой — фото сначала `processing`, через пару секунд `ready`. Не больше 10 фото у товара (409 `photo_limit_reached`).
 // Остальные разделы добавляются со своими экранами.
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 
 import {
   handleChangePassword,
   handleCheckSubdomain,
+  handleAddProductPhoto,
   handleCreateUpload,
   handleDeleteShopLogo,
   handleForgotPassword,
   handleBulkUpdateProducts,
   handleCreateProduct,
   handleDeleteProduct,
+  handleDeleteProductPhoto,
   handleGetMe,
   handleGetProduct,
   handleGetProductCounts,
@@ -32,6 +36,7 @@ import {
   handlePublishShop,
   handleUnpublishShop,
   handleRegister,
+  handleReorderProductPhotos,
   handleReplaceProductVariants,
   handleResendVerificationEmail,
   handleResetPassword,
@@ -41,7 +46,7 @@ import {
   handleVerifyEmail,
   type RequestHandlerOptions,
 } from '../gen/msw.gen.js';
-import type { Attribute, Image, Me, Problem, Product, Shop } from '../gen/types.gen.js';
+import type { Attribute, Image, Me, Photo, Problem, Product, Shop } from '../gen/types.gen.js';
 import {
   type AdminFilter,
   type AdminSort,
@@ -153,6 +158,9 @@ const TAKEN_SUBDOMAINS = [demoShop.subdomain, HIDDEN_DEMO_SUBDOMAIN];
 // служебные имена (FR-A2): в API список будет полнее
 const RESERVED_SUBDOMAINS = ['www', 'app', 'api', 'admin', 'mail', 'static', 'cdn', 'help', 'support'];
 const UPLOAD_ORIGIN = 'https://uploads.mock';
+const PHOTO_LIMIT = 10;
+// «сжатие» фото на моках
+const PHOTO_PROCESSING_MS = 2500;
 
 const subdomainProblem = (value: string): 'invalid' | 'reserved' | 'taken' | null => {
   if (!SUBDOMAIN_PATTERN.test(value)) return 'invalid';
@@ -233,6 +241,29 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
     demoAttributes ??= createDemoAdminAttributes(productsOf(session, request));
     return demoAttributes;
   };
+  const findProduct = (session: Session, request: Request, productId: unknown) => {
+    const products = productsOf(session, request);
+    return { products, index: products.findIndex((item) => item.id === productId) };
+  };
+  // фото встаёт в очередь «сжатия»: через паузу у него появляется картинка (если его ещё не удалили)
+  const processPhoto = (products: Product[], productId: string, photoId: string, url: string): void => {
+    setTimeout(() => {
+      const index = products.findIndex((item) => item.id === productId);
+      const product = products[index];
+      if (!product) return;
+      const image: Image = { width: 1280, height: 1280, sizes: { '320': url, '640': url, '1280': url } };
+      products[index] = {
+        ...product,
+        photos: product.photos.map((photo) => (photo.id === photoId ? { ...photo, status: 'ready', image } : photo)),
+      };
+    }, PHOTO_PROCESSING_MS);
+  };
+  const newPhoto = (position: number): Photo => ({
+    id: crypto.randomUUID(),
+    position,
+    status: 'processing',
+    image: null,
+  });
   const invalidVariants = () =>
     problem(422, 'validation_failed', { errors: [{ field: 'variants', code: 'unknown_attribute' }] });
   const shopOf = (session: Extract<Session, { kind: 'new' }>): Shop => ({
@@ -449,9 +480,15 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
         return problem(422, 'validation_failed', { errors: [{ field: 'name', code: 'required' }] });
       const variants = applyVariantInputs(body.variants, [], attributesOf(session, request), 'TV');
       if (!variants) return invalidVariants();
-      const product = createAdminProduct(body, variants);
+      const uploadIds = body.photoUploadIds ?? [];
+      if (uploadIds.length > PHOTO_LIMIT) return problem(409, 'photo_limit_reached');
+      if (uploadIds.some((uploadId) => !uploads.has(uploadId))) return problem(422, 'upload_not_found');
+      const photos = uploadIds.map((_, position) => newPhoto(position));
+      const product = { ...createAdminProduct(body, variants), photos };
       // «сначала новые»: новый товар — первым в списке
-      productsOf(session, request).unshift(product);
+      const products = productsOf(session, request);
+      products.unshift(product);
+      photos.forEach((photo, index) => processPhoto(products, product.id, photo.id, uploads.get(uploadIds[index]!)!));
       return HttpResponse.json(product, { status: 201 });
     }, options),
     handleDeleteProduct(({ request, params }) => {
@@ -476,6 +513,48 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
       if (!variants) return invalidVariants();
       products[index] = { ...product, variants, updatedAt: new Date().toISOString() };
       return HttpResponse.json(products[index]);
+    }, options),
+    handleAddProductPhoto(async ({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { products, index } = findProduct(session, request, params.productId);
+      const product = products[index];
+      if (!product) return problem(404, 'not_found');
+      if (product.photos.length >= PHOTO_LIMIT) return problem(409, 'photo_limit_reached');
+      const { uploadId } = await request.json();
+      const url = uploads.get(uploadId);
+      if (!url) return problem(422, 'upload_not_found');
+      const photo = newPhoto(product.photos.length);
+      products[index] = { ...product, photos: [...product.photos, photo], updatedAt: new Date().toISOString() };
+      processPhoto(products, product.id, photo.id, url);
+      return HttpResponse.json(photo, { status: 201 });
+    }, options),
+    handleReorderProductPhotos(async ({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { products, index } = findProduct(session, request, params.productId);
+      const product = products[index];
+      if (!product) return problem(404, 'not_found');
+      const { photoIds } = await request.json();
+      const byId = new Map(product.photos.map((photo) => [photo.id, photo]));
+      // список должен быть ровно теми же фото, без повторов
+      if (photoIds.length !== byId.size || new Set(photoIds).size !== byId.size || photoIds.some((id) => !byId.has(id)))
+        return problem(422, 'validation_failed', { errors: [{ field: 'photoIds', code: 'invalid' }] });
+      const photos = photoIds.map((id, position) => ({ ...byId.get(id)!, position }));
+      products[index] = { ...product, photos, updatedAt: new Date().toISOString() };
+      return HttpResponse.json(photos);
+    }, options),
+    handleDeleteProductPhoto(({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { products, index } = findProduct(session, request, params.productId);
+      const product = products[index];
+      if (!product?.photos.some((photo) => photo.id === params.photoId)) return problem(404, 'not_found');
+      const photos = product.photos
+        .filter((photo) => photo.id !== params.photoId)
+        .map((photo, position) => ({ ...photo, position }));
+      products[index] = { ...product, photos, updatedAt: new Date().toISOString() };
+      return new HttpResponse(null, { status: 204 });
     }, options),
     handleListAttributes(({ request }) => {
       const session = read();

@@ -29,11 +29,19 @@ export function useSaveProduct(product: Product) {
   });
 }
 
-/** Новый товар вручную; «Черновик» — скрытым (`isVisible: false`). */
+/** Новый товар вручную; «Черновик» — скрытым (`isVisible: false`); фото — уже загруженные, по порядку. */
 export function useCreateProduct() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ draft, visible }: { draft: ProductDraft; visible: boolean }) => {
+    mutationFn: async ({
+      draft,
+      visible,
+      photoUploadIds,
+    }: {
+      draft: ProductDraft;
+      visible: boolean;
+      photoUploadIds: string[];
+    }) => {
       const { data } = await createProduct({
         throwOnError: true,
         body: {
@@ -42,6 +50,7 @@ export function useCreateProduct() {
           categoryId: draft.categoryId,
           isVisible: visible,
           variants: toVariantInputs(draft),
+          photoUploadIds,
         },
       });
       return data;

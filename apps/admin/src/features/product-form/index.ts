@@ -18,8 +18,6 @@ export {
   FieldNote,
   ImportNote,
   LeaveConfirm,
-  PhotoPanel,
-  PhotoStrip,
   PriceField,
   SelectField,
   type SelectOption,

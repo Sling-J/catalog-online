@@ -5,8 +5,6 @@ export { ExcelMark } from './excel-mark';
 export { FieldNote } from './field-note';
 export { ImportNote } from './import-note';
 export { LeaveConfirm } from './leave-confirm';
-export { PhotoPanel } from './photo-panel';
-export { PhotoStrip } from './photo-strip';
 export { PriceField } from './price-field';
 export { SaveBar } from './save-bar';
 export { SelectField, type SelectOption } from './select-field';

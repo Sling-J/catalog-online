@@ -1,7 +1,7 @@
 import { setupServer } from 'msw/node';
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import type { Attribute, Me, Problem, Product, ProductListItem, Shop } from '../gen/types.gen.js';
+import type { Attribute, Me, Photo, Problem, Product, ProductListItem, Shop } from '../gen/types.gen.js';
 import { DEMO_ADMIN_PASSWORD, demoAdminHandlers, EXPIRED_EMAIL_TOKEN } from './admin-handlers.js';
 import { createDemoShopData } from './demo-shop.js';
 
@@ -288,5 +288,70 @@ describe('моки админки: товары', () => {
     expect((await fetch(url, { method: 'DELETE' })).status).toBe(204);
     expect((await fetch(url)).status).toBe(404);
     expect((await getJson<{ all: number }>('/admin/products/counts')).all).toBe(total - 1);
+  });
+});
+
+describe('моки админки: фото товара', () => {
+  // ссылка на загрузку → файл в «хранилище»; возвращает uploadId
+  const uploadPhoto = async (): Promise<string> => {
+    const target = (await (
+      await call('/admin/uploads', {
+        purpose: 'product_photo',
+        fileName: 'photo.jpg',
+        contentType: 'image/jpeg',
+        size: 3,
+      })
+    ).json()) as { uploadId: string; url: string };
+    await fetch(target.url, { method: 'PUT', headers: { 'Content-Type': 'image/jpeg' }, body: 'abc' });
+    return target.uploadId;
+  };
+  const productUrl = (id: string, rest = '') => `http://api.test/v1/admin/products/${id}${rest}`;
+  const send = (url: string, method: string, body?: unknown) =>
+    fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  afterEach(() => vi.useRealTimers());
+
+  it('прикреплённое фото встаёт последним в обработке, потом готово', async () => {
+    fresh();
+    const { items } = await getJson<Page>('/admin/products?filter=no_photo&limit=1');
+    const id = items[0]!.id;
+    // «сжатие» — пауза на таймере; список выше тоже ждёт таймер, поэтому подменяем после него
+    vi.useFakeTimers({ toFake: ['setTimeout'] });
+    const added = await send(productUrl(id, '/photos'), 'POST', { uploadId: await uploadPhoto() });
+    expect(added.status).toBe(201);
+    expect(await added.json()).toMatchObject({ position: 0, status: 'processing', image: null });
+    vi.runAllTimers();
+    const product = (await (await fetch(productUrl(id))).json()) as Product;
+    expect(product.photos[0]).toMatchObject({ status: 'ready' });
+    expect(product.photos[0]!.image!.sizes['320']).toMatch(/^data:image\/jpeg;base64,/);
+    expect((await send(productUrl(id, '/photos'), 'POST', { uploadId: 'nope' })).status).toBe(422);
+  });
+
+  it('порядок — тем же списком фото, удаление — 204 и сдвиг позиций', async () => {
+    fresh();
+    const { items } = await getJson<Page>('/admin/products?limit=1');
+    const product = (await (await fetch(productUrl(items[0]!.id))).json()) as Product;
+    const ids = product.photos.map((photo) => photo.id);
+    expect(ids.length).toBeGreaterThan(1);
+    const reordered = await send(productUrl(product.id, '/photos/order'), 'PUT', { photoIds: [...ids].reverse() });
+    expect(((await reordered.json()) as Photo[]).map((photo) => photo.id)).toEqual([...ids].reverse());
+    expect((await send(productUrl(product.id, '/photos/order'), 'PUT', { photoIds: [ids[0]] })).status).toBe(422);
+    expect((await fetch(productUrl(product.id, `/photos/${ids.at(-1)}`), { method: 'DELETE' })).status).toBe(204);
+    const after = (await (await fetch(productUrl(product.id))).json()) as Product;
+    expect(after.photos[0]).toMatchObject({ id: ids.at(-2), position: 0 });
+  });
+
+  it('новый товар сразу с фото в порядке загрузок; больше 10 — 409', async () => {
+    fresh();
+    const variants = [{ price: 1000, stock: 1, values: [] }];
+    const uploadIds = [await uploadPhoto(), await uploadPhoto()];
+    const created = (await (
+      await call('/admin/products', { name: 'С фото', variants, photoUploadIds: uploadIds })
+    ).json()) as Product;
+    expect(created.photos.map((photo) => [photo.position, photo.status])).toEqual([
+      [0, 'processing'],
+      [1, 'processing'],
+    ]);
+    const many = Array.from({ length: 11 }, () => uploadIds[0]!);
+    expect((await call('/admin/products', { name: 'Много', variants, photoUploadIds: many })).status).toBe(409);
   });
 });

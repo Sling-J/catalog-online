@@ -1,13 +1,14 @@
 import { Button } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 
-import { PhotoStrip, PriceField, SaveBar, SelectField, SizesEditor } from '@/features/product-form';
+import { PriceField, SaveBar, SelectField, SizesEditor } from '@/features/product-form';
+import { PhotoStrip } from '@/features/product-photos';
 import { BackBar } from '@/shared/ui';
 
 import type { NewProductView } from '../../types';
 
 /** Новый товар на телефоне (макет AdminPhone2, экран 7): фото, название, категория и цена, размеры. */
-export function PhoneNewProduct({ form, attributes, categories, onSave }: NewProductView) {
+export function PhoneNewProduct({ form, photos, attributes, categories, onSave }: NewProductView) {
   const { t } = useLingui();
   return (
     <form
@@ -20,7 +21,7 @@ export function PhoneNewProduct({ form, attributes, categories, onSave }: NewPro
       <BackBar to="/products">
         <Trans>Новый товар</Trans>
       </BackBar>
-      <PhotoStrip photos={[]} size="new" />
+      <PhotoStrip photos={photos} size="new" />
       {/* у строки фото 3 px снизу под рамку обложки — до полей 14 px, как в макете */}
       <div className="flex flex-col gap-3 px-4 pt-[11px]">
         <form.AppField name="name">{(field) => <field.TextField label={t`Название`} maxLength={200} />}</form.AppField>

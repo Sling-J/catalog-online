@@ -2,7 +2,8 @@ import { Button } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 
-import { FieldNote, PhotoPanel, PriceField, SelectField, SizesEditor, TextAreaField } from '@/features/product-form';
+import { FieldNote, PriceField, SelectField, SizesEditor, TextAreaField } from '@/features/product-form';
+import { PhotoPanel } from '@/features/product-photos';
 import { PageTitle } from '@/shared/ui';
 
 import type { NewProductView } from '../../types';
@@ -11,7 +12,7 @@ import type { NewProductView } from '../../types';
  * Новый товар на компьютере (макет AdminDesk2, экран 6): «Товары / Новый», заголовок с «Сохранить черновик» и
  * «Сохранить и показать»; слева фото, справа поля и белая карточка «Размеры и количество».
  */
-export function DeskNewProduct({ form, attributes, categories, onSave }: NewProductView) {
+export function DeskNewProduct({ form, photos, attributes, categories, onSave }: NewProductView) {
   const { t } = useLingui();
   return (
     <form
@@ -55,7 +56,7 @@ export function DeskNewProduct({ form, attributes, categories, onSave }: NewProd
       {/* до 1440 включительно (max-[1441px] — «уже 1441») правая колонка рядом с фото не помещается (таблица шире
           места) — поля сверху, фото под ними (решение основателя 2026-11-05) */}
       <div className="mt-[18px] flex gap-7 max-[1441px]:flex-col-reverse">
-        <PhotoPanel photos={[]} size="new" />
+        <PhotoPanel photos={photos} size="new" />
         <div className="flex flex-1 flex-col gap-3.5">
           <form.AppField name="name">
             {(field) => <field.TextField label={t`Название`} maxLength={200} />}

@@ -12,6 +12,7 @@ import {
   useProductForm,
   useSaveProduct,
 } from '@/features/product-form';
+import { useProductPhotos } from '@/features/product-photos';
 import { attributesQueryOptions } from '@/entities/attribute';
 import { categoriesQueryOptions, flattenCategories } from '@/entities/category';
 import { productQueryOptions } from '@/entities/product';
@@ -56,7 +57,9 @@ export function ProductPage({ productId }: { productId: string }) {
       }
     },
   });
-  const guard = useLeaveGuard(useIsDirty(form));
+  const photos = useProductPhotos(product);
+  // фото сохраняются сразу, но загружаемое ещё не прикреплено — уход его потеряет
+  const guard = useLeaveGuard(useIsDirty(form) || photos.busy);
   const toList = () => {
     guard.allow();
     return navigate({ to: '/products' });
@@ -71,6 +74,7 @@ export function ProductPage({ productId }: { productId: string }) {
   ];
   const view: ProductView = {
     product,
+    photos,
     form,
     categories,
     category: flattenCategories(tree).find((category) => category.id === product.categoryId)?.name,

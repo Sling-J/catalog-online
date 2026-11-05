@@ -7,12 +7,12 @@ import {
   ExcelMark,
   FieldNote,
   ImportNote,
-  PhotoPanel,
   SelectField,
   TextAreaField,
   VariantsTable,
   VisibilitySwitch,
 } from '@/features/product-form';
+import { PhotoPanel } from '@/features/product-photos';
 import { PageTitle } from '@/shared/ui';
 
 import type { ProductView } from '../../types';
@@ -23,6 +23,7 @@ import type { ProductView } from '../../types';
  */
 export function DeskEditor({
   product,
+  photos,
   form,
   categories,
   category,
@@ -73,7 +74,7 @@ export function DeskEditor({
       {/* до 1440 включительно (max-[1441px] — «уже 1441») правая колонка рядом с фото не помещается (таблица шире места) — поля сверху, фото
           под ними (решение основателя 2026-11-05) */}
       <div className="mt-[18px] flex gap-7 max-[1441px]:flex-col-reverse">
-        <PhotoPanel photos={product.photos} size="edit" />
+        <PhotoPanel photos={photos} size="edit" />
         <div className="flex flex-1 flex-col gap-3.5">
           <div className="grid grid-cols-2 gap-3.5">
             <form.AppField name="name">

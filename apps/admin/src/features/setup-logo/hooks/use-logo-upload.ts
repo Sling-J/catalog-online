@@ -1,8 +1,9 @@
-import { createUpload, setShopLogo } from '@catalog/contract';
+import { setShopLogo } from '@catalog/contract';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 import { applyShop } from '@/entities/shop';
+import { uploadFile } from '@/shared/api';
 
 import { LOGO_MAX_BYTES, LOGO_TYPES } from '@/features/setup-logo/constants';
 
@@ -27,18 +28,8 @@ export function useLogoUpload() {
     setPreview(URL.createObjectURL(file));
     setPending(true);
     try {
-      const { data: target } = await createUpload({
-        body: { purpose: 'logo', fileName: file.name, contentType: file.type, size: file.size },
-        throwOnError: true,
-      });
-      // в хранилище, не в API: SDK тут ни при чём
-      const stored = await fetch(target.url, {
-        method: target.method,
-        headers: { ...target.headers, 'Content-Type': file.type },
-        body: file,
-      });
-      if (!stored.ok) throw new Error(`upload ${stored.status}`);
-      const { data: shop } = await setShopLogo({ body: { uploadId: target.uploadId }, throwOnError: true });
+      const uploadId = await uploadFile('logo', file);
+      const { data: shop } = await setShopLogo({ body: { uploadId }, throwOnError: true });
       await applyShop(queryClient, shop);
       setPreview(undefined);
     } catch {
