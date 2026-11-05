@@ -1,7 +1,7 @@
 import type { StorefrontProduct, StorefrontProductCard, StorefrontShop } from '@catalog/contract';
 import { cx, Icon, useIsDesktop, formatPrice } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { findVariant, getPriceRange, isInStock, ProductTile, type Selection } from '@/entities/product';
 import { AddToCartButton } from '@/features/add-to-cart';
@@ -53,6 +53,37 @@ export function ProductView({
   // все варианты закончились — купить нельзя, можно спросить о поступлении (старая ссылка на товар)
   const soldOut = !product.variants.some(isInStock);
 
+  // Листание стрелками: фото и текст соседнего товара въезжают на 24px со стороны листания (окно стоит на месте).
+  // Прозрачность не с нуля — содержимое не мигает. Направление запоминаем в момент нажатия.
+  const direction = useRef(0);
+  const photoPane = useRef<HTMLDivElement>(null);
+  const infoPane = useRef<HTMLDivElement>(null);
+  const turn = (step: number, go?: () => void) =>
+    go &&
+    (() => {
+      direction.current = step;
+      go();
+    });
+  const goPrev = turn(-1, onPrev);
+  const goNext = turn(1, onNext);
+  useLayoutEffect(() => {
+    const shift = direction.current * 24;
+    direction.current = 0;
+    if (!shift || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    for (const pane of [photoPane.current, infoPane.current]) {
+      pane?.animate(
+        [
+          { transform: `translateX(${shift}px)`, opacity: 0.6 },
+          { transform: 'none', opacity: 1 },
+        ],
+        {
+          duration: 250,
+          easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        },
+      );
+    }
+  }, [product.id]);
+
   // окно поверх каталога: страница под ним не прокручивается, закрывается по Esc, листается стрелками
   useEffect(() => {
     if (!desktop) return;
@@ -60,15 +91,15 @@ export function ProductView({
     document.body.style.overflow = 'hidden';
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onBack();
-      else if (event.key === 'ArrowLeft') onPrev?.();
-      else if (event.key === 'ArrowRight') onNext?.();
+      else if (event.key === 'ArrowLeft') goPrev?.();
+      else if (event.key === 'ArrowRight') goNext?.();
     };
     window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = overflow;
       window.removeEventListener('keydown', onKey);
     };
-  }, [desktop, onBack, onPrev, onNext]);
+  }, [desktop, onBack, goPrev, goNext]);
 
   const price = variant
     ? formatPrice(variant.price)
@@ -110,7 +141,7 @@ export function ProductView({
           animate && 'motion-safe:lg:animate-pop',
         )}
       >
-        <div className="relative lg:w-[576px] lg:flex-none">
+        <div ref={photoPane} className="relative lg:w-[576px] lg:flex-none">
           {/* закончившийся товар: серое фото с плашкой «Закончился» */}
           <div className={cx('lg:h-full', soldOut && 'grayscale-[.85] brightness-105')}>
             {/* key: при переходе стрелками к соседнему товару галерея начинается с первого фото */}
@@ -135,7 +166,7 @@ export function ProductView({
           )}
         </div>
 
-        <div className="lg:flex lg:min-w-0 lg:flex-1 lg:flex-col lg:overflow-y-auto">
+        <div ref={infoPane} className="lg:flex lg:min-w-0 lg:flex-1 lg:flex-col lg:overflow-y-auto">
           <div className="px-4 pt-[18px] lg:flex-1 lg:px-8 lg:pt-[30px]">
             {product.category && <p className="text-[13px] text-ink-quiet lg:text-[14px]">{product.category.name}</p>}
             {soldOut ? (
@@ -235,20 +266,20 @@ export function ProductView({
         </button>
       </div>
 
-      {onPrev && (
+      {goPrev && (
         <button
           type="button"
-          onClick={onPrev}
+          onClick={goPrev}
           aria-label={t`Предыдущий товар`}
           className={`${arrowButton} left-[max(16px,calc(50%-644px))]`}
         >
           <Icon name="chevron-left" size={22} strokeWidth={2.4} />
         </button>
       )}
-      {onNext && (
+      {goNext && (
         <button
           type="button"
-          onClick={onNext}
+          onClick={goNext}
           aria-label={t`Следующий товар`}
           className={`${arrowButton} right-[max(16px,calc(50%-644px))]`}
         >
