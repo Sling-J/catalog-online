@@ -27,7 +27,8 @@ export type IconName =
   | 'image'
   | 'plus'
   | 'eye'
-  | 'eye-off';
+  | 'eye-off'
+  | 'sync';
 
 // Контурные иконки 24×24, штрих берут от `currentColor`. Общие для витрины и админки.
 const glyphs: Record<IconName, ReactNode> = {
@@ -157,6 +158,15 @@ const glyphs: Record<IconName, ReactNode> = {
   ),
   // товары админки: «+ Товар», массовые «Показать» / «Скрыть»
   plus: <path d="M12 5v14M5 12h14" />,
+  // пометка «из Excel» в редакторе товара: поле обновит следующий импорт
+  sync: (
+    <>
+      <path d="M4 12a8 8 0 0 1 14-5.3L20 9" />
+      <path d="M20 4v5h-5" />
+      <path d="M20 12a8 8 0 0 1-14 5.3L4 15" />
+      <path d="M4 20v-5h5" />
+    </>
+  ),
   eye: (
     <>
       <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />

@@ -3,18 +3,27 @@ import { checkSubdomainOptions, updateShopMutation } from '@catalog/contract/que
 import { Icon } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState, type FormEvent } from 'react';
+import { useStore } from '@tanstack/react-form';
 
 import { applyShop, ShopAvatar, storefrontRootDomain, SUBDOMAIN_PATTERN, subdomainFromName } from '@/entities/shop';
 import { problemCode } from '@/shared/api';
 import { useDebouncedValue, useFormMessages } from '@/shared/hooks';
-import { BigField, BigFieldCaption } from '@/shared/ui';
+import {
+  BigField,
+  BigFieldCaption,
+  clearServerError,
+  setFormError,
+  setServerError,
+  submitForm,
+  useAppForm,
+} from '@/shared/ui';
 
 type Status = 'checking' | 'ok' | 'taken' | 'invalid';
 
 /**
  * Мастер, шаг 2 — адрес витрины (макет AdminPhone2 / AdminDesk2; «Проверяем…» и «занят» — AdminSetupStates).
  * Адрес предлагаем по названию, свободен ли — проверяем на лету, пока ввод затих. На телефоне — превью ссылки (A13).
+ * Адрес, который API отверг при сохранении (успели занять), — ошибка сервера у поля: «занят», пока его не поправят.
  */
 export function AddressStep({
   formId,
@@ -32,21 +41,34 @@ export function AddressStep({
   const { t } = useLingui();
   const messages = useFormMessages();
   const queryClient = useQueryClient();
-  const [value, setValue] = useState(() => initial ?? subdomainFromName(name));
-  // адрес, который API отверг при сохранении (успели занять, пока человек думал)
-  const [rejected, setRejected] = useState<string>();
-  const [failed, setFailed] = useState(false);
+  const save = useMutation(updateShopMutation());
+  const form = useAppForm({
+    defaultValues: { subdomain: initial ?? subdomainFromName(name) },
+    onSubmit: async ({ value: { subdomain }, formApi }) => {
+      try {
+        const shop = await save.mutateAsync({ body: { subdomain } });
+        await applyShop(queryClient, shop);
+        onDone();
+      } catch (error) {
+        const code = problemCode(error);
+        if (code === 'subdomain_taken' || code === 'subdomain_reserved') setServerError(formApi, 'subdomain', 'taken');
+        else setFormError(formApi, messages.failed);
+      }
+    },
+  });
+  const value = useStore(form.store, (state) => state.values.subdomain);
+  const rejected = useStore(form.store, (state) => state.fieldMeta.subdomain?.errorMap.onServer === 'taken');
+  const failed = useStore(form.store, (state) => typeof state.errorMap.onSubmit === 'string');
   const debounced = useDebouncedValue(value, 400);
   const valid = SUBDOMAIN_PATTERN.test(value);
   const check = useQuery({
     ...checkSubdomainOptions({ query: { value: debounced } }),
     enabled: valid && debounced === value,
   });
-  const save = useMutation(updateShopMutation());
 
   const status: Status = !valid
     ? 'invalid'
-    : rejected === value
+    : rejected
       ? 'taken'
       : debounced !== value || check.isFetching || !check.data
         ? 'checking'
@@ -57,25 +79,16 @@ export function AddressStep({
             : 'taken';
   const root = storefrontRootDomain();
 
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    if (status !== 'ok') return;
-    setFailed(false);
-    save.mutate(
-      { body: { subdomain: value } },
-      {
-        onSuccess: (shop) => void applyShop(queryClient, shop).then(onDone),
-        onError: (error) => {
-          const code = problemCode(error);
-          if (code === 'subdomain_taken' || code === 'subdomain_reserved') setRejected(value);
-          else setFailed(true);
-        },
-      },
-    );
-  };
-
   return (
-    <form id={formId} noValidate onSubmit={submit}>
+    <form
+      id={formId}
+      noValidate
+      onSubmit={(event) => {
+        event.preventDefault();
+        // пока адрес не проверен или занят, «Дальше» ничего не делает
+        if (status === 'ok') void submitForm(form);
+      }}
+    >
       <BigField
         tone={status === 'ok' ? 'ok' : status === 'taken' || status === 'invalid' ? 'error' : 'idle'}
         className="mt-[22px] lg:mt-[30px]"
@@ -94,7 +107,10 @@ export function AddressStep({
             autoComplete="off"
             aria-label={t`Адрес витрины`}
             aria-invalid={status === 'taken' || status === 'invalid' ? true : undefined}
-            onChange={(event) => setValue(event.target.value.toLowerCase().replace(/\s/g, '-'))}
+            onChange={(event) => {
+              form.setFieldValue('subdomain', event.target.value.toLowerCase().replace(/\s/g, '-'));
+              clearServerError(form, 'subdomain');
+            }}
             className="absolute inset-0 w-full bg-transparent font-bold outline-none"
           />
         </span>

@@ -6,6 +6,8 @@
 // зарезервированы. Публикация (T-304): снятие переводит демо-магазин в черновик — так видна главная с чек-листом;
 // опубликовать можно, когда есть товары и почта подтверждена (иначе 409 `shop_not_ready`). Товары (T-305): список
 // с поиском, вкладками, категорией и сортировкой, «Витрина» у товара и массовые действия; правки живут в памяти.
+// Редактор (T-306): товар, таблица размеров целиком, новый товар вручную, удаление, свойства; «Свой размер» добавляет
+// значение.
 // Остальные разделы добавляются со своими экранами.
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 
@@ -16,10 +18,13 @@ import {
   handleDeleteShopLogo,
   handleForgotPassword,
   handleBulkUpdateProducts,
+  handleCreateProduct,
+  handleDeleteProduct,
   handleGetMe,
   handleGetProduct,
   handleGetProductCounts,
   handleGetShop,
+  handleListAttributes,
   handleListCategories,
   handleListProducts,
   handleLogin,
@@ -27,6 +32,7 @@ import {
   handlePublishShop,
   handleUnpublishShop,
   handleRegister,
+  handleReplaceProductVariants,
   handleResendVerificationEmail,
   handleResetPassword,
   handleSetShopLogo,
@@ -35,11 +41,14 @@ import {
   handleVerifyEmail,
   type RequestHandlerOptions,
 } from '../gen/msw.gen.js';
-import type { Image, Me, Problem, Product, Shop } from '../gen/types.gen.js';
+import type { Attribute, Image, Me, Problem, Product, Shop } from '../gen/types.gen.js';
 import {
   type AdminFilter,
   type AdminSort,
+  applyVariantInputs,
   countProducts,
+  createAdminProduct,
+  createDemoAdminAttributes,
   createDemoAdminProducts,
   demoAdminCategories,
   selectAdminProducts,
@@ -209,13 +218,23 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
   // загруженные файлы и логотип нового магазина — data: URL в памяти
   const uploads = new Map<string, string>();
   let logo: Image | null = null;
-  // товары демо-магазина: правки из списка живут, пока открыта страница
+  // товары и свойства: правки из списка и редактора живут, пока открыта страница; у нового магазина — пусто
   let demoProducts: Product[] | null = null;
+  let demoAttributes: Attribute[] | null = null;
+  const newProducts: Product[] = [];
+  const newAttributes: Attribute[] = [];
   const productsOf = (session: Session, request: Request): Product[] => {
-    if (session.kind !== 'demo') return [];
+    if (session.kind !== 'demo') return newProducts;
     demoProducts ??= createDemoAdminProducts(assetBase ?? globalThis.location?.origin ?? new URL(request.url).origin);
     return demoProducts;
   };
+  const attributesOf = (session: Session, request: Request): Attribute[] => {
+    if (session.kind !== 'demo') return newAttributes;
+    demoAttributes ??= createDemoAdminAttributes(productsOf(session, request));
+    return demoAttributes;
+  };
+  const invalidVariants = () =>
+    problem(422, 'validation_failed', { errors: [{ field: 'variants', code: 'unknown_attribute' }] });
   const shopOf = (session: Extract<Session, { kind: 'new' }>): Shop => ({
     ...newShop,
     name: session.shop?.name ?? null,
@@ -421,6 +440,47 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
       const changes = Object.fromEntries(Object.entries(body).filter(([, value]) => value !== undefined));
       products[index] = { ...products[index]!, ...changes, updatedAt: new Date().toISOString() };
       return HttpResponse.json(products[index]);
+    }, options),
+    handleCreateProduct(async ({ request }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const body = await request.json();
+      if (!body.name.trim())
+        return problem(422, 'validation_failed', { errors: [{ field: 'name', code: 'required' }] });
+      const variants = applyVariantInputs(body.variants, [], attributesOf(session, request), 'TV');
+      if (!variants) return invalidVariants();
+      const product = createAdminProduct(body, variants);
+      // «сначала новые»: новый товар — первым в списке
+      productsOf(session, request).unshift(product);
+      return HttpResponse.json(product, { status: 201 });
+    }, options),
+    handleDeleteProduct(({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const products = productsOf(session, request);
+      const index = products.findIndex((item) => item.id === params.productId);
+      if (index < 0) return problem(404, 'not_found');
+      products.splice(index, 1);
+      return new HttpResponse(null, { status: 204 });
+    }, options),
+    handleReplaceProductVariants(async ({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const products = productsOf(session, request);
+      const index = products.findIndex((item) => item.id === params.productId);
+      if (index < 0) return problem(404, 'not_found');
+      const product = products[index]!;
+      const { variants: inputs } = await request.json();
+      const prefix = product.variants[0]?.sku.split('-')[0] ?? 'TV';
+      const variants = applyVariantInputs(inputs, product.variants, attributesOf(session, request), prefix);
+      if (!variants) return invalidVariants();
+      products[index] = { ...product, variants, updatedAt: new Date().toISOString() };
+      return HttpResponse.json(products[index]);
+    }, options),
+    handleListAttributes(({ request }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      return HttpResponse.json(attributesOf(session, request));
     }, options),
     handleBulkUpdateProducts(async ({ request }) => {
       const session = read();

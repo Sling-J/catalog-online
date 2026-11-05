@@ -10,3 +10,4 @@
 |---|---|---|
 | [0001](0001-stack.md) | Стек и устройство приложения | accepted |
 | [0002](0002-frontend-fsd.md) | Структура кода фронтенда: Feature-Sliced Design | accepted |
+| [0003](0003-forms-tanstack-form.md) | Формы админки: TanStack Form | accepted |

@@ -1,7 +1,16 @@
 // Товары демо-магазина для админки (T-305): те же товары, что на витрине, плюс заведённые без фото и скрытые —
 // покупатели их не видят, поэтому витрина с ними не расходится. Артикулы и штрихкоды придуманы, остаток — в штуках.
 // Список, вкладки и счётчики считаются по этим данным так же, как их будет считать API.
-import type { Category, Product, ProductListItem, StorefrontProduct } from '../gen/types.gen.js';
+import type {
+  Attribute,
+  Category,
+  Product,
+  ProductCreate,
+  ProductListItem,
+  StorefrontProduct,
+  Variant,
+  VariantInput,
+} from '../gen/types.gen.js';
 import { createDemoShopData, demoCategories, demoImage, demoQuantityOf } from './demo-shop.js';
 
 const id = (n: number): string => `0192d000-0000-7000-8000-${n.toString(16).padStart(12, '0')}`;
@@ -224,4 +233,84 @@ export const selectAdminProducts = (products: Product[], query: AdminListQuery):
     stock_asc: (a, b) => totalStock(a) - totalStock(b),
   };
   return found.sort(compare[query.sort ?? 'new']);
+};
+
+/** Свойства демо-магазина (рост, размер обуви) со значениями в порядке витрины и числом вариантов с ними. */
+export const createDemoAdminAttributes = (products: Product[]): Attribute[] =>
+  createDemoShopData().facets.attributes.map((attribute, position) => ({
+    id: attribute.id,
+    name: attribute.name,
+    position,
+    inFilters: true,
+    values: attribute.values.map((entry, index) => ({
+      id: entry.id,
+      value: entry.value,
+      position: index,
+      usageCount: products.reduce(
+        (sum, product) =>
+          sum + product.variants.filter((variant) => variant.values.some((value) => value.valueId === entry.id)).length,
+        0,
+      ),
+    })),
+  }));
+
+/** Значение свойства по тексту; нет такого («Свой размер») — добавляется в конец. `null` — нет такого свойства. */
+const valueOf = (attributes: Attribute[], attributeId: string, text: string) => {
+  const attribute = attributes.find((item) => item.id === attributeId);
+  if (!attribute) return null;
+  const trimmed = text.trim();
+  let value = attribute.values.find((item) => item.value.toLowerCase() === trimmed.toLowerCase());
+  if (!value) {
+    value = { id: crypto.randomUUID(), value: trimmed, position: attribute.values.length, usageCount: 0 };
+    attribute.values.push(value);
+  }
+  return { attributeId, attributeName: attribute.name, valueId: value.id, value: value.value };
+};
+
+/**
+ * Таблица размеров из редактора — как её сохранит API: варианты с id обновляются, без id создаются, артикул без
+ * значения придумывается (`<префикс>-<номер>`). Неизвестное свойство — `null` (422).
+ */
+export const applyVariantInputs = (
+  inputs: VariantInput[],
+  current: Variant[],
+  attributes: Attribute[],
+  skuPrefix: string,
+): Variant[] | null => {
+  const variants: Variant[] = [];
+  let next = current.length + 1;
+  for (const input of inputs) {
+    const values = input.values.map((item) => valueOf(attributes, item.attributeId, item.value));
+    if (values.some((value) => value === null)) return null;
+    const existing = input.id ? current.find((variant) => variant.id === input.id) : undefined;
+    variants.push({
+      id: existing?.id ?? crypto.randomUUID(),
+      sku: input.sku?.trim() || existing?.sku || `${skuPrefix}-${String(next++).padStart(4, '0')}`,
+      barcode: input.barcode?.trim() || null,
+      price: input.price,
+      stock: input.stock,
+      values: values as Variant['values'],
+    });
+  }
+  return variants;
+};
+
+/** Новый товар вручную: без фото, ничего не помечено «из Excel». */
+export const createAdminProduct = (body: ProductCreate, variants: Variant[]): Product => {
+  const now = new Date().toISOString();
+  const shortId = Math.random().toString(36).slice(2, 7);
+  return {
+    id: crypto.randomUUID(),
+    shortId,
+    slug: `tovar-${shortId}`,
+    name: body.name.trim(),
+    description: body.description?.trim() || null,
+    categoryId: body.categoryId ?? null,
+    isVisible: body.isVisible ?? true,
+    importedFields: [],
+    photos: [],
+    variants,
+    createdAt: now,
+    updatedAt: now,
+  };
 };

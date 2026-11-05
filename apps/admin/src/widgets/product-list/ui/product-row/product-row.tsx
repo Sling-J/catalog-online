@@ -1,6 +1,7 @@
 import type { ProductListItem } from '@catalog/contract';
 import { cx } from '@catalog/ui';
 import { Plural } from '@lingui/react/macro';
+import { useNavigate } from '@tanstack/react-router';
 
 import { ProductThumb, stockLevel } from '@/entities/product';
 
@@ -12,8 +13,8 @@ import { StockText } from '../stock-text';
 
 /**
  * Строка списка на телефоне (макет AdminPhone, экран 2): фото, название, «Категория · N вариантов», цена, остаток.
- * Долгое нажатие начинает выбор; в режиме выбора слева квадрат, нажатие переключает строку (доска
- * AdminProductsStates, экран 1).
+ * Нажатие открывает карточку товара; долгое нажатие начинает выбор: в режиме выбора слева квадрат, нажатие
+ * переключает строку (доска AdminProductsStates, экран 1).
  */
 export function ProductRow({
   product,
@@ -28,15 +29,17 @@ export function ProductRow({
   selected: boolean;
   onToggle: () => void;
 }) {
-  // карточка товара — T-306; пока нажатие без выбора ничего не делает
-  const press = useLongPress(onToggle, () => selecting && onToggle());
+  const navigate = useNavigate();
+  const press = useLongPress(onToggle, () =>
+    selecting ? onToggle() : void navigate({ to: '/products/$productId', params: { productId: product.id } }),
+  );
   const variants = <Plural value={product.variantCount} one="# вариант" few="# варианта" other="# вариантов" />;
   return (
     <li
       {...press}
       aria-selected={selecting ? selected : undefined}
       className={cx(
-        'flex items-center gap-3 border-b border-[#f0eef7] py-2.5 select-none [-webkit-touch-callout:none]',
+        'flex cursor-pointer items-center gap-3 border-b border-[#f0eef7] py-2.5 select-none [-webkit-touch-callout:none]',
         selecting && 'px-4',
         selected && 'bg-[#f4f1ff]',
       )}

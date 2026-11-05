@@ -1,24 +1,76 @@
-import { Trans } from '@lingui/react/macro';
+import { useIsDesktop } from '@catalog/ui';
+import { useLingui } from '@lingui/react/macro';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 
-import { BackBar, PageTitle } from '@/shared/ui';
+import {
+  LeaveConfirm,
+  newProductDraft,
+  useCreateProduct,
+  useDraftMessages,
+  useLeaveGuard,
+  useProductForm,
+} from '@/features/product-form';
+import { attributesQueryOptions } from '@/entities/attribute';
+import { categoriesQueryOptions, flattenCategories } from '@/entities/category';
+import { fieldErrors } from '@/shared/api';
+import { useFormMessages } from '@/shared/hooks';
+import { setFormError, setServerError, submitForm, useIsDirty } from '@/shared/ui';
 
-/** Новый товар вручную (FR-A5). Заглушка; редактор — T-306. */
+import type { NewProductView } from '../types';
+
+import { DeskNewProduct } from './desk-new-product';
+import { PhoneNewProduct } from './phone-new-product';
+
+/**
+ * Новый товар вручную (FR-A5): телефон — макет AdminPhone2, экран 7; компьютер — AdminDesk2, экран 6.
+ * Размеры чипами, цена одна на все размеры, количество «− N +». «Черновик» сохраняет товар скрытым,
+ * «Сохранить и показать» — сразу на витрину; затем — обратно в «Товары», новый товар там первым. Уход с начатой
+ * карточкой спрашивает подтверждение.
+ */
 export function NewProductPage() {
+  const { t } = useLingui();
+  const messages = useFormMessages();
+  const draftMessage = useDraftMessages();
+  const isDesktop = useIsDesktop();
+  const navigate = useNavigate();
+  const { data: tree } = useSuspenseQuery(categoriesQueryOptions());
+  const { data: attributes } = useSuspenseQuery(attributesQueryOptions());
+  const create = useCreateProduct();
+  // исходные значения — один раз: свежий объект на каждой отрисовке форма приняла бы за новые
+  const [defaultValues] = useState(() => newProductDraft(attributes));
+  const form = useProductForm({
+    defaultValues,
+    onSubmit: async (draft, { visible }, formApi) => {
+      try {
+        await create.mutateAsync({ draft, visible });
+        guard.allow();
+        await navigate({ to: '/products' });
+      } catch (error) {
+        if (fieldErrors(error).name) setServerError(formApi, 'name', draftMessage('required'));
+        else setFormError(formApi, messages.failed);
+      }
+    },
+  });
+  const guard = useLeaveGuard(useIsDirty(form));
+
+  const view: NewProductView = {
+    form,
+    attributes,
+    categories: [
+      { value: '', label: t`Без категории` },
+      ...flattenCategories(tree).map((category) => ({
+        value: category.id,
+        label: `${' '.repeat(category.depth * 3)}${category.name}`,
+      })),
+    ],
+    onSave: (visible) => void submitForm(form, { visible }),
+  };
   return (
     <>
-      <BackBar to="/products">
-        <Trans>Новый товар</Trans>
-      </BackBar>
-      <div className="px-4 pt-4 lg:px-0 lg:pt-0">
-        <div className="hidden lg:block">
-          <PageTitle>
-            <Trans>Новый товар</Trans>
-          </PageTitle>
-        </div>
-        <p className="text-body text-ink-quiet lg:mt-3">
-          <Trans>Здесь будет карточка нового товара: фото, название, размеры, цена и количество.</Trans>
-        </p>
-      </div>
+      {isDesktop ? <DeskNewProduct {...view} /> : <PhoneNewProduct {...view} />}
+      <LeaveConfirm guard={guard} />
     </>
   );
 }

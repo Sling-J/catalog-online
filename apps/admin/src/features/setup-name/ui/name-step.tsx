@@ -2,15 +2,16 @@ import type { Image } from '@catalog/contract';
 import { updateShopMutation } from '@catalog/contract/query';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState, type FormEvent } from 'react';
+import type { ReactNode } from 'react';
 
 import { applyShop, ShopAvatar } from '@/entities/shop';
 import { useFormMessages } from '@/shared/hooks';
-import { BigField, BigFieldCaption } from '@/shared/ui';
+import { BigField, BigFieldCaption, invalidFields, setServerError, submitForm, useAppForm } from '@/shared/ui';
 
 /**
  * Мастер, шаг 1 — название (макет AdminPhone2 / AdminDesk2; пустое — AdminSetupStates, экран 1).
- * Название живое: страница передаёт его и в превью. На телефоне под полем — карточка «Шапка витрины».
+ * Название живое: каждую правку отдаём странице (`onChange`) — для превью. На телефоне под полем — карточка
+ * «Шапка витрины».
  */
 export function NameStep({
   formId,
@@ -28,50 +29,67 @@ export function NameStep({
   const { t } = useLingui();
   const messages = useFormMessages();
   const queryClient = useQueryClient();
-  const [error, setError] = useState<string>();
   const save = useMutation(updateShopMutation());
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    const name = value.trim();
-    if (!name) {
-      setError(t`Введите название магазина`);
-      return;
-    }
-    save.mutate(
-      { body: { name } },
-      {
-        onSuccess: (shop) => void applyShop(queryClient, shop).then(onDone),
-        onError: () => setError(messages.failed),
-      },
-    );
-  };
+  const form = useAppForm({
+    defaultValues: { name: value },
+    validators: {
+      onSubmit: ({ value: { name } }) =>
+        invalidFields({ name: name.trim() ? undefined : t`Введите название магазина` }),
+    },
+    onSubmit: async ({ value: { name }, formApi }) => {
+      try {
+        const shop = await save.mutateAsync({ body: { name: name.trim() } });
+        await applyShop(queryClient, shop);
+        onDone();
+      } catch {
+        // ошибка связи — под полем, как ошибка ввода
+        setServerError(formApi, 'name', messages.failed);
+      }
+    },
+  });
 
   return (
-    <form id={formId} noValidate onSubmit={submit}>
-      <BigField tone={error ? 'error' : 'idle'} className="mt-[22px] lg:mt-[30px]">
-        <input
-          autoFocus
-          value={value}
-          maxLength={80}
-          aria-label={t`Название магазина`}
-          aria-invalid={error ? true : undefined}
-          onChange={(event) => {
-            onChange(event.target.value);
-            setError(undefined);
-          }}
-          className="w-full bg-transparent font-bold outline-none"
-        />
-      </BigField>
-      {error ? (
-        <BigFieldCaption tone="error" className="mt-2.5">
-          {error}
-        </BigFieldCaption>
-      ) : (
-        <BigFieldCaption tone="muted" className="mt-2.5">
-          <Trans>Можно поменять в любой момент в настройках.</Trans>
-        </BigFieldCaption>
-      )}
+    <form
+      id={formId}
+      noValidate
+      onSubmit={(event) => {
+        event.preventDefault();
+        void submitForm(form);
+      }}
+    >
+      <form.Field name="name" listeners={{ onChange: ({ value: name }) => onChange(name) }}>
+        {(field) => {
+          const error = field.state.meta.errors[0] as ReactNode;
+          return (
+            <>
+              <BigField tone={error ? 'error' : 'idle'} className="mt-[22px] lg:mt-[30px]">
+                <input
+                  autoFocus
+                  value={field.state.value}
+                  maxLength={80}
+                  aria-label={t`Название магазина`}
+                  aria-invalid={error ? true : undefined}
+                  onBlur={field.handleBlur}
+                  onChange={(event) => {
+                    field.handleChange(event.target.value);
+                    field.setErrorMap({ onServer: undefined });
+                  }}
+                  className="w-full bg-transparent font-bold outline-none"
+                />
+              </BigField>
+              {error ? (
+                <BigFieldCaption tone="error" className="mt-2.5">
+                  {error}
+                </BigFieldCaption>
+              ) : (
+                <BigFieldCaption tone="muted" className="mt-2.5">
+                  <Trans>Можно поменять в любой момент в настройках.</Trans>
+                </BigFieldCaption>
+              )}
+            </>
+          );
+        }}
+      </form.Field>
       <div className="mt-[26px] rounded-[20px] bg-lilac-mist p-3.5 lg:hidden">
         <div className="text-[13px] font-semibold text-ink-quiet">
           <Trans>Шапка витрины</Trans>

@@ -1,6 +1,7 @@
 import type { ProductListItem } from '@catalog/contract';
 import { cx } from '@catalog/ui';
 import { Plural, Trans } from '@lingui/react/macro';
+import { Link } from '@tanstack/react-router';
 
 import { VisibilityToggle } from '@/features/toggle-product-visibility';
 import { ProductThumb, stockLevel } from '@/entities/product';
@@ -34,7 +35,13 @@ export function TableRow({
         <ProductThumb cover={product.cover} size="table" />
       </span>
       <div role="cell" className="min-w-0">
-        <div className="truncate font-semibold">{product.name}</div>
+        <Link
+          to="/products/$productId"
+          params={{ productId: product.id }}
+          className="block truncate font-semibold hover:text-iris"
+        >
+          {product.name}
+        </Link>
         <div className="text-[12px] text-ink-quiet">
           {product.photoCount === 0 ? <Trans>арт. {product.sku} · без фото</Trans> : <Trans>арт. {product.sku}</Trans>}
         </div>

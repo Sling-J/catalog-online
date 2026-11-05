@@ -1,7 +1,7 @@
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import type { Me, Problem, Product, ProductListItem, Shop } from '../gen/types.gen.js';
+import type { Attribute, Me, Problem, Product, ProductListItem, Shop } from '../gen/types.gen.js';
 import { DEMO_ADMIN_PASSWORD, demoAdminHandlers, EXPIRED_EMAIL_TOKEN } from './admin-handlers.js';
 import { createDemoShopData } from './demo-shop.js';
 
@@ -237,5 +237,56 @@ describe('моки админки: товары', () => {
     expect(((await res.json()) as Product).isVisible).toBe(false);
     const counts = await getJson<{ hidden: number }>('/admin/products/counts');
     expect(counts.hidden).toBe(4);
+  });
+
+  it('таблица размеров заменяется целиком; «Свой размер» добавляет значение свойства', async () => {
+    fresh();
+    const { items } = await getJson<Page>('/admin/products?limit=1');
+    const product = await getJson<Product>(`/admin/products/${items[0]!.id}`);
+    const [first] = product.variants;
+    const height = first!.values[0]!.attributeId;
+    const res = await fetch(`http://api.test/v1/admin/products/${product.id}/variants`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        variants: [
+          { id: first!.id, price: 20000, stock: 9, values: [{ attributeId: height, value: first!.values[0]!.value }] },
+          { price: 21000, stock: 1, values: [{ attributeId: height, value: '134' }] },
+        ],
+      }),
+    });
+    const saved = (await res.json()) as Product;
+    expect(saved.variants).toHaveLength(2);
+    expect(saved.variants[0]).toMatchObject({ id: first!.id, sku: first!.sku, price: 20000, stock: 9 });
+    expect(saved.variants[1]!.sku).toMatch(/-\d{4}$/);
+    const attributes = await getJson<Attribute[]>('/admin/attributes');
+    expect(attributes.find((item) => item.id === height)!.values.at(-1)!.value).toBe('134');
+  });
+
+  it('новый товар вручную — первым в списке; черновик скрыт', async () => {
+    fresh();
+    const [height] = await getJson<Attribute[]>('/admin/attributes');
+    const created = await call('/admin/products', {
+      name: 'Платье летнее',
+      isVisible: false,
+      variants: [{ price: 8200, stock: 2, values: [{ attributeId: height!.id, value: '98' }] }],
+    });
+    expect(created.status).toBe(201);
+    const product = (await created.json()) as Product;
+    expect(product).toMatchObject({ isVisible: false, importedFields: [], photos: [] });
+    expect(product.variants[0]!.values[0]).toMatchObject({ attributeName: height!.name, value: '98' });
+    const { items } = await getJson<Page>('/admin/products?limit=1');
+    expect(items[0]!.id).toBe(product.id);
+    const empty = await call('/admin/products', { name: ' ', variants: [{ price: 1, stock: 0, values: [] }] });
+    expect(empty.status).toBe(422);
+  });
+
+  it('удаление товара — 204, потом 404 и минус один в счётчиках', async () => {
+    fresh();
+    const { items, total } = await getJson<Page & { total: number }>('/admin/products?limit=1');
+    const url = `http://api.test/v1/admin/products/${items[0]!.id}`;
+    expect((await fetch(url, { method: 'DELETE' })).status).toBe(204);
+    expect((await fetch(url)).status).toBe(404);
+    expect((await getJson<{ all: number }>('/admin/products/counts')).all).toBe(total - 1);
   });
 });

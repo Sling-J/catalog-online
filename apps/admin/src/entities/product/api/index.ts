@@ -1,3 +1,4 @@
+export { applyProduct, productQueryOptions } from './product.api';
 export { productCountsQueryOptions } from './product-counts.api';
 export {
   invalidateProducts,

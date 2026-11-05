@@ -1,17 +1,22 @@
 import type { Me } from '@catalog/contract';
 import { registerMutation } from '@catalog/contract/query';
-import { Button, Field } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { useState, type FormEvent, type ReactNode } from 'react';
 
 import { fieldErrors, problemCode, statusOf } from '@/shared/api';
 import { useFormMessages } from '@/shared/hooks';
 import { looksLikeEmail, MIN_PASSWORD } from '@/shared/lib';
-import { FormError, FormFooter, FormNote, PasswordNote } from '@/shared/ui';
-
-type Errors = { email?: ReactNode; password?: string; form?: string };
+import {
+  FormFooter,
+  FormNote,
+  invalidFields,
+  PasswordNote,
+  setFormError,
+  setServerError,
+  submitForm,
+  useAppForm,
+} from '@/shared/ui';
 
 /**
  * Регистрация (FR-A1, макет AdminPhone2 / AdminDesk2, экран 1; ошибки — AdminAuthPhone, экран 3).
@@ -20,9 +25,6 @@ type Errors = { email?: ReactNode; password?: string; form?: string };
 export function RegisterForm({ onRegistered }: { onRegistered: (me: Me) => void }) {
   const { t } = useLingui();
   const messages = useFormMessages();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<Errors>({});
   const register = useMutation({ ...registerMutation(), onSuccess: onRegistered });
 
   const loginLink = (
@@ -31,74 +33,69 @@ export function RegisterForm({ onRegistered }: { onRegistered: (me: Me) => void 
     </Link>
   );
 
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    const next: Errors = {};
-    if (!looksLikeEmail(email)) next.email = email.trim() ? messages.emailInvalid : messages.emailRequired;
-    if (password.length < MIN_PASSWORD) next.password = messages.passwordTooShort;
-    setErrors(next);
-    if (next.email || next.password) return;
-    register.mutate(
-      { body: { email: email.trim(), password } },
-      {
-        onError: (error) => {
-          if (problemCode(error) === 'email_taken') {
-            setErrors({
-              email: (
-                <>
-                  <Trans>Каталог с этой почтой уже есть.</Trans> {loginLink}
-                </>
-              ),
-            });
-          } else if (fieldErrors(error).password) {
-            setErrors({ password: messages.passwordTooShort });
-          } else {
-            setErrors({ form: statusOf(error) === 429 ? messages.tooManyRequests : messages.failed });
-          }
-        },
-      },
-    );
-  };
+  const form = useAppForm({
+    defaultValues: { email: '', password: '' },
+    validators: {
+      onSubmit: ({ value }) =>
+        invalidFields({
+          email: looksLikeEmail(value.email)
+            ? undefined
+            : value.email.trim()
+              ? messages.emailInvalid
+              : messages.emailRequired,
+          password: value.password.length < MIN_PASSWORD ? messages.passwordTooShort : undefined,
+        }),
+    },
+    onSubmit: async ({ value, formApi }) => {
+      try {
+        await register.mutateAsync({ body: { email: value.email.trim(), password: value.password } });
+      } catch (error) {
+        if (problemCode(error) === 'email_taken') {
+          setServerError(
+            formApi,
+            'email',
+            <>
+              <Trans>Каталог с этой почтой уже есть.</Trans> {loginLink}
+            </>,
+          );
+        } else if (fieldErrors(error).password) {
+          setServerError(formApi, 'password', messages.passwordTooShort);
+        } else {
+          setFormError(formApi, statusOf(error) === 429 ? messages.tooManyRequests : messages.failed);
+        }
+      }
+    },
+  });
 
   return (
-    <form noValidate onSubmit={submit}>
+    <form
+      noValidate
+      onSubmit={(event) => {
+        event.preventDefault();
+        void submitForm(form);
+      }}
+    >
       <div className="mt-[30px] flex flex-col gap-3.5 lg:mt-[34px] lg:gap-4">
-        <Field
-          label={t`Email`}
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          value={email}
-          onChange={(event) => {
-            setEmail(event.target.value);
-            setErrors(({ email: _, ...rest }) => rest);
-          }}
-          error={errors.email}
-        />
-        <Field
-          label={t`Пароль`}
-          type="password"
-          autoComplete="new-password"
-          value={password}
-          note={<PasswordNote password={password} tooShort={Boolean(errors.password)} />}
-          onChange={(event) => {
-            setPassword(event.target.value);
-            setErrors(({ password: _, ...rest }) => rest);
-          }}
-          error={errors.password}
-        />
+        <form.AppField name="email">
+          {(field) => <field.TextField label={t`Email`} type="email" inputMode="email" autoComplete="email" />}
+        </form.AppField>
+        <form.AppField name="password">
+          {(field) => (
+            <field.TextField
+              label={t`Пароль`}
+              type="password"
+              autoComplete="new-password"
+              note={<PasswordNote password={field.state.value} tooShort={field.state.meta.errors.length > 0} />}
+            />
+          )}
+        </form.AppField>
       </div>
-      <Button
-        type="submit"
-        variant="primary"
-        size="form"
-        block
-        disabled={register.isPending}
-        className="mt-6 lg:mt-[26px]"
-      >
-        <Trans>Создать каталог</Trans>
-      </Button>
-      {errors.form && <FormError>{errors.form}</FormError>}
+      <form.AppForm>
+        <form.SubmitButton variant="primary" size="form" block className="mt-6 lg:mt-[26px]">
+          <Trans>Создать каталог</Trans>
+        </form.SubmitButton>
+        <form.FormServerError />
+      </form.AppForm>
       <FormNote>
         <Trans>Пришлём письмо для подтверждения почты</Trans>
       </FormNote>

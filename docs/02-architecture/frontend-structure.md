@@ -61,6 +61,10 @@ app → pages → widgets → features → entities → shared
 
 > Примечание (2026-11-02, T-305): «Товары» админки — страница `pages/products` (выбор в адресе: `?q=&filter=&category=`, разбор — `pages/products/lib`), виджет `widgets/product-list` (список на телефоне, таблица на компьютере, выбор строк), фичи `features/product-search`, `features/toggle-product-visibility` (переключатель «Витрина» сразу, без ожидания ответа), `features/bulk-edit-products` (полоса массовых действий); сущности `entities/product` (список по курсору, `invalidateProducts`, `ProductThumb`) и `entities/category`. `formatPrice` и `useLoadMore` нужны обоим приложениям и переехали в `@catalog/ui`; `useLoadMore` теперь отдаёт ref-колбэк (маркер может смениться после `useIsDesktop`). Выбор строк держит страница: на телефоне он меняет её шапку («Выбрано N») и закрывает меню панелью действий (`PhoneBulkBar`); само действие и текст сообщения — хук `useBulkProducts` фичи, сообщение показывает страница (`shared/ui/toast`).
 
+> Примечание (2026-11-05, T-306): редактор товара — фича `features/product-form` (форма `useProductForm`, чистые функции в `lib/product-draft.ts`, сохранение `useSaveProduct` / `useCreateProduct`, части формы в `ui/`); экраны `pages/product` (`/products/$productId`) и `pages/new-product` выбирают раскладку телефона или компьютера через `useIsDesktop` — макеты у них разные, а не одни и те же блоки с `lg:`. Свойства магазина — `entities/attribute`, товар в кеш после сохранения — `applyProduct` из `entities/product`.
+
+> Примечание (2026-11-05, ADR 0003): формы админки — TanStack Form через общую обвязку `shared/ui/app-form` (`useAppForm`, `field.TextField`, `form.SubmitButton`, `form.FormServerError`, `submitForm`, `setServerError` / `setFormError`, `invalidFields`, `useIsDirty`); правила — в ADR 0003. Своих `useState` для значений и ошибок форм не заводим.
+
 ## 2. Структура среза (feature / widget / entity / page)
 
 ```
@@ -143,10 +147,10 @@ ui/
 
 | Слой | Срезы |
 |---|---|
-| `entities` | `session` (текущий аккаунт, `meQueryOptions`, `startSession` — кеш после входа), `shop` (запрос магазина, аватар, статус витрины, адрес витрины), `product` (счётчики товаров) |
-| `features` | `copy-link` (скопировать ссылку с галочкой), `register`, `login`, `forgot-password`, `reset-password`, `change-password` (формы входа и пароля), `resend-verification` (повторное письмо: кнопка и ссылка), `setup-name`, `setup-address`, `setup-whatsapp`, `setup-logo` (шаги мастера), `publish-shop` («Опубликовать витрину» с причиной, если нельзя) |
+| `entities` | `session` (текущий аккаунт, `meQueryOptions`, `startSession` — кеш после входа), `shop` (запрос магазина, аватар, статус витрины, адрес витрины), `product` (счётчики товаров), `attribute` (свойства со значениями — размеры в редакторе) |
+| `features` | `copy-link` (скопировать ссылку с галочкой), `register`, `login`, `forgot-password`, `reset-password`, `change-password` (формы входа и пароля), `resend-verification` (повторное письмо: кнопка и ссылка), `setup-name`, `setup-address`, `setup-whatsapp`, `setup-logo` (шаги мастера), `publish-shop` («Опубликовать витрину» с причиной, если нельзя), `product-form` (редактор товара: черновик, проверка, сохранение, поля, таблицы размеров) |
 | `widgets` | `app-shell` (меню снизу / слева — адреса и выделение разделов в `hooks/use-nav-sections.ts`, шапка телефона, «Ваша витрина»), `auth-layout` (экраны без меню: форма слева, сиреневая колонка справа на компьютере), `setup-layout` (экран мастера: шаги, кнопки), `setup-preview` (живое превью витрины в мастере) |
-| `pages` | `home` (главная до публикации: чек-лист — `lib/checklist.ts`), `setup`, `register`, `login`, `forgot-password`, `reset-password`, `verify-email`, `shop-account`, `products`, `import`, `shop` (пока заглушки), `not-found`, `error` |
+| `pages` | `home` (главная до публикации: чек-лист — `lib/checklist.ts`), `setup`, `register`, `login`, `forgot-password`, `reset-password`, `verify-email`, `shop-account`, `products`, `import`, `shop` (пока заглушки), `not-found`, `error`, `product` (карточка товара), `new-product` |
 
 > Примечание (2026-11-02, T-302): разбор ошибок API (статус, код, ошибки полей, `isUnauthorized`) — `shared/api/api-error.ts`; рабочее название сервиса — `shared/constants/service.ts`. Проверка сессии — `beforeLoad` макета `app/routes/_shell.tsx` (401 → `/login`). Общие куски форм — `shared/ui` (`FormNote`, `FormFooter`, `FormError`, `PasswordNote`, `SendAgain`, `ButtonLink`, `BackBar`), проверки почты и пароля — `shared/lib/credentials.ts`, тексты ошибок форм — `shared/hooks/use-form-messages.ts`. Вложенный экран раздела (на телефоне без шапки и меню) помечается в маршруте `staticData: { subScreen: true }` (тип — `app/router.tsx`), его читает `widgets/app-shell`.
 
