@@ -1,6 +1,7 @@
 import { useLoadMore } from '@catalog/ui';
 import { Plural } from '@lingui/react/macro';
-import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { hashKey, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import { productFacetsQueryOptions, productsQueryOptions, ProductTile } from '@/entities/product';
 import type { ProductListParams, ProductSort } from '@/entities/product';
@@ -39,7 +40,13 @@ export function CatalogGrid({
     hasNextPage,
     data.pages.length,
   );
-  const cards = data.pages.flatMap((page) => page.items);
+
+  // Сколько страниц было при показе этой выборки: их плитки стоят сразу, следующие проявляются по очереди.
+  // Смена выборки (фильтры, категория) снова считает показанными все её страницы.
+  const queryKey = hashKey(productsQueryOptions(subdomain, params).queryKey);
+  const [shown, setShown] = useState({ queryKey, pages: data.pages.length });
+  if (shown.queryKey !== queryKey) setShown({ queryKey, pages: data.pages.length });
+  const shownPages = shown.queryKey === queryKey ? shown.pages : data.pages.length;
 
   return (
     <section className="mx-auto max-w-[1240px]">
@@ -50,7 +57,7 @@ export function CatalogGrid({
         </p>
         <CatalogSort value={params.sort ?? 'new'} onChange={onSortChange} />
       </div>
-      {cards.length === 0 ? (
+      {data.pages[0]?.items.length === 0 ? (
         <EmptyState
           subdomain={subdomain}
           params={params}
@@ -61,11 +68,20 @@ export function CatalogGrid({
         />
       ) : (
         <ul className="grid grid-cols-3 gap-0.5 lg:grid-cols-5 lg:gap-2 lg:px-5">
-          {cards.map((card) => (
-            <li key={card.id}>
-              <ProductTile card={card} />
-            </li>
-          ))}
+          {data.pages.map((page, pageIndex) =>
+            page.items.map((card, index) => {
+              const loaded = pageIndex >= shownPages;
+              return (
+                <li
+                  key={card.id}
+                  className={loaded ? 'motion-safe:animate-tile-in' : undefined}
+                  style={loaded ? { animationDelay: `${index * 30}ms` } : undefined}
+                >
+                  <ProductTile card={card} />
+                </li>
+              );
+            }),
+          )}
         </ul>
       )}
       {hasNextPage && <div ref={marker} aria-hidden="true" className="h-px" />}

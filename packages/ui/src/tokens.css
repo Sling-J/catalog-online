@@ -124,6 +124,8 @@
   --animate-pop: pop 0.28s var(--ease-out-soft);
   --animate-fade: fade 0.25s ease;
   --animate-fade-fast: fade 0.2s ease;
+  /* подгруженные плитки сетки: прозрачны, пока ждут своей задержки (animation-delay у плитки) */
+  --animate-tile-in: fade 0.25s ease backwards;
   @keyframes slide-in {
     from {
       transform: translateX(40px);
