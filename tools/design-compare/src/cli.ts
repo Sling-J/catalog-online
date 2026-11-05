@@ -1,6 +1,6 @@
 // Сверка экрана приложения с артбордом холста: pnpm design:compare --board <доска> --frame <экран> --url <адрес>.
 // Описание и примеры — tools/design-compare/README.md.
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 
@@ -20,7 +20,7 @@ const HELP = `Сверка экрана приложения с артбордо
   --url     экран приложения (дев-сервер должен быть запущен)
   --list    показать экраны доски и выйти
   --init    JS до загрузки страницы приложения (localStorage, сессия моков)
-  --before  JS после загрузки (открыть шторку, выбрать строки); можно await
+  --before  JS после загрузки (открыть шторку, выбрать строки); можно await; @файл — из файла
   --wait    пауза после загрузки и после --before, мс (по умолчанию 800)
   --tol     допуск по положению и размеру, px (по умолчанию 1)
   --max-shift  дальше — одинаковый текст считаем другими данными, px (по умолчанию 24)
@@ -98,7 +98,9 @@ try {
   });
   await appPage.waitForTimeout(wait);
   if (args.before) {
-    await appPage.evaluate(`(async () => { ${args.before} })()`);
+    // длинный скрипт (заполнить форму) удобнее файлом; заодно кириллица не портится в командной строке Windows
+    const before = args.before.startsWith('@') ? readFileSync(args.before.slice(1), 'utf8') : args.before;
+    await appPage.evaluate(`(async () => { ${before} })()`);
     await appPage.waitForTimeout(wait);
   }
   await appPage.evaluate(() => document.fonts.ready);

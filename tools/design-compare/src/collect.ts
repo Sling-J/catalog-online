@@ -140,14 +140,44 @@ export function collectItems(scope: Scope): Collected {
       .trim();
     add(el, text, range.getBoundingClientRect(), false);
   }
+  // значение заполненного поля (редактор товара) — в макете это обычный текст: с отступа поля, по центру строки
+  // (у многострочного — с верхнего отступа)
+  for (const input of root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea')) {
+    if (!visible(input) || !input.value.trim() || ['hidden', 'checkbox', 'radio'].includes(input.type)) continue;
+    const style = getComputedStyle(input);
+    const rect = input.getBoundingClientRect();
+    // высота — как у текстового узла в макете (область шрифта), а не строки
+    const lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.25;
+    const glyphs = parseFloat(style.fontSize) * 1.25;
+    const left = rect.left + parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft);
+    const top =
+      input.tagName === 'TEXTAREA'
+        ? rect.top + parseFloat(style.borderTopWidth) + parseFloat(style.paddingTop) + (lineHeight - glyphs) / 2
+        : rect.top + (rect.height - glyphs) / 2;
+    const text = input.value.replace(/\s+/g, ' ').trim();
+    // многострочное поле: последняя строка — область шрифта, остальные — по высоте строки
+    const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+    const lines =
+      input.tagName === 'TEXTAREA' ? Math.max(1, Math.round((input.scrollHeight - padding) / lineHeight)) : 1;
+    add(input, text, new DOMRect(left, top, rect.width, (lines - 1) * lineHeight + glyphs), true);
+  }
   // подсказка в поле — в макете это обычный текст; у поля ширина своя, сравниваем без неё
   for (const input of root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea')) {
     if (!visible(input) || !input.placeholder || input.value) continue;
     const style = getComputedStyle(input, '::placeholder');
+    const box = getComputedStyle(input);
     const rect = input.getBoundingClientRect();
+    // как у значения поля: с отступа, высота — область шрифта
     const lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.25;
-    const top = rect.top + (rect.height - lineHeight) / 2;
-    add(input, input.placeholder, new DOMRect(rect.left, top, rect.width, lineHeight), true);
+    const glyphs = parseFloat(style.fontSize) * 1.25;
+    const left = rect.left + parseFloat(box.borderLeftWidth) + parseFloat(box.paddingLeft);
+    const top =
+      input.tagName === 'TEXTAREA'
+        ? rect.top + parseFloat(box.borderTopWidth) + parseFloat(box.paddingTop) + (lineHeight - glyphs) / 2
+        : rect.top + (rect.height - glyphs) / 2;
+    // неразрывные пробелы («8 200 ₸») — как обычные, как и в тексте
+    const text = input.placeholder.replace(/\s+/g, ' ').trim();
+    add(input, text, new DOMRect(left, top, rect.width, glyphs), true);
     items[items.length - 1]!.color = rgba(style.color);
   }
   // <select>: показанный вариант
