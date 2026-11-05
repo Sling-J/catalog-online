@@ -4,17 +4,21 @@ import { useUnit } from 'effector-react';
 
 import { $count, $open, $total, cartOpened } from '@/entities/cart';
 
+import { useBumpOnAdd } from '@/widgets/cart-pill/lib';
+
 /**
  * Кнопка корзины в шапке компьютера: «Корзина» или «3 · 31 700 ₸», открывает выпадающую панель корзины (S8);
- * пока панель открыта, вокруг кнопки кольцо. На телефоне вместо неё плавающая плашка внизу, поэтому `hidden lg:flex`.
+ * пока панель открыта, вокруг кнопки кольцо. Стало больше товаров — коротко «прыгает» (видно и под окном товара). На телефоне вместо неё плавающая плашка внизу, поэтому `hidden lg:flex`.
  */
 export function CartButton({ subdomain }: { subdomain: string }) {
   const { t } = useLingui();
   const { count, total, open } = useUnit({ count: $count, total: $total, open: $open });
   const openCart = useUnit(cartOpened);
+  const bump = useBumpOnAdd<HTMLButtonElement>('button', count);
 
   return (
     <button
+      ref={bump}
       type="button"
       onClick={() => openCart(subdomain)}
       aria-expanded={open}
