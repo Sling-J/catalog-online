@@ -113,7 +113,8 @@ export function ProductView({
         <div className="relative lg:w-[576px] lg:flex-none">
           {/* закончившийся товар: серое фото с плашкой «Закончился» */}
           <div className={cx('lg:h-full', soldOut && 'grayscale-[.85] brightness-105')}>
-            <ProductGallery photos={product.photos} name={product.name} short={soldOut} />
+            {/* key: при переходе стрелками к соседнему товару галерея начинается с первого фото */}
+            <ProductGallery key={product.id} photos={product.photos} name={product.name} short={soldOut} />
           </div>
           {soldOut && (
             <span className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[4deg] rounded-pill bg-ink-night px-[18px] py-2.5 text-[16px] font-extrabold text-white lg:px-[22px] lg:py-3 lg:text-[20px]">
