@@ -97,7 +97,9 @@ export function OrderSent({ order, onClose }: { order: SentOrder; onClose: () =>
             onClick={copy}
             className="inline-flex h-[52px] items-center justify-center rounded-pill bg-chip-haze px-[22px] text-[15px] font-semibold whitespace-nowrap text-ink-night hover:bg-haze-hover"
           >
-            {copied ? <Trans>Скопировано</Trans> : <Trans>Скопировать текст</Trans>}
+            <span key={String(copied)} className="motion-safe:animate-swap">
+              {copied ? <Trans>Скопировано</Trans> : <Trans>Скопировать текст</Trans>}
+            </span>
           </button>
         </div>
       </div>

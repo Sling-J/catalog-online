@@ -126,6 +126,8 @@
   --animate-fade-fast: fade 0.2s ease;
   /* подгруженные плитки сетки: прозрачны, пока ждут своей задержки (animation-delay у плитки) */
   --animate-tile-in: fade 0.25s ease backwards;
+  /* смена текста или иконки на месте («Скопировано»): новое проявляется, элемент с key */
+  --animate-swap: fade 0.15s ease;
   @keyframes slide-in {
     from {
       transform: translateX(40px);

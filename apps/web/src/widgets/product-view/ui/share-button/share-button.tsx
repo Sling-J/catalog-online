@@ -34,7 +34,7 @@ export function ShareButton({ title, className }: { title: string; className?: s
       aria-label={copied ? t`Ссылка скопирована` : t`Поделиться`}
       className={className}
     >
-      <Icon name={copied ? 'check' : 'share'} />
+      <Icon key={copied ? 'check' : 'share'} name={copied ? 'check' : 'share'} className="motion-safe:animate-swap" />
     </button>
   );
 }

@@ -27,7 +27,9 @@ export function CopyAddressButton({ address, className }: { address: string; cla
       onClick={copy}
       className={cx('flex flex-1 items-center justify-center rounded-[14px] text-[14px] font-semibold', className)}
     >
-      {copied ? <Trans>Скопировано</Trans> : <Trans>Скопировать адрес</Trans>}
+      <span key={String(copied)} className="motion-safe:animate-swap">
+        {copied ? <Trans>Скопировано</Trans> : <Trans>Скопировать адрес</Trans>}
+      </span>
     </button>
   );
 }

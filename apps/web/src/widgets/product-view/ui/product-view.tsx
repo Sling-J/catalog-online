@@ -162,9 +162,13 @@ export function ProductView({
           >
             <Icon name="chevron-left" strokeWidth={2.4} />
           </button>
-          {/* на компьютере и у закончившегося товара «Поделиться» в макете нет */}
+          {/* у закончившегося товара «Поделиться» в макете нет; на компьютере — по просьбе основателя (2026-11-05), в макете нет:
+              слева вверху на уровне «Закрыть» */}
           {!soldOut && (
-            <ShareButton title={product.name} className={`${roundButton} absolute top-3.5 right-3.5 lg:hidden`} />
+            <ShareButton
+              title={product.name}
+              className={`${roundButton} absolute top-3.5 right-3.5 lg:top-5 lg:right-auto lg:left-5`}
+            />
           )}
         </div>
 
@@ -183,7 +187,7 @@ export function ProductView({
               </div>
             ) : (
               <>
-                <h1 className="mt-1 text-[24px] leading-[1.15] font-extrabold tracking-[-0.02em] lg:mt-1.5 lg:mr-14 lg:text-[30px] lg:leading-[1.1] lg:tracking-[-0.03em]">
+                <h1 className="mt-1 text-[24px] leading-[1.15] font-extrabold tracking-[-0.02em] lg:mt-1.5 lg:mr-8 lg:text-[30px] lg:leading-[1.1] lg:tracking-[-0.03em]">
                   {product.name}
                 </h1>
                 <p className="mt-2 text-[26px] font-extrabold tabular-nums lg:mt-2.5 lg:text-[28px]">{price}</p>
