@@ -1,7 +1,7 @@
 import { useLoadMore } from '@catalog/ui';
 import { Plural } from '@lingui/react/macro';
 import { hashKey, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { productFacetsQueryOptions, productsQueryOptions, ProductTile } from '@/entities/product';
 import type { ProductListParams, ProductSort } from '@/entities/product';
@@ -48,6 +48,20 @@ export function CatalogGrid({
   if (shown.queryKey !== queryKey) setShown({ queryKey, pages: data.pages.length });
   const shownPages = shown.queryKey === queryKey ? shown.pages : data.pages.length;
 
+  // Новая выборка: сетка на миг чуть приглушается и возвращается — видно, что список обновился.
+  // Сетку не пересоздаём (иначе фото декодируются заново и плитки мигают пустыми); при первом показе — без анимации.
+  const grid = useRef<HTMLUListElement>(null);
+  const firstKey = useRef(queryKey);
+  useEffect(() => {
+    if (queryKey === firstKey.current) return;
+    firstKey.current = '';
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    grid.current?.animate([{ opacity: 0.6 }, { opacity: 1 }], {
+      duration: 300,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+    });
+  }, [queryKey]);
+
   return (
     <section className="mx-auto max-w-[1240px]">
       {/* на компьютере число товаров и сортировка стоят в строке категорий */}
@@ -67,7 +81,7 @@ export function CatalogGrid({
           onShowAllCategories={onShowAllCategories}
         />
       ) : (
-        <ul className="grid grid-cols-3 gap-0.5 lg:grid-cols-5 lg:gap-2 lg:px-5">
+        <ul ref={grid} className="grid grid-cols-3 gap-0.5 lg:grid-cols-5 lg:gap-2 lg:px-5">
           {data.pages.map((page, pageIndex) =>
             page.items.map((card, index) => {
               const loaded = pageIndex >= shownPages;
