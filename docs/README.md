@@ -4,7 +4,7 @@
 
 ## С чего начать
 
-1. [status.md](status.md): где проект сейчас и что дальше.
+1. [status.md](status.md): где проект сейчас и что дальше. Что уже сделано — [changelog.md](changelog.md).
 2. [00-vision/idea.md](00-vision/idea.md): что за продукт и зачем.
 3. [00-vision/idea-evaluation.md](00-vision/idea-evaluation.md): риски и корректировки идеи.
 4. [06-process/workflow.md](06-process/workflow.md): как мы работаем, стадии.
