@@ -65,4 +65,4 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - Токены дизайн-системы — `packages/ui/src/tokens.css` (Tailwind v4 `@theme`), источник — `DESIGN.md`.
 - Формы админки — TanStack Form через `useAppForm` из `@/shared/ui` (ADR 0003): проверка в `validators.onSubmit`, отправка `submitForm`, ошибки сервера `setServerError` / `setFormError`.
 - Файл в хранилище (API2) — `uploadFile` из `@/shared/api`; перетаскивание в админке — `@dnd-kit/react` (ADR 0001, пример — `features/product-photos/ui/sortable-photos`).
-- Общее для витрины и админки без бизнес-контекста (базовые компоненты, `Icon`, `useIsDesktop`, `useLoadMore`, `formatPrice`) — в `@catalog/ui`, не копией в каждом приложении.
+- Общее для витрины и админки без бизнес-контекста (базовые компоненты, `Icon`, `ChangingValue`, `useIsDesktop`, `useLoadMore`, `formatPrice`) — в `@catalog/ui`, не копией в каждом приложении.

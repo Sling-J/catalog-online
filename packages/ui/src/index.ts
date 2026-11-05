@@ -1,4 +1,5 @@
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './components/Button.js';
+export { ChangingValue, type ChangingValueProps } from './components/ChangingValue.js';
 export { Chip, type ChipProps } from './components/Chip.js';
 export { SizeChip, type SizeChipProps } from './components/SizeChip.js';
 export { Field, type FieldProps } from './components/Field.js';

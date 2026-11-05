@@ -14,7 +14,7 @@ export function CartButton({ subdomain }: { subdomain: string }) {
   const { t } = useLingui();
   const { count, total, open } = useUnit({ count: $count, total: $total, open: $open });
   const openCart = useUnit(cartOpened);
-  const bump = useBumpOnAdd<HTMLButtonElement>('button', count);
+  const bump = useBumpOnAdd<HTMLButtonElement>(count, { quiet: open });
 
   return (
     <button

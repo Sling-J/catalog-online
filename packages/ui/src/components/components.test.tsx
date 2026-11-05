@@ -5,6 +5,7 @@ import { useState, type ReactNode } from 'react';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { Button } from './Button.js';
+import { ChangingValue } from './ChangingValue.js';
 import { Chip } from './Chip.js';
 import { Field } from './Field.js';
 import { StockPill } from './StockPill.js';
@@ -28,6 +29,14 @@ describe('Button', () => {
     render(<Button variant="primary">Создать каталог</Button>);
     expect(screen.getByRole('button').className).toContain('bg-sun');
     expect(screen.getByRole('button').className).toContain('shadow-press-sun');
+  });
+});
+
+describe('ChangingValue', () => {
+  it('при смене показывает новое значение', () => {
+    const { rerender } = render(<ChangingValue value="9 500 ₸" />);
+    rerender(<ChangingValue value="19 000 ₸" />);
+    expect(screen.getByText('19 000 ₸')).toBeTruthy();
   });
 });
 

@@ -1,4 +1,4 @@
-import { Sheet, useIsDesktop, formatPrice } from '@catalog/ui';
+import { ChangingValue, Sheet, useIsDesktop, formatPrice } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useQuery } from '@tanstack/react-query';
 import { useUnit } from 'effector-react';
@@ -117,7 +117,9 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
                     <span className="text-[15px] text-ink-soft lg:text-[14px]">
                       <Trans>Итого</Trans>
                     </span>
-                    <span className="text-[22px] font-extrabold tabular-nums lg:text-[20px]">{formatPrice(total)}</span>
+                    <span className="text-[22px] font-extrabold tabular-nums lg:text-[20px]">
+                      <ChangingValue value={formatPrice(total)} />
+                    </span>
                   </div>
 
                   <div className="mt-3.5 lg:mt-3">
