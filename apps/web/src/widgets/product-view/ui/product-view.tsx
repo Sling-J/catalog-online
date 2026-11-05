@@ -136,8 +136,10 @@ export function ProductView({
         role={desktop ? 'dialog' : undefined}
         aria-modal={desktop || undefined}
         aria-label={desktop ? product.name : undefined}
+        // will-change: окно по центру стоит на дробных пикселях; без постоянного слоя после «всплытия»
+        // и листания браузер перерисовывает его с округлением — текст и рамки в конце сдвигаются
         className={cx(
-          'mx-auto h-full max-w-[640px] overflow-y-auto overscroll-contain pb-32 lg:relative lg:flex lg:h-[min(720px,calc(100dvh-64px))] lg:w-[min(1040px,100%)] lg:max-w-none lg:overflow-hidden lg:rounded-panel lg:bg-white lg:pb-0 lg:shadow-[0_40px_100px_rgb(11_10_38/0.35)]',
+          'mx-auto h-full lg:will-change-transform max-w-[640px] overflow-y-auto overscroll-contain pb-32 lg:relative lg:flex lg:h-[min(720px,calc(100dvh-64px))] lg:w-[min(1040px,100%)] lg:max-w-none lg:overflow-hidden lg:rounded-panel lg:bg-white lg:pb-0 lg:shadow-[0_40px_100px_rgb(11_10_38/0.35)]',
           animate && 'motion-safe:lg:animate-pop',
         )}
       >

@@ -32,8 +32,10 @@ export function ProductTile({ card }: { card: StorefrontProductCard }) {
           height={card.cover.height}
           alt=""
           loading="lazy"
+          // will-change: на компьютере плитки стоят на дробных пикселях; без постоянного слоя после зума
+          // браузер перерисовывает фото с округлением, и оно в конце «дёргается»
           className={cx(
-            'block aspect-square w-full object-cover transition-transform duration-[400ms] ease-out-soft group-hover:scale-[1.04] lg:duration-500',
+            'block aspect-square w-full object-cover transition-transform duration-[400ms] ease-out-soft group-hover:scale-[1.04] lg:duration-500 lg:will-change-transform',
             out && 'opacity-50 grayscale',
           )}
         />
