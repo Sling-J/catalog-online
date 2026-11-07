@@ -886,11 +886,12 @@ paths:
     delete:
       tags: [categories]
       operationId: deleteCategory
-      summary: Удалить; товары остаются без категории (FR-A6)
+      summary: Удалить; товары остаются без категории (FR-A6). Категорию с подкатегориями — нельзя (409 category_has_children)
       security: [{ cookieAuth: [] }]
       responses:
         '204': { description: 'Удалена' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
 
   # ───────────────────────── Свойства (атрибуты) ─────────────────────────
   /v1/admin/attributes:
@@ -972,6 +973,9 @@ paths:
       tags: [attributes]
       operationId: replaceAttributeValues
       summary: Значения и их порядок целиком. С id — переименовать/переставить, без id — добавить, отсутствующие — удалить (если не используются)
+      description: |
+        409 attribute_value_in_use — удаляемое значение стоит у вариантов; 409 attribute_value_taken — значение
+        повторяется (без учёта регистра), в `errors` — какое: `{ field: 'values.3.value', code: 'taken' }`.
       security: [{ cookieAuth: [] }]
       requestBody:
         required: true
@@ -1391,12 +1395,13 @@ components:
           type: string
           description: |
             Машинный код: not_found, unauthorized, validation_failed, subdomain_taken, subdomain_reserved,
-            email_taken, sku_taken, category_name_taken, attribute_name_taken, attribute_value_in_use,
+            email_taken, sku_taken, category_name_taken, category_has_children, attribute_name_taken,
+            attribute_value_in_use, attribute_value_taken,
             shop_not_ready, shop_hidden, shop_blocked, import_in_progress, import_not_ready,
             photo_limit_reached, upload_not_found, token_expired, rate_limited
         errors:
           type: array
-          description: Для validation_failed — ошибки по полям
+          description: Для validation_failed и attribute_value_taken — ошибки по полям
           items:
             type: object
             required: [field, code]

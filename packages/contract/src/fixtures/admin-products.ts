@@ -165,17 +165,6 @@ export const createDemoAdminProducts = (assetBase?: string): Product[] => {
   return ordered.map((item, index) => item.build(new Date(CREATED_FROM - index * 3_600_000).toISOString()));
 };
 
-/** Категории админки: дерево (в демо — один уровень) с числом товаров. */
-export const demoAdminCategories = (products: Product[]): Category[] =>
-  demoCategories.map((category, position) => ({
-    id: category.id,
-    name: category.name,
-    parentId: null,
-    position,
-    productCount: products.filter((product) => product.categoryId === category.id).length,
-    children: [],
-  }));
-
 const totalStock = (product: Product): number => product.variants.reduce((sum, variant) => sum + variant.stock, 0);
 
 export const toListItem = (product: Product, categories: Category[]): ProductListItem => {

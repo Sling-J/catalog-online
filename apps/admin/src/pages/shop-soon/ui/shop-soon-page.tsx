@@ -4,15 +4,13 @@ import type { ReactNode } from 'react';
 
 import { BackBar } from '@/shared/ui';
 
-type Section = 'categories' | 'stock' | 'stats';
+type Section = 'stock' | 'stats';
 
 /**
- * Заглушка пунктов раздела «Магазин», экраны которых ещё не сделаны: категории (T-311), наличие (T-312),
- * статистика (T-313). Вложенный экран: «Назад» в «Магазин».
+ * Заглушка пунктов раздела «Магазин», экраны которых ещё не сделаны: наличие (T-312), статистика (T-313). Вложенный экран: «Назад» в «Магазин».
  */
 export function ShopSoonPage({ section }: { section: Section }) {
   const titles: Record<Section, ReactNode> = {
-    categories: <Trans>Категории и размеры</Trans>,
     stock: <Trans>Как показывать наличие</Trans>,
     stats: <Trans>Статистика</Trans>,
   };

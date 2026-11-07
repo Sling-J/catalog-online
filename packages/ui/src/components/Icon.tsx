@@ -31,7 +31,8 @@ export type IconName =
   | 'eye-off'
   | 'lock'
   | 'chart'
-  | 'sync';
+  | 'sync'
+  | 'drag';
 
 // Контурные иконки 24×24, штрих берут от `currentColor`. Общие для витрины и админки.
 const glyphs: Record<IconName, ReactNode> = {
@@ -200,6 +201,17 @@ const glyphs: Record<IconName, ReactNode> = {
   ),
   // столбики «Статистика» (макет AdminPhone2, раздел «Магазин»): штрих 2.4
   chart: <path d="M5 19V11M12 19V5M19 19v-6" />,
+  // шесть точек — «перетаскивайте» (макет AdminPhone2, «Категории и размеры»): штрих 2.6
+  drag: (
+    <>
+      <circle cx="9" cy="6" r="1" />
+      <circle cx="15" cy="6" r="1" />
+      <circle cx="9" cy="12" r="1" />
+      <circle cx="15" cy="12" r="1" />
+      <circle cx="9" cy="18" r="1" />
+      <circle cx="15" cy="18" r="1" />
+    </>
+  ),
 };
 
 export interface IconProps {

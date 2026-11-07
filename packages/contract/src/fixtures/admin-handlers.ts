@@ -13,6 +13,8 @@
 // Импорт (T-309): сценарий — по имени файла, шаги идут по времени (подробно — admin-imports.ts).
 // Раздел «Магазин» (T-310): правки «О магазине» и логотип демо-магазина живут, пока открыта страница; токен превью —
 // любой (витрина на моках принимает любой); статистика — неизменный пример за неделю.
+// Категории и свойства (T-311): создать, переименовать, порядок и вложенность, удалить; правки живут в памяти
+// (подробно — admin-catalog.ts).
 // Остальные разделы добавляются со своими экранами.
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 
@@ -41,8 +43,16 @@ import {
   handleGetProduct,
   handleGetProductCounts,
   handleGetShop,
+  handleCreateAttribute,
+  handleCreateCategory,
+  handleDeleteAttribute,
+  handleDeleteCategory,
   handleListAttributes,
   handleListCategories,
+  handleRenameCategory,
+  handleReorderCategories,
+  handleReplaceAttributeValues,
+  handleUpdateAttribute,
   handleListProducts,
   handleLogin,
   handleLogout,
@@ -68,10 +78,25 @@ import {
   createAdminProduct,
   createDemoAdminAttributes,
   createDemoAdminProducts,
-  demoAdminCategories,
   selectAdminProducts,
   toListItem,
 } from './admin-products.js';
+import {
+  type CatalogOutcome,
+  type CategoryRecord,
+  categoryTree,
+  createAttribute,
+  createCategory,
+  deleteAttribute,
+  deleteCategory,
+  demoCategoryRecords,
+  flatCategories,
+  renameCategory,
+  reorderCategories,
+  replaceAttributeValues,
+  updateAttribute,
+  withUsage,
+} from './admin-catalog.js';
 import { createImportStore, importTemplateXlsx, mappingProblem } from './admin-imports.js';
 import { demoShop, HIDDEN_DEMO_SUBDOMAIN } from './demo-shop.js';
 
@@ -305,6 +330,16 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
     demoAttributes ??= createDemoAdminAttributes(productsOf(session, request));
     return demoAttributes;
   };
+  // категории: у демо-магазина — из витрины, у нового — пусто
+  let demoCategoryList: CategoryRecord[] | null = null;
+  const newCategories: CategoryRecord[] = [];
+  const categoriesOf = (session: Session): CategoryRecord[] => {
+    if (session.kind !== 'demo') return newCategories;
+    demoCategoryList ??= demoCategoryRecords();
+    return demoCategoryList;
+  };
+  const treeOf = (session: Session, request: Request) =>
+    categoryTree(categoriesOf(session), productsOf(session, request));
   const findProduct = (session: Session, request: Request, productId: unknown) => {
     const products = productsOf(session, request);
     return { products, index: products.findIndex((item) => item.id === productId) };
@@ -328,6 +363,14 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
     status: 'processing',
     image: null,
   });
+  // ответ на правку категорий и свойств: не нашли — 404, повтор имени — 409 с кодом, остальное — 422
+  const outcomeProblem = (outcome: CatalogOutcome<unknown> | 'in_use', conflictCode: string): Response | null => {
+    if (outcome === 'not_found') return problem(404, 'not_found');
+    if (outcome === 'conflict') return problem(409, conflictCode);
+    if (outcome === 'in_use') return problem(409, 'attribute_value_in_use');
+    if (outcome === 'invalid') return problem(422, 'validation_failed');
+    return null;
+  };
   const invalidVariants = () =>
     problem(422, 'validation_failed', { errors: [{ field: 'variants', code: 'unknown_attribute' }] });
   const shopOf = (session: Extract<Session, { kind: 'new' }>): Shop => ({
@@ -534,7 +577,7 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
       });
       const offset = Number(query.get('cursor') ?? 0) || 0;
       const limit = Number(query.get('limit') ?? PAGE_SIZE) || PAGE_SIZE;
-      const categories = demoAdminCategories(products);
+      const categories = flatCategories(treeOf(session, request));
       return HttpResponse.json({
         items: found.slice(offset, offset + limit).map((product) => toListItem(product, categories)),
         nextCursor: offset + limit < found.length ? String(offset + limit) : null,
@@ -544,7 +587,45 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
     handleListCategories(({ request }) => {
       const session = read();
       if (session.kind === 'out') return problem(401, 'unauthorized');
-      return HttpResponse.json(session.kind === 'demo' ? demoAdminCategories(productsOf(session, request)) : []);
+      return HttpResponse.json(treeOf(session, request));
+    }, options),
+    handleCreateCategory(async ({ request }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { name, parentId } = await request.json();
+      const outcome = createCategory(categoriesOf(session), name, parentId ?? null);
+      const failed = outcomeProblem(outcome, 'category_name_taken');
+      if (failed) return failed;
+      const created = flatCategories(treeOf(session, request)).find(
+        (item) => item.id === (outcome as CategoryRecord).id,
+      );
+      return HttpResponse.json(created, { status: 201 });
+    }, options),
+    handleReorderCategories(async ({ request }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { items } = await request.json();
+      const outcome = reorderCategories(categoriesOf(session), items);
+      // повтор имени среди новых соседей — тоже 422: порядок пришёл неверный
+      if (typeof outcome === 'string') return problem(422, 'validation_failed');
+      return HttpResponse.json(treeOf(session, request));
+    }, options),
+    handleRenameCategory(async ({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { name } = await request.json();
+      const outcome = renameCategory(categoriesOf(session), String(params.categoryId), name);
+      const failed = outcomeProblem(outcome, 'category_name_taken');
+      if (failed) return failed;
+      return HttpResponse.json(flatCategories(treeOf(session, request)).find((item) => item.id === params.categoryId));
+    }, options),
+    handleDeleteCategory(({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const outcome = deleteCategory(categoriesOf(session), productsOf(session, request), String(params.categoryId));
+      if (outcome === 'not_found') return problem(404, 'not_found');
+      if (outcome === 'has_children') return problem(409, 'category_has_children');
+      return new HttpResponse(null, { status: 204 });
     }, options),
     handleGetProduct(({ request, params }) => {
       const session = read();
@@ -650,7 +731,53 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
     handleListAttributes(({ request }) => {
       const session = read();
       if (session.kind === 'out') return problem(401, 'unauthorized');
-      return HttpResponse.json(attributesOf(session, request));
+      const products = productsOf(session, request);
+      return HttpResponse.json(attributesOf(session, request).map((attribute) => withUsage(attribute, products)));
+    }, options),
+    handleCreateAttribute(async ({ request }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const outcome = createAttribute(attributesOf(session, request), await request.json());
+      return outcomeProblem(outcome, 'attribute_name_taken') ?? HttpResponse.json(outcome, { status: 201 });
+    }, options),
+    handleUpdateAttribute(async ({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const products = productsOf(session, request);
+      const outcome = updateAttribute(
+        attributesOf(session, request),
+        products,
+        String(params.attributeId),
+        await request.json(),
+      );
+      const failed = outcomeProblem(outcome, 'attribute_name_taken');
+      return failed ?? HttpResponse.json(withUsage(outcome as Attribute, products));
+    }, options),
+    handleDeleteAttribute(({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const removed = deleteAttribute(
+        attributesOf(session, request),
+        productsOf(session, request),
+        String(params.attributeId),
+      );
+      return removed ? new HttpResponse(null, { status: 204 }) : problem(404, 'not_found');
+    }, options),
+    handleReplaceAttributeValues(async ({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { values } = await request.json();
+      const outcome = replaceAttributeValues(
+        attributesOf(session, request),
+        productsOf(session, request),
+        String(params.attributeId),
+        values,
+      );
+      if (typeof outcome === 'object' && 'taken' in outcome)
+        return problem(409, 'attribute_value_taken', {
+          errors: [{ field: `values.${outcome.taken}.value`, code: 'taken' }],
+        });
+      return outcomeProblem(outcome, 'attribute_value_taken') ?? HttpResponse.json(outcome);
     }, options),
     handleBulkUpdateProducts(async ({ request }) => {
       const session = read();

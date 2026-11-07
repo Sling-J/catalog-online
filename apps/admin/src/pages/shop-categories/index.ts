@@ -1,0 +1,1 @@
+export { ShopCategoriesPage } from './ui';
