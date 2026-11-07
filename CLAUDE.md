@@ -4,7 +4,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 
 ## Начало каждой сессии
 1. Прочитай `docs/status.md`: текущая стадия и следующий шаг.
-2. Карта документации: `docs/README.md`. Процесс: `docs/06-process/workflow.md`.
+2. Карта документации: `docs/README.md`. Процесс: `docs/06-process/workflow.md`. Грабли прошлых сессий (окружение, сборка, проверка) — `docs/06-process/pitfalls.md`.
 3. Перед задачей — документы её темы из таблицы «Где что лежит» ниже и стек в `docs/02-architecture/adr/0001-stack.md`. Перед кодом фронта — `docs/02-architecture/frontend-structure.md`.
 
 ## Правила работы
@@ -15,6 +15,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - Язык документов и общения: русский.
 - В конце сессии обнови `docs/status.md`.
 - Документацию библиотек и фреймворков смотри через Context7 MCP, а не по памяти.
+- Что-то не запустилось, упало или пришлось обходить (команда, сборка, проверка, поведение библиотеки) — сразу запиши в `docs/06-process/pitfalls.md`: что случилось → почему → как правильно. Продуктовые решения туда не пишем.
 
 ## Документация всегда актуальна
 Цель: в новой сессии проект понятен из документов, без пересказа. Устаревший документ хуже отсутствующего.
@@ -59,10 +60,10 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 
 ## Код
 - Контракт API правится только в `openapi.yaml`, затем `pnpm generate`; сгенерированное (`*.gen.ts`) руками не трогаем.
-- Демо-данные «Айгерим Kids» для моков — `@catalog/contract/fixtures`, обработчики MSW — `@catalog/contract/msw`.
+- Демо-данные «Айгерим Kids» для моков — `@catalog/contract/fixtures`, обработчики MSW — `@catalog/contract/msw`. В разработке приложения берут контракт из `src/` (условие `development` в `exports`), пересобирать после правок моков не нужно; `tsc` приложений по-прежнему смотрит на `dist` — его обновляет `pnpm check` / `pnpm build`.
 - Сообщения превью админка ↔ витрина (`postMessage`) — `@catalog/contract/preview` (Zod), не в `openapi.yaml`.
 - Код `apps/web` и `apps/admin` — по FSD (`docs/02-architecture/frontend-structure.md`): слои `app → pages → widgets → features → entities → shared`, без импортов между срезами одного слоя, снаружи среза только через его `index.ts`, алиас `@/*` → `src/*`. Границы проверяет `pnpm lint` (`eslint.fsd.js`).
 - Токены дизайн-системы — `packages/ui/src/tokens.css` (Tailwind v4 `@theme`), источник — `DESIGN.md`.
-- Формы админки — TanStack Form через `useAppForm` из `@/shared/ui` (ADR 0003): проверка в `validators.onSubmit`, отправка `submitForm`, ошибки сервера `setServerError` / `setFormError`.
+- Формы админки — TanStack Form через `useAppForm` из `@/shared/ui` (ADR 0003): проверка в `validators.onSubmit`, отправка `submitForm`, ошибки сервера `setServerError` / `setFormError`. Уход с несохранёнными правками — `useLeaveGuard` из `@/shared/hooks` и `LeaveConfirm` из `@/shared/ui`; общие поля форм (`TextAreaField`, `FieldLabel`, `FieldNote`, `SaveBar`) — там же.
 - Файл в хранилище (API2) — `uploadFile` из `@/shared/api`; перетаскивание в админке — `@dnd-kit/react` (ADR 0001, пример — `features/product-photos/ui/sortable-photos`).
 - Общее для витрины и админки без бизнес-контекста (базовые компоненты, `Icon`, `ChangingValue`, `useIsDesktop`, `useLoadMore`, `formatPrice`) — в `@catalog/ui`, не копией в каждом приложении.

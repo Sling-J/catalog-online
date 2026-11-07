@@ -6,30 +6,37 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "development": "./src/index.ts",
       "default": "./dist/index.js"
     },
     "./query": {
       "types": "./dist/query.d.ts",
+      "development": "./src/query.ts",
       "default": "./dist/query.js"
     },
     "./zod": {
       "types": "./dist/zod.d.ts",
+      "development": "./src/zod.ts",
       "default": "./dist/zod.js"
     },
     "./msw": {
       "types": "./dist/msw.d.ts",
+      "development": "./src/msw.ts",
       "default": "./dist/msw.js"
     },
     "./nest": {
       "types": "./dist/nest.d.ts",
+      "development": "./src/nest.ts",
       "default": "./dist/nest.js"
     },
     "./preview": {
       "types": "./dist/preview.d.ts",
+      "development": "./src/preview.ts",
       "default": "./dist/preview.js"
     },
     "./fixtures": {
       "types": "./dist/fixtures/index.d.ts",
+      "development": "./src/fixtures/index.ts",
       "default": "./dist/fixtures/index.js"
     }
   },

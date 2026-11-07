@@ -20,7 +20,7 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 | `apps/admin` | Админка магазина — Vite + React SPA; код по FSD, формы на TanStack Form ([ADR 0003](docs/02-architecture/adr/0003-forms-tanstack-form.md)), перетаскивание — `@dnd-kit/react` |
 | `apps/api` | API — NestJS + PostgreSQL (Drizzle) |
 | `packages/ui` | Токены дизайн-системы, общие компоненты, иконки и хуки витрины и админки |
-| `packages/contract` | Контракт API `openapi.yaml` и сгенерированный код |
+| `packages/contract` | Контракт API `openapi.yaml` и сгенерированный код. В разработке (Vite, Vitest) приложения берут исходники `src/` — условие `development` в `exports`, правки моков видны без сборки; сборка и проверка типов — из `dist` |
 | `tools/design-compare` | Сверка экрана приложения с артбордом холста (`pnpm design:compare`, описание — README папки) |
 
 ## Что нужно для разработки
