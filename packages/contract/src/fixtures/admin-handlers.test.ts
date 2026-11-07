@@ -152,6 +152,25 @@ describe('моки админки: мастер', () => {
   });
 });
 
+describe('моки админки: наличие на витрине', () => {
+  it('режим, порог «мало» и показ закончившихся сохраняются; порог вне 1–50 — 422', async () => {
+    fresh();
+    const patch = (body: unknown) =>
+      fetch('http://api.test/v1/admin/shop', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    const saved = (await (
+      await patch({ stockDisplay: 'exact', lowStockThreshold: 5, showOutOfStock: false })
+    ).json()) as Shop;
+    expect(saved).toMatchObject({ stockDisplay: 'exact', lowStockThreshold: 5, showOutOfStock: false });
+    expect(await getJson<Shop>('/admin/shop')).toMatchObject({ stockDisplay: 'exact', lowStockThreshold: 5 });
+    expect((await patch({ lowStockThreshold: 0 })).status).toBe(422);
+    expect((await patch({ lowStockThreshold: 51 })).status).toBe(422);
+  });
+});
+
 describe('моки админки: публикация', () => {
   it('снятие переводит демо-магазин в черновик, публикация — обратно', async () => {
     fresh();

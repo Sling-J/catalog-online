@@ -4,14 +4,13 @@ import type { ReactNode } from 'react';
 
 import { BackBar } from '@/shared/ui';
 
-type Section = 'stock' | 'stats';
+type Section = 'stats';
 
 /**
- * Заглушка пунктов раздела «Магазин», экраны которых ещё не сделаны: наличие (T-312), статистика (T-313). Вложенный экран: «Назад» в «Магазин».
+ * Заглушка пунктов раздела «Магазин», экраны которых ещё не сделаны: статистика (T-313). Вложенный экран: «Назад» в «Магазин».
  */
 export function ShopSoonPage({ section }: { section: Section }) {
   const titles: Record<Section, ReactNode> = {
-    stock: <Trans>Как показывать наличие</Trans>,
     stats: <Trans>Статистика</Trans>,
   };
   const title = titles[section];

@@ -1,9 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { ShopSoonPage } from '@/pages/shop-soon';
+import { shopQueryOptions } from '@/entities/shop';
+import { ShopStockPage } from '@/pages/shop-stock';
 
-// «Магазин → Как показывать наличие» — экран появится в T-312; пока заглушка, чтобы строка раздела куда-то вела.
+// «Магазин → Наличие на витрине» (T-312). Вложенный экран: на телефоне без шапки магазина и нижнего меню.
 export const Route = createFileRoute('/_shell/shop_/stock')({
   staticData: { subScreen: true },
-  component: () => <ShopSoonPage section="stock" />,
+  loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(shopQueryOptions()),
+  component: ShopStockPage,
 });

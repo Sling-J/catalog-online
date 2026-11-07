@@ -11,7 +11,8 @@
 // Фото (T-307): прикрепить загруженное (в новом товаре — сразу при создании), порядок, удаление; сжатие изображается
 // паузой — фото сначала `processing`, через пару секунд `ready`. Не больше 10 фото у товара (409 `photo_limit_reached`).
 // Импорт (T-309): сценарий — по имени файла, шаги идут по времени (подробно — admin-imports.ts).
-// Раздел «Магазин» (T-310): правки «О магазине» и логотип демо-магазина живут, пока открыта страница; токен превью —
+// Раздел «Магазин» (T-310): правки «О магазине», настройки наличия (T-312) и логотип демо-магазина живут, пока открыта
+// страница (у нового магазина — в сессии); порог «мало» — от 1 до 50 (иначе 422); токен превью —
 // любой (витрина на моках принимает любой); статистика — неизменный пример за неделю.
 // Категории и свойства (T-311): создать, переименовать, порядок и вложенность, удалить; правки живут в памяти
 // (подробно — admin-catalog.ts).
@@ -189,10 +190,33 @@ type NewShopFields = {
   subdomain?: string;
   whatsapp?: string;
   setupCompleted?: boolean;
-} & Partial<Pick<Shop, 'description' | 'instagram' | 'address' | 'howToFind' | 'schedule'>>;
+} & Partial<
+  Pick<
+    Shop,
+    | 'description'
+    | 'instagram'
+    | 'address'
+    | 'howToFind'
+    | 'schedule'
+    | 'stockDisplay'
+    | 'lowStockThreshold'
+    | 'showOutOfStock'
+  >
+>;
 
 /** Поля «О магазине», которые моки запоминают из `PATCH /shop`. */
-const SETTINGS_FIELDS = ['name', 'description', 'whatsapp', 'instagram', 'address', 'howToFind', 'schedule'] as const;
+const SETTINGS_FIELDS = [
+  'name',
+  'description',
+  'whatsapp',
+  'instagram',
+  'address',
+  'howToFind',
+  'schedule',
+  'stockDisplay',
+  'lowStockThreshold',
+  'showOutOfStock',
+] as const;
 
 /** Сессия на моках: демо-владелец, только что зарегистрированный магазин или никто. */
 type Session =
@@ -453,6 +477,10 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
         if (reason === 'invalid')
           return problem(422, 'validation_failed', { errors: [{ field: 'subdomain', code: 'invalid_format' }] });
         if (reason) return problem(409, reason === 'taken' ? 'subdomain_taken' : 'subdomain_reserved');
+      }
+      const threshold = body.lowStockThreshold;
+      if (threshold !== undefined && (!Number.isInteger(threshold) || threshold < 1 || threshold > 50)) {
+        return problem(422, 'validation_failed', { errors: [{ field: 'lowStockThreshold', code: 'out_of_range' }] });
       }
       if (body.whatsapp !== undefined && !/^\+7\d{10}$/.test(body.whatsapp)) {
         return problem(422, 'validation_failed', { errors: [{ field: 'whatsapp', code: 'invalid_format' }] });
