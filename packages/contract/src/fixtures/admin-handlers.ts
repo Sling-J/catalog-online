@@ -13,7 +13,7 @@
 // Импорт (T-309): сценарий — по имени файла, шаги идут по времени (подробно — admin-imports.ts).
 // Раздел «Магазин» (T-310): правки «О магазине», настройки наличия (T-312) и логотип демо-магазина живут, пока открыта
 // страница (у нового магазина — в сессии); порог «мало» — от 1 до 50 (иначе 422); токен превью —
-// любой (витрина на моках принимает любой); статистика — неизменный пример за неделю.
+// любой (витрина на моках принимает любой); статистика — admin-stats.ts.
 // Категории и свойства (T-311): создать, переименовать, порядок и вложенность, удалить; правки живут в памяти
 // (подробно — admin-catalog.ts).
 // Остальные разделы добавляются со своими экранами.
@@ -70,7 +70,7 @@ import {
   handleVerifyEmail,
   type RequestHandlerOptions,
 } from '../gen/msw.gen.js';
-import type { Attribute, Image, Me, Photo, Problem, Product, Shop, Stats } from '../gen/types.gen.js';
+import type { Attribute, Image, Me, Photo, Problem, Product, Shop } from '../gen/types.gen.js';
 import {
   type AdminFilter,
   type AdminSort,
@@ -99,6 +99,7 @@ import {
   withUsage,
 } from './admin-catalog.js';
 import { createImportStore, importTemplateXlsx, mappingProblem } from './admin-imports.js';
+import { demoStats, emptyStats, type StatsPeriod } from './admin-stats.js';
 import { demoShop, HIDDEN_DEMO_SUBDOMAIN } from './demo-shop.js';
 
 const SHOP_ID = '0192d000-0000-7000-8000-00000000a001';
@@ -288,33 +289,6 @@ const meOf = (session: Exclude<Session, { kind: 'out' }>, edits: Partial<Shop> =
           setupCompleted: session.shop?.setupCompleted ?? false,
         },
       };
-
-const DEMO_DAY_VIEWS = [150, 162, 171, 168, 190, 212, 187];
-const DEMO_DAY_CLICKS = [5, 6, 7, 5, 8, 9, 6];
-
-/** Последние 7 дней по UTC, от старых к новым. */
-const lastWeek = (): string[] =>
-  Array.from({ length: 7 }, (_, index) => new Date(Date.now() - (6 - index) * 86_400_000).toISOString().slice(0, 10));
-
-const demoStats = (): Stats => ({
-  period: '7d',
-  totals: { views: 1240, orderClicks: 46 },
-  previousTotals: { views: 1050, orderClicks: 39 },
-  byDay: lastWeek().map((date, index) => ({
-    date,
-    views: DEMO_DAY_VIEWS[index] ?? 0,
-    orderClicks: DEMO_DAY_CLICKS[index] ?? 0,
-  })),
-  topProducts: [],
-});
-
-const emptyStats = (): Stats => ({
-  period: '7d',
-  totals: { views: 0, orderClicks: 0 },
-  previousTotals: { views: 0, orderClicks: 0 },
-  byDay: lastWeek().map((date) => ({ date, views: 0, orderClicks: 0 })),
-  topProducts: [],
-});
 
 export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminHandlersOptions = {}): HttpHandler[] => {
   let memory: Session = { kind: 'demo' };
@@ -579,11 +553,16 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
         { status: 201 },
       );
     }, options),
-    // статистика за неделю — пример для строки «Статистика» в разделе «Магазин»; экран — T-313
-    handleGetStats(() => {
+    // статистика (T-313): неизменные примеры за 7 и 30 дней и за всё время; пауза — чтобы была видна загрузка
+    handleGetStats(async ({ request }) => {
       const session = read();
       if (session.kind === 'out') return problem(401, 'unauthorized');
-      return HttpResponse.json(session.kind === 'demo' ? demoStats() : emptyStats());
+      await delay(300);
+      const value = new URL(request.url).searchParams.get('period') ?? '7d';
+      const period: StatsPeriod = value === '30d' || value === 'all' ? value : '7d';
+      return HttpResponse.json(
+        session.kind === 'demo' ? demoStats(period, productsOf(session, request)) : emptyStats(period),
+      );
     }, options),
     handleGetProductCounts(({ request }) => {
       const session = read();
