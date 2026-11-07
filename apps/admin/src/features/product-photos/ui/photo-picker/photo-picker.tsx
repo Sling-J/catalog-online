@@ -8,8 +8,8 @@ import { SortablePhotos } from '../sortable-photos';
 export type PhotoPickerApi = {
   /** Плитки в текущем порядке (пока тянут — в новом). */
   tiles: PhotoList['tiles'];
-  /** Открыть выбор файлов. */
-  choose: () => void;
+  /** Открыть выбор файлов; `camera` — сразу камера телефона (на компьютере — обычный выбор). */
+  choose: (source?: 'camera') => void;
   /** Открыть действия с фото. */
   open: (id: string) => void;
 };
@@ -20,24 +20,38 @@ export type PhotoPickerApi = {
  */
 export function PhotoPicker({ photos, children }: { photos: PhotoList; children: (api: PhotoPickerApi) => ReactNode }) {
   const input = useRef<HTMLInputElement>(null);
+  const camera = useRef<HTMLInputElement>(null);
   const [openId, setOpenId] = useState<string>();
   const opened = photos.tiles.find((tile) => tile.id === openId);
   const sortableIds = photos.tiles.filter((tile) => tile.sortable).map((tile) => tile.id);
   return (
     <>
-      <input
-        ref={input}
-        type="file"
-        accept={PHOTO_ACCEPT}
-        multiple
-        hidden
-        onChange={(event) => {
-          photos.add([...(event.target.files ?? [])]);
-          event.target.value = '';
-        }}
-      />
+      {[
+        { ref: input, multiple: true, capture: undefined },
+        { ref: camera, multiple: false, capture: 'environment' as const },
+      ].map(({ ref, multiple, capture }) => (
+        <input
+          key={capture ?? 'files'}
+          ref={ref}
+          type="file"
+          accept={PHOTO_ACCEPT}
+          capture={capture}
+          multiple={multiple}
+          hidden
+          onChange={(event) => {
+            photos.add([...(event.target.files ?? [])]);
+            event.target.value = '';
+          }}
+        />
+      ))}
       <SortablePhotos tiles={photos.tiles} onReorder={photos.reorder}>
-        {(tiles) => children({ tiles, choose: () => input.current?.click(), open: setOpenId })}
+        {(tiles) =>
+          children({
+            tiles,
+            choose: (source) => (source === 'camera' ? camera : input).current?.click(),
+            open: setOpenId,
+          })
+        }
       </SortablePhotos>
       <PhotoActions
         tile={opened}

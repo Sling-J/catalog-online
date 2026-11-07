@@ -88,7 +88,7 @@ export function HomePage() {
               />
             }
             // быстрый режим «Добавить фото» — T-308; пока ведём в «Товары» (A16)
-            action={{ to: '/products', label: <Trans>Снять →</Trans> }}
+            action={{ to: '/products/photos', label: <Trans>Снять →</Trans> }}
           />
         );
       case 'email':

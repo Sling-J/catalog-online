@@ -81,6 +81,15 @@ export function ProductsPage({
         <PageTitle
           actions={
             <>
+              {counts.noPhoto > 0 && (
+                <Link
+                  to="/products/photos"
+                  className="press hidden h-11 items-center gap-2 rounded-pill border-[1.5px] border-line bg-white px-[18px] text-[14px] font-bold hover:border-line-hover lg:inline-flex"
+                >
+                  <Icon name="camera" size={18} />
+                  <Trans>Добавить фото</Trans>
+                </Link>
+              )}
               <Link
                 to="/import"
                 className="press hidden h-11 items-center gap-2 rounded-pill border-[1.5px] border-line bg-white px-[18px] text-[14px] font-bold hover:border-line-hover lg:inline-flex"
@@ -120,9 +129,9 @@ export function ProductsPage({
         </div>
       </div>
       {/* баннер — над списком товаров; при загрузке, ошибке и пустой выборке его нет (доска AdminProductsStates) */}
-      {counts.noPhoto > 0 && search.filter !== 'no_photo' && hasRows && !selectingOnPhone && (
+      {counts.noPhoto > 0 && hasRows && !selectingOnPhone && (
         <div className="lg:hidden">
-          <PhotoBanner count={counts.noPhoto} onShoot={() => change({ filter: 'no_photo' })} />
+          <PhotoBanner count={counts.noPhoto} />
         </div>
       )}
       <ProductList

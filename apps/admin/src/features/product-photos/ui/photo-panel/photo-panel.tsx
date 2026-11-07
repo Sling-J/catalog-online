@@ -79,7 +79,7 @@ export function PhotoPanel({ photos, size }: { photos: PhotoList; size: 'edit' |
                   // рамка снаружи размера, как в макете (content-box)
                   <button
                     type="button"
-                    onClick={choose}
+                    onClick={() => choose()}
                     className="box-content flex size-[98px] flex-col items-center justify-center gap-1 rounded-field border-[1.5px] border-dashed border-[#c9c3e3] bg-[#f6f5fb] text-[12px] font-semibold text-ink-quiet"
                   >
                     <Icon name="plus" size={20} />
@@ -91,7 +91,7 @@ export function PhotoPanel({ photos, size }: { photos: PhotoList; size: 'edit' |
             {zone && photos.canAdd && (
               <button
                 type="button"
-                onClick={choose}
+                onClick={() => choose()}
                 className={cx(
                   'box-content flex h-[110px] w-[calc(100%-4px)] flex-col items-center justify-center gap-1.5 rounded-[20px] border-2 border-dashed border-[#c9c3e3] bg-[#f8f7fd] text-[14px] text-ink-quiet',
                   cover && 'mt-2',

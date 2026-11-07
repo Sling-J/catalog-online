@@ -35,7 +35,7 @@ export function PhotoStrip({ photos, size, hint }: { photos: PhotoList; size: 'e
               // рамка снаружи размера, как в макете (content-box)
               <button
                 type="button"
-                onClick={choose}
+                onClick={() => choose()}
                 className={cx(
                   'box-content flex flex-none flex-col items-center justify-center gap-1 rounded-thumb border-[1.5px] border-dashed border-[#c9c3e3] bg-[#f6f5fb] text-[12px] font-semibold text-ink-quiet',
                   box,
