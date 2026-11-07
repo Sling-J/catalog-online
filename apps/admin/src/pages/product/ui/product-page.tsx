@@ -1,25 +1,18 @@
 import { useIsDesktop } from '@catalog/ui';
-import { useLingui } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 
-import {
-  draftFromProduct,
-  LeaveConfirm,
-  useDraftMessages,
-  useLeaveGuard,
-  useProductForm,
-  useSaveProduct,
-} from '@/features/product-form';
+import { draftFromProduct, useDraftMessages, useProductForm, useSaveProduct } from '@/features/product-form';
 import { useProductPhotos } from '@/features/product-photos';
 import { attributesQueryOptions } from '@/entities/attribute';
 import { categoriesQueryOptions, flattenCategories } from '@/entities/category';
 import { productQueryOptions } from '@/entities/product';
 import { shopQueryOptions, storefrontUrl } from '@/entities/shop';
 import { fieldErrors } from '@/shared/api';
-import { useFormMessages } from '@/shared/hooks';
-import { setFormError, setServerError, submitForm, useIsDirty } from '@/shared/ui';
+import { useFormMessages, useLeaveGuard } from '@/shared/hooks';
+import { LeaveConfirm, setFormError, setServerError, submitForm, useIsDirty } from '@/shared/ui';
 
 import type { ProductView } from '../types';
 
@@ -94,7 +87,7 @@ export function ProductPage({ productId }: { productId: string }) {
   return (
     <>
       {isDesktop ? <DeskEditor {...view} /> : <PhoneEditor {...view} />}
-      <LeaveConfirm guard={guard} />
+      <LeaveConfirm guard={guard} text={<Trans>Правки в карточке пропадут.</Trans>} />
     </>
   );
 }

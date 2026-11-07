@@ -2,7 +2,7 @@ import { cx } from '@catalog/ui';
 import { useId, type ReactNode } from 'react';
 
 import { AmountInput } from '../amount-input';
-import { FieldLabel } from '../field-label';
+import { FieldLabel } from '@/shared/ui';
 
 /** «Цена, ₸» нового товара — одна на все размеры (макеты AdminPhone2, экран 7, и AdminDesk2, экран 6). */
 export function PriceField({

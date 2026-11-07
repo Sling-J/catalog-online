@@ -38,7 +38,7 @@ export function HomePage() {
             key={item.key}
             title={<Trans>Настройте магазин</Trans>}
             sub={<Trans>Адрес, график, как найти</Trans>}
-            action={{ to: '/shop', label: <Trans>Заполнить →</Trans> }}
+            action={{ to: '/shop/info', label: <Trans>Заполнить →</Trans> }}
           />
         );
       case 'products':

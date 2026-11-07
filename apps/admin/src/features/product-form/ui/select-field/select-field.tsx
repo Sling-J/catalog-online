@@ -1,7 +1,7 @@
 import { cx, Icon } from '@catalog/ui';
 import { useId, type ReactNode } from 'react';
 
-import { FieldLabel } from '../field-label';
+import { FieldLabel } from '@/shared/ui';
 
 export type SelectOption = { value: string; label: string };
 

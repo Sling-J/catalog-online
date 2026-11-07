@@ -40,10 +40,25 @@ export function useShopDraft(subdomain: string): void {
     };
 
     window.addEventListener('message', onMessage);
-    window.parent.postMessage(
-      { source: 'catalog-storefront', type: 'ready' } satisfies StorefrontToAdminMessage,
-      origin,
-    );
-    return () => window.removeEventListener('message', onMessage);
+    // «готова» — когда страница целиком ожила после серверной отрисовки: правка, пришедшая раньше, меняет данные
+    // ещё не гидрированной части, и React перерисовывает её с ошибкой гидратации
+    let frame = 0;
+    const ready = () => {
+      frame = requestAnimationFrame(() => {
+        frame = requestAnimationFrame(() =>
+          window.parent.postMessage(
+            { source: 'catalog-storefront', type: 'ready' } satisfies StorefrontToAdminMessage,
+            origin,
+          ),
+        );
+      });
+    };
+    if (document.readyState === 'complete') ready();
+    else window.addEventListener('load', ready, { once: true });
+    return () => {
+      window.removeEventListener('message', onMessage);
+      window.removeEventListener('load', ready);
+      cancelAnimationFrame(frame);
+    };
   }, [queryClient, subdomain]);
 }

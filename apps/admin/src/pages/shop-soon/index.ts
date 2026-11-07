@@ -1,0 +1,1 @@
+export { ShopSoonPage } from './ui';

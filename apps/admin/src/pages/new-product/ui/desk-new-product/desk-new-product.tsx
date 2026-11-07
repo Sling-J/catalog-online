@@ -2,7 +2,8 @@ import { Button } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 
-import { FieldNote, PriceField, SelectField, SizesEditor, TextAreaField } from '@/features/product-form';
+import { PriceField, SelectField, SizesEditor } from '@/features/product-form';
+import { FieldNote, TextAreaField } from '@/shared/ui';
 import { PhotoPanel } from '@/features/product-photos';
 import { PageTitle } from '@/shared/ui';
 

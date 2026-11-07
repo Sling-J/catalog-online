@@ -1,15 +1,8 @@
 import { Trans, useLingui } from '@lingui/react/macro';
 
-import {
-  DeleteProduct,
-  ExcelMark,
-  SaveBar,
-  SelectField,
-  VariantsCard,
-  VisibilitySwitch,
-} from '@/features/product-form';
+import { DeleteProduct, ExcelMark, SelectField, VariantsCard, VisibilitySwitch } from '@/features/product-form';
 import { PhotoStrip } from '@/features/product-photos';
-import { BackBar } from '@/shared/ui';
+import { BackBar, SaveBar } from '@/shared/ui';
 
 import type { ProductView } from '../../types';
 

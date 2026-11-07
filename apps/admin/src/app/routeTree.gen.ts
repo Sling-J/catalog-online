@@ -25,6 +25,10 @@ import { Route as ShellProductsProductIdRouteImport } from './routes/_shell/prod
 import { Route as ShellProductsNewRouteImport } from './routes/_shell/products_.new'
 import { Route as ShellProductsPhotosRouteImport } from './routes/_shell/products_.photos'
 import { Route as ShellShopAccountRouteImport } from './routes/_shell/shop_.account'
+import { Route as ShellShopCategoriesRouteImport } from './routes/_shell/shop_.categories'
+import { Route as ShellShopInfoRouteImport } from './routes/_shell/shop_.info'
+import { Route as ShellShopStatsRouteImport } from './routes/_shell/shop_.stats'
+import { Route as ShellShopStockRouteImport } from './routes/_shell/shop_.stock'
 
 const ShellRoute = ShellRouteImport.update({
   id: '/_shell',
@@ -105,6 +109,26 @@ const ShellShopAccountRoute = ShellShopAccountRouteImport.update({
   path: '/shop/account',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellShopCategoriesRoute = ShellShopCategoriesRouteImport.update({
+  id: '/shop_/categories',
+  path: '/shop/categories',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellShopInfoRoute = ShellShopInfoRouteImport.update({
+  id: '/shop_/info',
+  path: '/shop/info',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellShopStatsRoute = ShellShopStatsRouteImport.update({
+  id: '/shop_/stats',
+  path: '/shop/stats',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellShopStockRoute = ShellShopStockRouteImport.update({
+  id: '/shop_/stock',
+  path: '/shop/stock',
+  getParentRoute: () => ShellRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof ShellIndexRoute
@@ -122,6 +146,10 @@ export interface FileRoutesByFullPath {
   '/products/new': typeof ShellProductsNewRoute
   '/products/photos': typeof ShellProductsPhotosRoute
   '/shop/account': typeof ShellShopAccountRoute
+  '/shop/categories': typeof ShellShopCategoriesRoute
+  '/shop/info': typeof ShellShopInfoRoute
+  '/shop/stats': typeof ShellShopStatsRoute
+  '/shop/stock': typeof ShellShopStockRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
@@ -139,6 +167,10 @@ export interface FileRoutesByTo {
   '/products/new': typeof ShellProductsNewRoute
   '/products/photos': typeof ShellProductsPhotosRoute
   '/shop/account': typeof ShellShopAccountRoute
+  '/shop/categories': typeof ShellShopCategoriesRoute
+  '/shop/info': typeof ShellShopInfoRoute
+  '/shop/stats': typeof ShellShopStatsRoute
+  '/shop/stock': typeof ShellShopStockRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -158,6 +190,10 @@ export interface FileRoutesById {
   '/_shell/products_/new': typeof ShellProductsNewRoute
   '/_shell/products_/photos': typeof ShellProductsPhotosRoute
   '/_shell/shop_/account': typeof ShellShopAccountRoute
+  '/_shell/shop_/categories': typeof ShellShopCategoriesRoute
+  '/_shell/shop_/info': typeof ShellShopInfoRoute
+  '/_shell/shop_/stats': typeof ShellShopStatsRoute
+  '/_shell/shop_/stock': typeof ShellShopStockRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -177,6 +213,10 @@ export interface FileRouteTypes {
     | '/products/new'
     | '/products/photos'
     | '/shop/account'
+    | '/shop/categories'
+    | '/shop/info'
+    | '/shop/stats'
+    | '/shop/stock'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -194,6 +234,10 @@ export interface FileRouteTypes {
     | '/products/new'
     | '/products/photos'
     | '/shop/account'
+    | '/shop/categories'
+    | '/shop/info'
+    | '/shop/stats'
+    | '/shop/stock'
   id:
     | '__root__'
     | '/_shell'
@@ -212,6 +256,10 @@ export interface FileRouteTypes {
     | '/_shell/products_/new'
     | '/_shell/products_/photos'
     | '/_shell/shop_/account'
+    | '/_shell/shop_/categories'
+    | '/_shell/shop_/info'
+    | '/_shell/shop_/stats'
+    | '/_shell/shop_/stock'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -338,6 +386,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellShopAccountRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/shop_/categories': {
+      id: '/_shell/shop_/categories'
+      path: '/shop/categories'
+      fullPath: '/shop/categories'
+      preLoaderRoute: typeof ShellShopCategoriesRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/shop_/info': {
+      id: '/_shell/shop_/info'
+      path: '/shop/info'
+      fullPath: '/shop/info'
+      preLoaderRoute: typeof ShellShopInfoRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/shop_/stats': {
+      id: '/_shell/shop_/stats'
+      path: '/shop/stats'
+      fullPath: '/shop/stats'
+      preLoaderRoute: typeof ShellShopStatsRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/shop_/stock': {
+      id: '/_shell/shop_/stock'
+      path: '/shop/stock'
+      fullPath: '/shop/stock'
+      preLoaderRoute: typeof ShellShopStockRouteImport
+      parentRoute: typeof ShellRoute
+    }
   }
 }
 
@@ -351,6 +427,10 @@ interface ShellRouteChildren {
   ShellProductsNewRoute: typeof ShellProductsNewRoute
   ShellProductsPhotosRoute: typeof ShellProductsPhotosRoute
   ShellShopAccountRoute: typeof ShellShopAccountRoute
+  ShellShopCategoriesRoute: typeof ShellShopCategoriesRoute
+  ShellShopInfoRoute: typeof ShellShopInfoRoute
+  ShellShopStatsRoute: typeof ShellShopStatsRoute
+  ShellShopStockRoute: typeof ShellShopStockRoute
 }
 
 const ShellRouteChildren: ShellRouteChildren = {
@@ -363,6 +443,10 @@ const ShellRouteChildren: ShellRouteChildren = {
   ShellProductsNewRoute: ShellProductsNewRoute,
   ShellProductsPhotosRoute: ShellProductsPhotosRoute,
   ShellShopAccountRoute: ShellShopAccountRoute,
+  ShellShopCategoriesRoute: ShellShopCategoriesRoute,
+  ShellShopInfoRoute: ShellShopInfoRoute,
+  ShellShopStatsRoute: ShellShopStatsRoute,
+  ShellShopStockRoute: ShellShopStockRoute,
 }
 
 const ShellRouteWithChildren = ShellRoute._addFileChildren(ShellRouteChildren)

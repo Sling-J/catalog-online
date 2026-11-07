@@ -1,7 +1,8 @@
 import { Button } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 
-import { PriceField, SaveBar, SelectField, SizesEditor } from '@/features/product-form';
+import { PriceField, SelectField, SizesEditor } from '@/features/product-form';
+import { SaveBar } from '@/shared/ui';
 import { PhotoStrip } from '@/features/product-photos';
 import { BackBar } from '@/shared/ui';
 

@@ -3,12 +3,13 @@ import { cx } from '@catalog/ui';
 
 import { getInitials } from '@/entities/shop/lib';
 
-// размеры из макетов: превью витрины 36, шапка 36/40, превью ссылки 52 (квадрат), мастер 96/104
+// размеры из макетов: превью витрины 36, шапка 36/40, превью ссылки 52 (квадрат), «О магазине» 64, мастер 96/104
 const sizes = {
   xs: 'size-9 text-[12px]',
   sm: 'size-9 text-[13px]',
   md: 'size-10 text-[14px]',
   link: 'size-[52px] text-[18px]',
+  info: 'size-16 text-[22px]',
   lg: 'size-24 text-[32px]',
   xl: 'size-[104px] text-[34px]',
 } as const;

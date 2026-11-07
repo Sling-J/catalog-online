@@ -4,11 +4,11 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
-import { applyShop } from '@/entities/shop';
+import { applyShop, formatPhone, PHONE_DIGITS } from '@/entities/shop';
 import { useFormMessages } from '@/shared/hooks';
 import { BigField, BigFieldCaption, invalidFields, setServerError, submitForm, useAppForm } from '@/shared/ui';
 
-import { formatPhone, PHONE_DIGITS, whatsappTestLink } from '@/features/setup-whatsapp/lib';
+import { whatsappTestLink } from '@/features/setup-whatsapp/lib';
 
 /**
  * Мастер, шаг 3 — WhatsApp (макет AdminPhone2 / AdminDesk2; неверный номер — AdminSetupStates). Номер — 10 цифр

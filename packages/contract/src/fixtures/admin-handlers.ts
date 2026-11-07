@@ -11,6 +11,8 @@
 // Фото (T-307): прикрепить загруженное (в новом товаре — сразу при создании), порядок, удаление; сжатие изображается
 // паузой — фото сначала `processing`, через пару секунд `ready`. Не больше 10 фото у товара (409 `photo_limit_reached`).
 // Импорт (T-309): сценарий — по имени файла, шаги идут по времени (подробно — admin-imports.ts).
+// Раздел «Магазин» (T-310): правки «О магазине» и логотип демо-магазина живут, пока открыта страница; токен превью —
+// любой (витрина на моках принимает любой); статистика — неизменный пример за неделю.
 // Остальные разделы добавляются со своими экранами.
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 
@@ -18,6 +20,8 @@ import {
   handleApplyImport,
   handleCancelImport,
   handleCreateImport,
+  handleCreatePreviewToken,
+  handleGetStats,
   handleDownloadImportTemplate,
   handleGetImport,
   handleListImportErrors,
@@ -55,7 +59,7 @@ import {
   handleVerifyEmail,
   type RequestHandlerOptions,
 } from '../gen/msw.gen.js';
-import type { Attribute, Image, Me, Photo, Problem, Product, Shop } from '../gen/types.gen.js';
+import type { Attribute, Image, Me, Photo, Problem, Product, Shop, Stats } from '../gen/types.gen.js';
 import {
   type AdminFilter,
   type AdminSort,
@@ -154,8 +158,16 @@ const newShop: Shop = {
   readiness: { settingsFilled: false, productCount: 0, productsWithoutPhoto: 0, canPublish: false },
 };
 
-/** Что новый магазин успел заполнить в мастере. */
-type NewShopFields = { name?: string; subdomain?: string; whatsapp?: string; setupCompleted?: boolean };
+/** Что новый магазин успел заполнить в мастере и в «О магазине». */
+type NewShopFields = {
+  name?: string;
+  subdomain?: string;
+  whatsapp?: string;
+  setupCompleted?: boolean;
+} & Partial<Pick<Shop, 'description' | 'instagram' | 'address' | 'howToFind' | 'schedule'>>;
+
+/** Поля «О магазине», которые моки запоминают из `PATCH /shop`. */
+const SETTINGS_FIELDS = ['name', 'description', 'whatsapp', 'instagram', 'address', 'howToFind', 'schedule'] as const;
 
 /** Сессия на моках: демо-владелец, только что зарегистрированный магазин или никто. */
 type Session =
@@ -200,13 +212,18 @@ const tooShort = (field: string): Response =>
   problem(422, 'validation_failed', { errors: [{ field, code: 'too_short', params: { min: MIN_PASSWORD } }] });
 const gone = (): Response => problem(410, 'token_expired');
 
-/** Демо-магазин в сессии: опубликован или снят с публикации. */
-const demoShopOf = (session: Extract<Session, { kind: 'demo' }>): Shop =>
-  session.draft ? { ...demoAdminShop, status: 'draft', publishedAt: null } : demoAdminShop;
+/** Демо-магазин в сессии: опубликован или снят с публикации; поверх — правки «О магазине». */
+const demoShopOf = (session: Extract<Session, { kind: 'demo' }>, edits: Partial<Shop> = {}): Shop => ({
+  ...(session.draft ? { ...demoAdminShop, status: 'draft', publishedAt: null } : demoAdminShop),
+  ...edits,
+});
 
-const meOf = (session: Exclude<Session, { kind: 'out' }>): Me =>
+const meOf = (session: Exclude<Session, { kind: 'out' }>, edits: Partial<Shop> = {}): Me =>
   session.kind === 'demo'
-    ? { ...demoMe, shop: { ...demoMe.shop, status: session.draft ? 'draft' : 'published' } }
+    ? {
+        ...demoMe,
+        shop: { ...demoMe.shop, name: edits.name ?? demoMe.shop.name, status: session.draft ? 'draft' : 'published' },
+      }
     : {
         account: {
           id: NEW_ACCOUNT_ID,
@@ -223,6 +240,33 @@ const meOf = (session: Exclude<Session, { kind: 'out' }>): Me =>
         },
       };
 
+const DEMO_DAY_VIEWS = [150, 162, 171, 168, 190, 212, 187];
+const DEMO_DAY_CLICKS = [5, 6, 7, 5, 8, 9, 6];
+
+/** Последние 7 дней по UTC, от старых к новым. */
+const lastWeek = (): string[] =>
+  Array.from({ length: 7 }, (_, index) => new Date(Date.now() - (6 - index) * 86_400_000).toISOString().slice(0, 10));
+
+const demoStats = (): Stats => ({
+  period: '7d',
+  totals: { views: 1240, orderClicks: 46 },
+  previousTotals: { views: 1050, orderClicks: 39 },
+  byDay: lastWeek().map((date, index) => ({
+    date,
+    views: DEMO_DAY_VIEWS[index] ?? 0,
+    orderClicks: DEMO_DAY_CLICKS[index] ?? 0,
+  })),
+  topProducts: [],
+});
+
+const emptyStats = (): Stats => ({
+  period: '7d',
+  totals: { views: 0, orderClicks: 0 },
+  previousTotals: { views: 0, orderClicks: 0 },
+  byDay: lastWeek().map((date) => ({ date, views: 0, orderClicks: 0 })),
+  topProducts: [],
+});
+
 export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminHandlersOptions = {}): HttpHandler[] => {
   let memory: Session = { kind: 'demo' };
   const read = (): Session => {
@@ -238,6 +282,9 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
   // имена загруженных файлов — по ним моки выбирают сценарий импорта
   const uploadNames = new Map<string, string>();
   let logo: Image | null = null;
+  // правки «О магазине» и логотип демо-магазина
+  let demoEdits: Partial<Shop> = {};
+  const demoShopIn = (session: Extract<Session, { kind: 'demo' }>): Shop => demoShopOf(session, demoEdits);
   // импорты: у демо-магазина есть история, у нового — нет
   const demoImports = createImportStore(true);
   const newImports = createImportStore(false);
@@ -285,6 +332,7 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
     problem(422, 'validation_failed', { errors: [{ field: 'variants', code: 'unknown_attribute' }] });
   const shopOf = (session: Extract<Session, { kind: 'new' }>): Shop => ({
     ...newShop,
+    ...session.shop,
     name: session.shop?.name ?? null,
     subdomain: session.shop?.subdomain ?? null,
     whatsapp: session.shop?.whatsapp ?? null,
@@ -346,12 +394,12 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
     }, options),
     handleGetMe(() => {
       const session = read();
-      return session.kind === 'out' ? problem(401, 'unauthorized') : HttpResponse.json(meOf(session));
+      return session.kind === 'out' ? problem(401, 'unauthorized') : HttpResponse.json(meOf(session, demoEdits));
     }, options),
     handleGetShop(() => {
       const session = read();
       if (session.kind === 'out') return problem(401, 'unauthorized');
-      return HttpResponse.json(session.kind === 'demo' ? demoShopOf(session) : shopOf(session));
+      return HttpResponse.json(session.kind === 'demo' ? demoShopIn(session) : shopOf(session));
     }, options),
     handleUpdateShop(async ({ request }) => {
       const session = read();
@@ -366,13 +414,19 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
       if (body.whatsapp !== undefined && !/^\+7\d{10}$/.test(body.whatsapp)) {
         return problem(422, 'validation_failed', { errors: [{ field: 'whatsapp', code: 'invalid_format' }] });
       }
-      // демо-магазин настроен заранее: правки не сохраняем
-      if (session.kind === 'demo') return HttpResponse.json({ ...demoShopOf(session), ...body });
-      // только переданные поля (PATCH)
-      const { name, subdomain, whatsapp, setupCompleted } = body;
-      const changes = Object.fromEntries(
-        Object.entries({ name, subdomain, whatsapp, setupCompleted }).filter(([, value]) => value !== undefined),
-      ) as NewShopFields;
+      // только переданные поля (PATCH); адрес витрины демо-магазина не меняется
+      const settings = Object.fromEntries(
+        SETTINGS_FIELDS.filter((field) => body[field] !== undefined).map((field) => [field, body[field]]),
+      ) as Partial<Shop>;
+      if (session.kind === 'demo') {
+        demoEdits = { ...demoEdits, ...settings };
+        return HttpResponse.json(demoShopIn(session));
+      }
+      const { subdomain, setupCompleted } = body;
+      const changes = {
+        ...settings,
+        ...Object.fromEntries(Object.entries({ subdomain, setupCompleted }).filter(([, value]) => value !== undefined)),
+      } as NewShopFields;
       const next = { ...session, shop: { ...session.shop, ...changes } };
       write(next);
       return HttpResponse.json(shopOf(next));
@@ -416,12 +470,16 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
       const url = uploads.get(uploadId);
       if (!url) return problem(422, 'upload_not_found');
       const image: Image = { width: 400, height: 400, sizes: { '320': url, '640': url, '1280': url } };
-      if (session.kind === 'demo') return HttpResponse.json({ ...demoShopOf(session), logo: image });
+      if (session.kind === 'demo') {
+        demoEdits = { ...demoEdits, logo: image };
+        return HttpResponse.json(demoShopIn(session));
+      }
       logo = image;
       return HttpResponse.json(shopOf(session));
     }, options),
     handleDeleteShopLogo(() => {
       logo = null;
+      demoEdits = { ...demoEdits, logo: null };
       return new HttpResponse(null, { status: 204 });
     }, options),
     handlePublishShop(() => {
@@ -431,7 +489,7 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
       if (session.kind === 'new') return problem(409, 'shop_not_ready');
       const next = { kind: 'demo' as const, draft: false };
       write(next);
-      return HttpResponse.json(demoShopOf(next));
+      return HttpResponse.json(demoShopIn(next));
     }, options),
     handleUnpublishShop(() => {
       const session = read();
@@ -439,7 +497,22 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
       if (session.kind === 'new') return HttpResponse.json(shopOf(session));
       const next = { kind: 'demo' as const, draft: true };
       write(next);
-      return HttpResponse.json(demoShopOf(next));
+      return HttpResponse.json(demoShopIn(next));
+    }, options),
+    // токен превью витрины (A7): витрина на моках принимает любой
+    handleCreatePreviewToken(() => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      return HttpResponse.json(
+        { token: 'demo', expiresAt: new Date(Date.now() + 30 * 60_000).toISOString() },
+        { status: 201 },
+      );
+    }, options),
+    // статистика за неделю — пример для строки «Статистика» в разделе «Магазин»; экран — T-313
+    handleGetStats(() => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      return HttpResponse.json(session.kind === 'demo' ? demoStats() : emptyStats());
     }, options),
     handleGetProductCounts(({ request }) => {
       const session = read();

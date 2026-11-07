@@ -1,1 +1,1 @@
-export { formatPhone, PHONE_DIGITS, whatsappTestLink } from './phone';
+export { whatsappTestLink } from './phone';

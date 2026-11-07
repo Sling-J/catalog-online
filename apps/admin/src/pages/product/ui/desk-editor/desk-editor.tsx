@@ -5,15 +5,13 @@ import { Link } from '@tanstack/react-router';
 import {
   DeleteProduct,
   ExcelMark,
-  FieldNote,
   ImportNote,
   SelectField,
-  TextAreaField,
   VariantsTable,
   VisibilitySwitch,
 } from '@/features/product-form';
 import { PhotoPanel } from '@/features/product-photos';
-import { PageTitle } from '@/shared/ui';
+import { FieldNote, PageTitle, TextAreaField } from '@/shared/ui';
 
 import type { ProductView } from '../../types';
 

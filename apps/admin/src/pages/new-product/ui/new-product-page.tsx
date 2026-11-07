@@ -1,23 +1,16 @@
 import { useIsDesktop } from '@catalog/ui';
-import { useLingui } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 
-import {
-  LeaveConfirm,
-  newProductDraft,
-  useCreateProduct,
-  useDraftMessages,
-  useLeaveGuard,
-  useProductForm,
-} from '@/features/product-form';
+import { newProductDraft, useCreateProduct, useDraftMessages, useProductForm } from '@/features/product-form';
 import { PhotosNotUploadedError, useNewProductPhotos } from '@/features/product-photos';
 import { attributesQueryOptions } from '@/entities/attribute';
 import { categoriesQueryOptions, flattenCategories } from '@/entities/category';
 import { fieldErrors } from '@/shared/api';
-import { useFormMessages } from '@/shared/hooks';
-import { setFormError, setServerError, submitForm, useIsDirty } from '@/shared/ui';
+import { useFormMessages, useLeaveGuard } from '@/shared/hooks';
+import { LeaveConfirm, setFormError, setServerError, submitForm, useIsDirty } from '@/shared/ui';
 
 import type { NewProductView } from '../types';
 
@@ -78,7 +71,7 @@ export function NewProductPage() {
   return (
     <>
       {isDesktop ? <DeskNewProduct {...view} /> : <PhoneNewProduct {...view} />}
-      <LeaveConfirm guard={guard} />
+      <LeaveConfirm guard={guard} text={<Trans>Правки в карточке пропадут.</Trans>} />
     </>
   );
 }

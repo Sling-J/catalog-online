@@ -8,7 +8,7 @@ import { digitsOf, newRow, rowLabel } from '../../lib';
 import { AmountInput } from '../amount-input';
 import { DraftErrorText } from '../draft-error-text';
 import { ExcelMark } from '../excel-mark';
-import { FieldLabel } from '../field-label';
+import { FieldLabel } from '@/shared/ui';
 
 const SHOWN = 3;
 // ячейки таблицы правятся на месте: выглядят текстом, как в макете
