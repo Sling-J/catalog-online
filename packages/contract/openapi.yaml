@@ -1888,6 +1888,9 @@ components:
         id: { type: string, format: uuid }
         status: { $ref: '#/components/schemas/ImportStatus' }
         fileName: { type: string }
+        rowCount:
+          type: [integer, 'null']
+          description: Строк с данными в файле (без заголовка); известно после чтения — «218 строк» уже на шаге «Колонки»
         headers:
           type: [array, 'null']
           items: { type: string }

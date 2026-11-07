@@ -10,10 +10,19 @@
 // значение.
 // Фото (T-307): прикрепить загруженное (в новом товаре — сразу при создании), порядок, удаление; сжатие изображается
 // паузой — фото сначала `processing`, через пару секунд `ready`. Не больше 10 фото у товара (409 `photo_limit_reached`).
+// Импорт (T-309): сценарий — по имени файла, шаги идут по времени (подробно — admin-imports.ts).
 // Остальные разделы добавляются со своими экранами.
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 
 import {
+  handleApplyImport,
+  handleCancelImport,
+  handleCreateImport,
+  handleDownloadImportTemplate,
+  handleGetImport,
+  handleListImportErrors,
+  handleListImports,
+  handleSetImportMapping,
   handleChangePassword,
   handleCheckSubdomain,
   handleAddProductPhoto,
@@ -59,6 +68,7 @@ import {
   selectAdminProducts,
   toListItem,
 } from './admin-products.js';
+import { createImportStore, importTemplateXlsx, mappingProblem } from './admin-imports.js';
 import { demoShop, HIDDEN_DEMO_SUBDOMAIN } from './demo-shop.js';
 
 const SHOP_ID = '0192d000-0000-7000-8000-00000000a001';
@@ -225,7 +235,14 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
   };
   // загруженные файлы и логотип нового магазина — data: URL в памяти
   const uploads = new Map<string, string>();
+  // имена загруженных файлов — по ним моки выбирают сценарий импорта
+  const uploadNames = new Map<string, string>();
   let logo: Image | null = null;
+  // импорты: у демо-магазина есть история, у нового — нет
+  const demoImports = createImportStore(true);
+  const newImports = createImportStore(false);
+  const importsOf = (session: Exclude<Session, { kind: 'out' }>) =>
+    session.kind === 'demo' ? demoImports : newImports;
   // товары и свойства: правки из списка и редактора живут, пока открыта страница; у нового магазина — пусто
   let demoProducts: Product[] | null = null;
   let demoAttributes: Attribute[] | null = null;
@@ -369,8 +386,9 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
       const reason = own ? null : subdomainProblem(value);
       return HttpResponse.json({ available: reason === null, reason });
     }, options),
-    handleCreateUpload(async () => {
+    handleCreateUpload(async ({ request }) => {
       const uploadId = crypto.randomUUID();
+      uploadNames.set(uploadId, (await request.json()).fileName);
       return HttpResponse.json(
         {
           uploadId,
@@ -577,6 +595,70 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
             : { ...product, isVisible: action === 'show' };
       });
       return HttpResponse.json({ updated });
+    }, options),
+    handleListImports(() => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      return HttpResponse.json({ items: importsOf(session).list(), nextCursor: null });
+    }, options),
+    handleCreateImport(async ({ request }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { uploadId } = await request.json();
+      const fileName = uploadNames.get(uploadId);
+      if (!fileName || !uploads.has(uploadId)) return problem(422, 'upload_not_found');
+      const created = importsOf(session).create(fileName);
+      return created ? HttpResponse.json(created, { status: 202 }) : problem(409, 'import_in_progress');
+    }, options),
+    // до /imports/{importId}: иначе «template» сойдёт за id
+    handleDownloadImportTemplate(() => {
+      if (read().kind === 'out') return problem(401, 'unauthorized');
+      return new HttpResponse(importTemplateXlsx(), {
+        headers: {
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'Content-Disposition': 'attachment; filename="shablon-tovarov.xlsx"',
+        },
+      });
+    }, options),
+    handleGetImport(({ params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const found = importsOf(session).get(params.importId);
+      return found ? HttpResponse.json(found) : problem(404, 'not_found');
+    }, options),
+    handleCancelImport(({ params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const outcome = importsOf(session).cancel(params.importId);
+      if (outcome === 'not_found') return problem(404, 'not_found');
+      if (outcome === 'conflict') return problem(409, 'import_not_ready');
+      return new HttpResponse(null, { status: 204 });
+    }, options),
+    handleSetImportMapping(async ({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { mapping } = await request.json();
+      const reason = mappingProblem(mapping);
+      if (reason) return problem(422, 'validation_failed', { errors: [{ field: 'mapping', code: reason }] });
+      const outcome = importsOf(session).setMapping(params.importId, mapping);
+      if (outcome === 'not_found') return problem(404, 'not_found');
+      if (outcome === 'conflict') return problem(409, 'import_not_ready');
+      return HttpResponse.json(outcome, { status: 202 });
+    }, options),
+    handleListImportErrors(({ params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const errors = importsOf(session).errors(params.importId);
+      return errors ? HttpResponse.json({ items: errors, nextCursor: null }) : problem(404, 'not_found');
+    }, options),
+    handleApplyImport(async ({ request, params }) => {
+      const session = read();
+      if (session.kind === 'out') return problem(401, 'unauthorized');
+      const { zeroMissing } = await request.json();
+      const outcome = importsOf(session).apply(params.importId, zeroMissing);
+      if (outcome === 'not_found') return problem(404, 'not_found');
+      if (outcome === 'conflict') return problem(409, 'import_not_ready');
+      return HttpResponse.json(outcome, { status: 202 });
     }, options),
   ];
 };

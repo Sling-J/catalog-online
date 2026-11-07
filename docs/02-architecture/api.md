@@ -1,7 +1,7 @@
 ---
 status: accepted
 owner: founder
-updated: 2026-11-02
+updated: 2026-11-07
 ---
 
 # Контракт API: соглашения
@@ -43,6 +43,6 @@ updated: 2026-11-02
 | Карточка / новый товар, размеры, фото | `getProduct`, `createProduct`, `updateProduct`, `replaceProductVariants`, `addProductPhoto`, `reorderProductPhotos` |
 | Быстрый режим «Добавить фото» | `listProducts?filter=no_photo` + `addProductPhoto` |
 | Категории и свойства | `/v1/admin/categories/*`, `/v1/admin/attributes/*` |
-| Импорт: файл → колонки → проверка → готово | `createUpload` → `createImport` → `setImportMapping` → `getImport` / `listImportErrors` → `applyImport` |
+| Импорт: файл → колонки → проверка → готово | `createUpload` → `createImport` → `setImportMapping` → `getImport` / `listImportErrors` → `applyImport`; «Другой файл» — `cancelImport`; история — `listImports`; шаблон — `downloadImportTemplate` |
 | Статистика | `getStats` |
 | Суперадминка | `/v1/staff/*` |

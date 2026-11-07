@@ -20,6 +20,7 @@ import { Route as ShellIndexRouteImport } from './routes/_shell/index'
 import { Route as ShellImportRouteImport } from './routes/_shell/import'
 import { Route as ShellProductsRouteImport } from './routes/_shell/products'
 import { Route as ShellShopRouteImport } from './routes/_shell/shop'
+import { Route as ShellImportHistoryRouteImport } from './routes/_shell/import_.history'
 import { Route as ShellProductsProductIdRouteImport } from './routes/_shell/products_.$productId'
 import { Route as ShellProductsNewRouteImport } from './routes/_shell/products_.new'
 import { Route as ShellProductsPhotosRouteImport } from './routes/_shell/products_.photos'
@@ -79,6 +80,11 @@ const ShellShopRoute = ShellShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellImportHistoryRoute = ShellImportHistoryRouteImport.update({
+  id: '/import_/history',
+  path: '/import/history',
+  getParentRoute: () => ShellRoute,
+} as any)
 const ShellProductsProductIdRoute = ShellProductsProductIdRouteImport.update({
   id: '/products_/$productId',
   path: '/products/$productId',
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/import': typeof ShellImportRoute
   '/products': typeof ShellProductsRoute
   '/shop': typeof ShellShopRoute
+  '/import/history': typeof ShellImportHistoryRoute
   '/products/$productId': typeof ShellProductsProductIdRoute
   '/products/new': typeof ShellProductsNewRoute
   '/products/photos': typeof ShellProductsPhotosRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/products': typeof ShellProductsRoute
   '/shop': typeof ShellShopRoute
   '/': typeof ShellIndexRoute
+  '/import/history': typeof ShellImportHistoryRoute
   '/products/$productId': typeof ShellProductsProductIdRoute
   '/products/new': typeof ShellProductsNewRoute
   '/products/photos': typeof ShellProductsPhotosRoute
@@ -145,6 +153,7 @@ export interface FileRoutesById {
   '/_shell/products': typeof ShellProductsRoute
   '/_shell/shop': typeof ShellShopRoute
   '/_shell/': typeof ShellIndexRoute
+  '/_shell/import_/history': typeof ShellImportHistoryRoute
   '/_shell/products_/$productId': typeof ShellProductsProductIdRoute
   '/_shell/products_/new': typeof ShellProductsNewRoute
   '/_shell/products_/photos': typeof ShellProductsPhotosRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/products'
     | '/shop'
+    | '/import/history'
     | '/products/$productId'
     | '/products/new'
     | '/products/photos'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/shop'
     | '/'
+    | '/import/history'
     | '/products/$productId'
     | '/products/new'
     | '/products/photos'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/_shell/products'
     | '/_shell/shop'
     | '/_shell/'
+    | '/_shell/import_/history'
     | '/_shell/products_/$productId'
     | '/_shell/products_/new'
     | '/_shell/products_/photos'
@@ -291,6 +303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellShopRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/import_/history': {
+      id: '/_shell/import_/history'
+      path: '/import/history'
+      fullPath: '/import/history'
+      preLoaderRoute: typeof ShellImportHistoryRouteImport
+      parentRoute: typeof ShellRoute
+    }
     '/_shell/products_/$productId': {
       id: '/_shell/products_/$productId'
       path: '/products/$productId'
@@ -327,6 +346,7 @@ interface ShellRouteChildren {
   ShellProductsRoute: typeof ShellProductsRoute
   ShellShopRoute: typeof ShellShopRoute
   ShellIndexRoute: typeof ShellIndexRoute
+  ShellImportHistoryRoute: typeof ShellImportHistoryRoute
   ShellProductsProductIdRoute: typeof ShellProductsProductIdRoute
   ShellProductsNewRoute: typeof ShellProductsNewRoute
   ShellProductsPhotosRoute: typeof ShellProductsPhotosRoute
@@ -338,6 +358,7 @@ const ShellRouteChildren: ShellRouteChildren = {
   ShellProductsRoute: ShellProductsRoute,
   ShellShopRoute: ShellShopRoute,
   ShellIndexRoute: ShellIndexRoute,
+  ShellImportHistoryRoute: ShellImportHistoryRoute,
   ShellProductsProductIdRoute: ShellProductsProductIdRoute,
   ShellProductsNewRoute: ShellProductsNewRoute,
   ShellProductsPhotosRoute: ShellProductsPhotosRoute,

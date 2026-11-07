@@ -18,6 +18,7 @@ export type IconName =
   | 'chevron-down'
   | 'tag'
   | 'upload'
+  | 'file'
   | 'store'
   | 'external'
   | 'copy-square'
@@ -100,6 +101,14 @@ const glyphs: Record<IconName, ReactNode> = {
     <>
       <path d="M3 12V4h8l10 10-8 8z" />
       <circle cx="7.5" cy="8.5" r="1.5" />
+    </>
+  ),
+  // документ с текстом — файл импорта (макеты импорта админки)
+  file: (
+    <>
+      <path d="M6 3h8l4 4v14H6z" />
+      <path d="M14 3v4h4" />
+      <path d="M9 13h6M9 17h6" />
     </>
   ),
   upload: (
