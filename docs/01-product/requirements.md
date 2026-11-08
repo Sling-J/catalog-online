@@ -6,7 +6,7 @@ updated: 2026-10-31
 
 # Требования к MVP (ТЗ)
 
-Основа: [mvp-scope.md](mvp-scope.md) (решения D1–D12), [user-stories.md](user-stories.md). Технические решения (стек, хранение, API) здесь не фиксируются, они будут в `02-architecture/`.
+Основа: [mvp-scope.md](mvp-scope.md) (решения D…), [user-stories.md](user-stories.md). Технические решения (стек, хранение, API) здесь не фиксируются, они в [02-architecture](../02-architecture/README.md).
 
 Пункты с пометкой **[предложено]** приняты основателем как значения по умолчанию (2026-10-31).
 

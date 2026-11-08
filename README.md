@@ -22,6 +22,7 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 | `packages/ui` | Токены дизайн-системы, общие компоненты, иконки и хуки витрины и админки |
 | `packages/contract` | Контракт API `openapi.yaml` и сгенерированный код. В разработке (Vite, Vitest) приложения берут исходники `src/` — условие `development` в `exports`, правки моков видны без сборки; сборка и проверка типов — из `dist` |
 | `tools/e2e` | Сценарии в браузере на Playwright (`pnpm e2e`): пока админка на моках — онбординг, «Товары» |
+| `tools/docs-check` | Проверка документации (`pnpm docs:check`, входит в `pnpm check`): ссылки, front matter, оглавления разделов, статусы ADR — правила в `docs/06-process/documentation-rules.md` |
 | `tools/design-compare` | Сверка экрана приложения с артбордом холста (`pnpm design:compare`, описание — README папки) |
 
 ## Что нужно для разработки
@@ -34,7 +35,8 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 |---|---|
 | `pnpm install` | Установить зависимости |
 | `pnpm generate` | Код из `packages/contract/openapi.yaml` (Hey API): типы, SDK, хуки Query, Zod, MSW, типы для Nest |
-| `pnpm check` | Линтеры (включая контракт и границы FSD), типы, тесты и сборка всех пакетов |
+| `pnpm check` | Проверка документации, линтеры (включая контракт и границы FSD), типы, тесты и сборка всех пакетов |
+| `pnpm docs:check` | Только проверка документации: битые ссылки, front matter, оглавления разделов, статусы в журнале ADR |
 | `pnpm dev` | Запустить приложения: `apps/web` на http://localhost:3000 и `apps/admin` на http://app.localhost:3002, оба с моками API (api появится в E4). В админке на моках по умолчанию вошёл владелец демо-магазина; сессия моков — в `localStorage` (`catalog-admin-mock-session`: `{"kind":"out"}` — вышли), вход демо-владельца — `aigerim.kids@example.com` / `demo-password` (`DEMO_ADMIN_PASSWORD` в `packages/contract/src/fixtures/admin-handlers.ts`). Ссылки из писем на моках: http://app.localhost:3002/verify-email?token=abc и http://app.localhost:3002/reset-password?token=abc; токен `expired` — ссылка устарела. Мастер на моках: адреса `aigerim-kids` и `skrytyj-magazin` заняты, служебные (`www`, `app`, `api`, `admin`…) зарезервированы; логотип живёт только до перезагрузки. Главная до публикации на демо-данных: `localStorage.setItem('catalog-admin-mock-session', '{"kind":"demo","draft":true}')`; новый магазин на моках опубликовать нельзя (товаров нет). Витрина демо-магазина — http://aigerim-kids.localhost:3000, лендинг — http://localhost:3000, превью скрытого магазина (как из админки) — http://skrytyj-magazin.localhost:3000/?preview=demo. Переменные фронтов (`VITE_ROOT_DOMAIN`, `VITE_ADMIN_ORIGIN`, `VITE_STOREFRONT_PORT`, `VITE_DEMO_SHOP`, `VITE_API_URL`) — в `.env.example` |
 | `pnpm design:compare` | Сверка экрана с макетом: `--board <доска> --frame <экран> --url <адрес>` — расхождения положения, размера, шрифта, цвета и подложки по тексту (нужен установленный Google Chrome и запущенный дев-сервер; `tools/design-compare/README.md`). Админку сверяем на http://localhost:3012 (конфигурация `admin-check` в `.claude/launch.json`): на `app.localhost` во встроенном браузере service worker моков не регистрируется |
 | `pnpm e2e` | Сценарии в браузере (`tools/e2e`, Playwright, телефон 390 и компьютер 1440): сам поднимает дев-сервер админки на моках на http://localhost:3022 (уже запущенный — переиспользует), нужен установленный Google Chrome. В `pnpm check` не входит; запускать после правок админки |

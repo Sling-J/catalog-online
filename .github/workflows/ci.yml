@@ -34,4 +34,5 @@ jobs:
           restore-keys: turbo-${{ runner.os }}-
 
       - run: pnpm format:check
+      - run: pnpm docs:check
       - run: pnpm turbo run lint typecheck test build --cache-dir=.turbo/cache

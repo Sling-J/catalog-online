@@ -1,0 +1,15 @@
+{
+  "name": "@catalog/docs-check",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node src/cli.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@catalog/tsconfig": "workspace:*"
+  }
+}
