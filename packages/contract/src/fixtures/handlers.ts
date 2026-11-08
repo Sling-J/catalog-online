@@ -101,7 +101,6 @@ export const demoStorefrontHandlers = ({ assetBase, ...options }: DemoHandlersOp
           status: 'unavailable' as const,
           quantity: 0,
           price: null,
-          previousPrice: null,
           product: null,
         };
       }
@@ -118,7 +117,6 @@ export const demoStorefrontHandlers = ({ assetBase, ...options }: DemoHandlersOp
         status: outOfStock ? ('out_of_stock' as const) : ('ok' as const),
         quantity,
         price: variant.price,
-        previousPrice: null,
         product: {
           shortId: product.shortId,
           slug: product.slug,

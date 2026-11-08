@@ -1613,11 +1613,16 @@ components:
         variantId: { type: string, format: uuid }
         status:
           type: string
-          enum: [ok, price_changed, quantity_reduced, out_of_stock, unavailable]
-          description: unavailable — товар скрыт или удалён
-        quantity: { type: integer, description: 'С учётом остатка' }
-        price: { oneOf: [{ $ref: '#/components/schemas/Money' }, { type: 'null' }] }
-        previousPrice: { oneOf: [{ $ref: '#/components/schemas/Money' }, { type: 'null' }] }
+          enum: [ok, out_of_stock, unavailable]
+          description: >-
+            unavailable — товар скрыт или удалён. «Цена изменилась» и «количество уменьшено» API не сообщает:
+            он не знает, что лежит в корзине покупателя, — клиент сравнивает `price` и `quantity` со своим снимком.
+        quantity: { type: integer, description: 'Запрошенное количество, урезанное до остатка' }
+        price:
+          {
+            oneOf: [{ $ref: '#/components/schemas/Money' }, { type: 'null' }],
+            description: 'Текущая цена; null у unavailable',
+          }
         product:
           oneOf:
             - type: object

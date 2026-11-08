@@ -5,7 +5,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 ## Начало каждой сессии
 1. Прочитай `docs/status.md`: текущая стадия и следующий шаг.
 2. Карта документации: `docs/README.md`. Процесс: `docs/06-process/workflow.md`. Грабли прошлых сессий (окружение, сборка, проверка) — `docs/06-process/pitfalls.md`.
-3. Перед задачей — документы её темы из таблицы «Где что лежит» ниже и стек в `docs/02-architecture/adr/0001-stack.md`. Перед кодом фронта — `docs/02-architecture/frontend-structure.md`.
+3. Перед задачей — документы её темы из таблицы «Где что лежит» ниже и стек в `docs/02-architecture/adr/0001-stack.md`. Перед кодом фронта — `docs/02-architecture/frontend-structure.md`, перед кодом бэка — `docs/02-architecture/backend-structure.md`.
 
 ## Правила работы
 - Работаем в паре с основателем (опытный разработчик). На развилках (продукт, UX, архитектура, стек, зависимости) предлагай вариант с рекомендацией и спрашивай. Детали внутри согласованного плана решай сам.
@@ -31,6 +31,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 | Экраны и решения по витрине и админке | `docs/04-design/storefront.md`, `admin.md`; макеты (вёрстка) — `design/canvas/` (копия холста, см. её README) |
 | Стек и архитектурные решения | `docs/02-architecture/adr/` |
 | Структура кода фронтов (FSD) | `docs/02-architecture/frontend-structure.md` (ADR 0002) |
+| Структура кода бэкенда (модули Nest) | `docs/02-architecture/backend-structure.md` (ADR 0004) |
 | Модель данных, соглашения API | `docs/02-architecture/data-model.md`, `api.md`; контракт — `packages/contract/openapi.yaml` |
 | План и задачи | `docs/05-tasks/roadmap.md`, `backlog.md` |
 | Нерешённое | `docs/open-questions.md` |

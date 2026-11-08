@@ -7,9 +7,9 @@ export const isBlocked = (notices: CartNotice[] | undefined): boolean =>
   !!notices?.some((notice) => notice.kind === 'out_of_stock' || notice.kind === 'unavailable');
 
 /**
- * Применяет ответ `cart/check` к корзине. Что изменилось, определяем сравнением со снимком в корзине:
- * API не знает прежней цены и количества покупателя, поэтому не может надёжно вернуть
- * `price_changed` и `quantity_reduced` (open-questions). Позиции, которых нет в ответе, не трогаем.
+ * Применяет ответ `cart/check` к корзине. «Цена изменилась» и «количество уменьшено» определяем
+ * сравнением со снимком в корзине: API их не сообщает (решение 2026-11-08, api.md).
+ * Позиции, которых нет в ответе, не трогаем.
  */
 export function applyCheck(items: CartItem[], checked: CartItemChecked[]): { items: CartItem[]; notices: CartNotices } {
   const byVariant = new Map(checked.map((line) => [line.variantId, line]));

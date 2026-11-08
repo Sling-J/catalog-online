@@ -18,7 +18,7 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 |---|---|
 | `apps/web` | Лендинг и витрины магазинов — TanStack Start (SSR); код по FSD |
 | `apps/admin` | Админка магазина — Vite + React SPA; код по FSD, формы на TanStack Form ([ADR 0003](docs/02-architecture/adr/0003-forms-tanstack-form.md)), перетаскивание — `@dnd-kit/react` |
-| `apps/api` | API — NestJS + PostgreSQL (Drizzle) |
+| `apps/api` | API — NestJS + PostgreSQL (Drizzle); код — модули по областям, контроллер → сервис → репозиторий ([ADR 0004](docs/02-architecture/adr/0004-backend-structure.md)) |
 | `packages/ui` | Токены дизайн-системы, общие компоненты, иконки и хуки витрины и админки |
 | `packages/contract` | Контракт API `openapi.yaml` и сгенерированный код. В разработке (Vite, Vitest) приложения берут исходники `src/` — условие `development` в `exports`, правки моков видны без сборки; сборка и проверка типов — из `dist` |
 | `tools/e2e` | Сценарии в браузере на Playwright (`pnpm e2e`): пока админка на моках — онбординг, «Товары» |
