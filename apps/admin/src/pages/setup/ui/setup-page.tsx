@@ -20,6 +20,7 @@ const FORM_ID = 'setup-step';
 /**
  * Мастер настройки 1–4 (FR-A2, A8): название → адрес → WhatsApp → логотип. Каждый шаг сохраняется по «Дальше»,
  * поэтому после перезагрузки мастер продолжается с первого незаполненного шага. Шаг — в адресе (`?step=`).
+ * После мастера — «Главная» с чек-листом (A31).
  */
 export function SetupPage({ requestedStep }: { requestedStep: number | undefined }) {
   const queryClient = useQueryClient();
@@ -37,8 +38,7 @@ export function SetupPage({ requestedStep }: { requestedStep: number | undefined
     finish.mutate(
       { body: { setupCompleted: true } },
       {
-        onSuccess: (updated) =>
-          void applyShop(queryClient, updated).then(() => navigate({ to: '/products', replace: true })),
+        onSuccess: (updated) => void applyShop(queryClient, updated).then(() => navigate({ to: '/', replace: true })),
       },
     );
 
@@ -52,27 +52,18 @@ export function SetupPage({ requestedStep }: { requestedStep: number | undefined
       </span>
     </Button>
   );
-  const finishButtons = (phone: boolean): ReactNode => (
-    <>
-      <Button
-        variant="line"
-        size="form"
-        disabled={logoPending || finish.isPending}
-        onClick={done}
-        className="flex-none"
-      >
-        <Trans>Пропустить</Trans>
-      </Button>
-      <Button
-        variant="primary"
-        size="form"
-        disabled={logoPending || finish.isPending}
-        onClick={done}
-        className={phone ? 'flex-1' : undefined}
-      >
-        <Trans>Готово, к товарам →</Trans>
-      </Button>
-    </>
+  // L5: без логотипа — только «Пропустить», с логотипом — только «Готово» (UX-аудит)
+  const hasLogo = Boolean(shop.logo);
+  const finishButton = (phone: boolean): ReactNode => (
+    <Button
+      variant={hasLogo ? 'primary' : 'line'}
+      size="form"
+      disabled={logoPending || finish.isPending}
+      onClick={done}
+      className={phone ? 'flex-1' : undefined}
+    >
+      {hasLogo ? <Trans>Готово →</Trans> : <Trans>Пропустить</Trans>}
+    </Button>
   );
 
   const screens: Record<number, { title: ReactNode; subtitle: ReactNode; body: ReactNode }> = {
@@ -124,7 +115,7 @@ export function SetupPage({ requestedStep }: { requestedStep: number | undefined
       subtitle={screen.subtitle}
       phoneActions={
         step === 4 ? (
-          finishButtons(true)
+          finishButton(true)
         ) : (
           <>
             {step > 1 && <BackButton variant="phone" onClick={() => goTo(step - 1)} />}
@@ -136,7 +127,7 @@ export function SetupPage({ requestedStep }: { requestedStep: number | undefined
         <>
           {step > 1 && <BackButton variant="desk" onClick={() => goTo(step - 1)} />}
           <span className="flex-1" />
-          {step === 4 ? finishButtons(false) : next}
+          {step === 4 ? finishButton(false) : next}
         </>
       }
       preview={<SetupPreview name={step === 1 ? name : savedName} logo={shop.logo ?? null} initials={step === 4} />}

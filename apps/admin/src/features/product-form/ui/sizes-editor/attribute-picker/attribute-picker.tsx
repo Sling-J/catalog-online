@@ -1,5 +1,5 @@
 import type { Attribute } from '@catalog/contract';
-import { Icon } from '@catalog/ui';
+import { Icon, Select } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 
 /** Свойство таблицы размеров — серая пилюля «Рост ⌄»; на компьютере перед ней подпись «Свойство». */
@@ -15,23 +15,22 @@ export function AttributePicker({
   onChange: (attributeId: string | null) => void;
 }) {
   const { t } = useLingui();
+  const options = [
+    ...attributes.map((attribute) => ({ value: attribute.id, label: attribute.name })),
+    { value: '', label: t`Без размеров` },
+  ];
+  const current = options.find((option) => option.value === (value ?? ''));
   const pill = (
-    <span className="relative inline-flex h-8 items-center gap-1 rounded-pill bg-chip-haze px-3 text-[13px] font-semibold text-ink-night focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-iris">
-      <select
-        value={value ?? ''}
-        aria-label={t`Свойство размеров`}
-        onChange={(event) => onChange(event.target.value || null)}
-        className="field-sizing-content cursor-pointer appearance-none bg-transparent outline-none"
-      >
-        {attributes.map((attribute) => (
-          <option key={attribute.id} value={attribute.id}>
-            {attribute.name}
-          </option>
-        ))}
-        <option value="">{t`Без размеров`}</option>
-      </select>
-      <Icon name="chevron-down" size={13} strokeWidth={2.4} className="pointer-events-none text-ink-quiet" />
-    </span>
+    <Select
+      label={t`Свойство размеров`}
+      value={value ?? ''}
+      options={options}
+      onChange={(next) => onChange(next || null)}
+      className="press inline-flex h-8 items-center gap-1 rounded-pill bg-chip-haze px-3 text-[13px] font-semibold text-ink-night hover:bg-haze-hover"
+    >
+      {current?.label}
+      <Icon name="chevron-down" size={13} strokeWidth={2.4} className="text-ink-quiet" />
+    </Select>
   );
   if (!caption) return pill;
   return (

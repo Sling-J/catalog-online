@@ -9,9 +9,10 @@ import { ConfirmSheet } from '@/shared/ui';
 
 /**
  * «Снять» в карточке витрины (раздел «Магазин», макет AdminPhone2, экран 8) с подтверждением — в макете его нет,
- * сделано по образцу «Удалить товар?». Сняли — витрина скрыта, карточка показывает черновик.
+ * сделано по образцу «Удалить товар?». Сняли — остаёмся на месте, карточка показывает черновик, а страница —
+ * сообщение «Витрина скрыта» (`onDone`; UX-аудит, U4).
  */
-export function UnpublishShop({ className }: { className?: string }) {
+export function UnpublishShop({ className, onDone }: { className?: string; onDone: () => void }) {
   const queryClient = useQueryClient();
   const messages = useFormMessages();
   const [asking, setAsking] = useState(false);
@@ -40,7 +41,7 @@ export function UnpublishShop({ className }: { className?: string }) {
             {
               onSuccess: (shop) => {
                 setAsking(false);
-                void applyShop(queryClient, shop);
+                void applyShop(queryClient, shop).then(onDone);
               },
             },
           )

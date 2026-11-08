@@ -1,13 +1,13 @@
 import type { ColumnMapping } from '@catalog/contract';
-import { cx, Icon } from '@catalog/ui';
+import { cx, Icon, Select } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
 
 import { useTargetLabels } from '../../hooks';
 import { FIELD_TARGETS, mappingFromValue, mappingValue } from '../../lib';
 
 /**
- * «Куда загрузить» колонку: поле, свойство или «Не загружать». Пилюля 40 px с подписью и стрелкой, поверх —
- * прозрачный системный список (на телефоне откроется родной выбор). Свойство — сиреневое, «Не загружать» —
+ * «Куда загрузить» колонку: поле, свойство или «Не загружать». Пилюля 40 px с подписью и стрелкой, список —
+ * свой (`Select`: панель на компьютере, шторка на телефоне), с группами «Поля товара» и «Атрибуты». Свойство — сиреневое, «Не загружать» —
  * серое с пунктиром (макет AdminDesk, экран 3). Свойства — существующие в магазине и новое с именем колонки.
  */
 export function TargetSelect({
@@ -37,11 +37,28 @@ export function TargetSelect({
         ? t`Не загружать`
         : labels[item.target];
   const column = item.column;
+  const options = [
+    ...FIELD_TARGETS.map((target) => ({ value: target, label: labels[target], group: t`Поля товара` })),
+    ...attributes.map((name) => ({
+      value: `attribute:${name}`,
+      label: t`Атрибут «${name}»`,
+      group: t`Атрибуты — по ним фильтруют на витрине`,
+    })),
+    ...extra.map((name) => ({
+      value: `attribute:${name}`,
+      label: t`Новый атрибут «${name}»`,
+      group: t`Атрибуты — по ним фильтруют на витрине`,
+    })),
+    { value: 'skip', label: t`Не загружать` },
+  ];
   return (
-    <span
+    <Select
+      label={t`Куда загрузить колонку «${column}»`}
+      value={value}
+      options={options}
+      onChange={(next) => onChange(mappingFromValue(item.column, next))}
       className={cx(
-        'relative inline-flex h-10 min-w-0 items-center justify-between gap-2 rounded-[12px] border-[1.5px] px-3 text-[14px] font-semibold',
-        'focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-iris',
+        'press inline-flex h-10 min-w-0 items-center justify-between gap-2 rounded-[12px] border-[1.5px] px-3 text-left text-[14px] font-semibold',
         item.target === 'attribute'
           ? 'border-[#cfc8ff] bg-[#ece9ff] text-[#2a2290]'
           : item.target === 'skip'
@@ -52,33 +69,6 @@ export function TargetSelect({
     >
       <span className="truncate">{label}</span>
       <Icon name="chevron-down" size={15} strokeWidth={2.4} className="flex-none text-ink-quiet" />
-      <select
-        value={value}
-        aria-label={t`Куда загрузить колонку «${column}»`}
-        onChange={(event) => onChange(mappingFromValue(item.column, event.target.value))}
-        className="absolute inset-0 size-full cursor-pointer appearance-none opacity-0"
-      >
-        <optgroup label={t`Поля товара`}>
-          {FIELD_TARGETS.map((target) => (
-            <option key={target} value={target}>
-              {labels[target]}
-            </option>
-          ))}
-        </optgroup>
-        <optgroup label={t`Атрибуты — по ним фильтруют на витрине`}>
-          {attributes.map((name) => (
-            <option key={name} value={`attribute:${name}`}>
-              {t`Атрибут «${name}»`}
-            </option>
-          ))}
-          {extra.map((name) => (
-            <option key={name} value={`attribute:${name}`}>
-              {t`Новый атрибут «${name}»`}
-            </option>
-          ))}
-        </optgroup>
-        <option value="skip">{t`Не загружать`}</option>
-      </select>
-    </span>
+    </Select>
   );
 }

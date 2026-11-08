@@ -1,4 +1,4 @@
-export { applyShop, shopQueryOptions } from './api';
+export { applyShop, previewTokenQueryOptions, shopQueryOptions } from './api';
 export {
   closesAfterOpen,
   formatPhone,
@@ -6,6 +6,8 @@ export {
   isTime,
   normalizeTime,
   PHONE_DIGITS,
+  type PublishBlocker,
+  publishBlockers,
   type ScheduleGroup,
   shopToday,
   storefrontHost,
@@ -15,5 +17,7 @@ export {
   subdomainFromName,
   WEEKDAYS,
   type WeekdayKey,
+  whatsappShareUrl,
+  withPreview,
 } from './lib';
-export { ShopAvatar, ShopStatus } from './ui';
+export { ShopAvatar, ShopStatus, StorefrontLink } from './ui';

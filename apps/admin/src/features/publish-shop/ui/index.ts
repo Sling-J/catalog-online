@@ -1,3 +1,3 @@
-export { PublishAgain } from './publish-again';
 export { PublishButton } from './publish-button';
+export { PublishedSheet } from './published-sheet';
 export { UnpublishShop } from './unpublish-shop';

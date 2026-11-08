@@ -32,12 +32,21 @@ export type IconName =
   | 'lock'
   | 'chart'
   | 'sync'
-  | 'drag';
+  | 'drag'
+  | 'home'
+  | 'user'
+  | 'sort'
+  | 'arrow-up'
+  | 'arrow-down';
 
 // Контурные иконки 24×24, штрих берут от `currentColor`. Общие для витрины и админки.
 const glyphs: Record<IconName, ReactNode> = {
   'chevron-right': <path d="M9 6l6 6-6 6" />,
   'chevron-down': <path d="M7 10l5 5 5-5" />,
+  // сортировка: колонку можно упорядочить / упорядочено по возрастанию / по убыванию
+  sort: <path d="M8 9.5l4-4 4 4M8 14.5l4 4 4-4" />,
+  'arrow-up': <path d="M12 19V5M6.5 10.5L12 5l5.5 5.5" />,
+  'arrow-down': <path d="M12 5v14M6.5 13.5L12 19l5.5-5.5" />,
   instagram: (
     <>
       <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
@@ -210,6 +219,21 @@ const glyphs: Record<IconName, ReactNode> = {
       <circle cx="15" cy="12" r="1" />
       <circle cx="9" cy="18" r="1" />
       <circle cx="15" cy="18" r="1" />
+    </>
+  ),
+  // «Главная» в меню админки (UX-аудит, A31)
+  home: (
+    <>
+      <path d="M4 10.5L12 4l8 6.5" />
+      <path d="M6 9v11h12V9" />
+      <path d="M10 20v-6h4v6" />
+    </>
+  ),
+  // аккаунт владельца (UX-аудит, A31)
+  user: (
+    <>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20a8 8 0 0 1 16 0" />
     </>
   ),
 };

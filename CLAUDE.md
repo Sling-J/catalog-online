@@ -56,6 +56,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - `pnpm format` / `pnpm format:check` — Prettier.
 - `pnpm i18n:extract` — строки Lingui в каталоги `.po`.
 - `docker compose up -d` — PostgreSQL и S3-хранилище для разработки (`.env.example`).
+- `pnpm e2e` — сценарии в браузере (`tools/e2e`, Playwright на моках); после правок админки, в `pnpm check` не входит.
 - `pnpm design:compare --board <доска> --frame <экран> --url <адрес>` — сверка экрана с макетом (`tools/design-compare/README.md`); после вёрстки по макету — обязательно, вместо ручных замеров в браузере. Админку сверяем на http://localhost:3012 (`admin-check`).
 
 ## Код
@@ -65,5 +66,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - Код `apps/web` и `apps/admin` — по FSD (`docs/02-architecture/frontend-structure.md`): слои `app → pages → widgets → features → entities → shared`, без импортов между срезами одного слоя, снаружи среза только через его `index.ts`, алиас `@/*` → `src/*`. Границы проверяет `pnpm lint` (`eslint.fsd.js`).
 - Токены дизайн-системы — `packages/ui/src/tokens.css` (Tailwind v4 `@theme`), источник — `DESIGN.md`.
 - Формы админки — TanStack Form через `useAppForm` из `@/shared/ui` (ADR 0003): проверка в `validators.onSubmit`, отправка `submitForm`, ошибки сервера `setServerError` / `setFormError`. Уход с несохранёнными правками — `useLeaveGuard` из `@/shared/hooks` и `LeaveConfirm` из `@/shared/ui`; общие поля форм (`TextAreaField`, `FieldLabel`, `FieldNote`, `SaveBar`) — там же.
+- Ссылка на витрину в админке — только `StorefrontLink` из `@/entities/shop`: до публикации он сам ведёт в превью (`?preview=<токен>`), обычный адрес черновика покупателю не отвечает (A32).
 - Файл в хранилище (API2) — `uploadFile` из `@/shared/api`; перетаскивание в админке — `@dnd-kit/react` (ADR 0001, пример — `features/product-photos/ui/sortable-photos`).
-- Общее для витрины и админки без бизнес-контекста (базовые компоненты, `Icon`, `ChangingValue`, `useIsDesktop`, `useLoadMore`, `formatPrice`) — в `@catalog/ui`, не копией в каждом приложении.
+- Выпадающий список — `Select` из `@catalog/ui` (панель на компьютере, шторка на телефоне, действия под чертой — `actions`), не системный `<select>`. Копирование с отметкой «Скопировано» — `useCopied` из `@/shared/hooks`.
+- Общее для витрины и админки без бизнес-контекста (базовые компоненты, `Icon`, `Select`, `ChangingValue`, `useIsDesktop`, `useLoadMore`, `formatPrice`) — в `@catalog/ui`, не копией в каждом приложении.

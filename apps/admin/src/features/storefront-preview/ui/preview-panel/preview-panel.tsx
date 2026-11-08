@@ -4,7 +4,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 
-import { previewTokenQueryOptions } from '../../api';
+import { previewTokenQueryOptions, withPreview } from '@/entities/shop';
 
 // телефон в панели — как в макете: рамка 320×660, экран 300×640; витрина внутри — шириной настоящего телефона
 const FRAME_W = 320;
@@ -133,7 +133,7 @@ export function PreviewPanel({
                 <iframe
                   ref={frame}
                   title={t`Витрина магазина`}
-                  src={`${storefrontUrl}/?preview=${encodeURIComponent(token.data)}`}
+                  src={withPreview(`${storefrontUrl}/`, token.data)}
                   className="origin-top-left border-0"
                   style={{ width: PHONE_W, height: SCREEN_H / SCREEN_SCALE, transform: `scale(${SCREEN_SCALE})` }}
                 />

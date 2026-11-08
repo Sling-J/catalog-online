@@ -19,3 +19,11 @@ export function storefrontHost(url: string): string {
 export function storefrontRootDomain(): string {
   return import.meta.env.VITE_ROOT_DOMAIN ?? 'localhost';
 }
+
+/**
+ * Адрес витрины в режиме превью (T-113): `?preview=<токен>`. Черновик по обычному адресу не виден
+ * (API ответит «Магазин не найден»), поэтому до публикации все ссылки «Витрина» ведут сюда (UX-аудит, E2).
+ */
+export function withPreview(url: string, token: string): string {
+  return `${url}${url.includes('?') ? '&' : '?'}preview=${encodeURIComponent(token)}`;
+}

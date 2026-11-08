@@ -1,0 +1,1 @@
+export { ShopSettingsLayout } from './ui';

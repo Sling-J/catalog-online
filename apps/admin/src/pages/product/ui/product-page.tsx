@@ -1,5 +1,5 @@
 import { useIsDesktop } from '@catalog/ui';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { Trans } from '@lingui/react/macro';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -9,7 +9,7 @@ import { useProductPhotos } from '@/features/product-photos';
 import { attributesQueryOptions } from '@/entities/attribute';
 import { categoriesQueryOptions, flattenCategories } from '@/entities/category';
 import { productQueryOptions } from '@/entities/product';
-import { shopQueryOptions, storefrontUrl } from '@/entities/shop';
+import { shopQueryOptions } from '@/entities/shop';
 import { fieldErrors } from '@/shared/api';
 import { useFormMessages, useLeaveGuard } from '@/shared/hooks';
 import { LeaveConfirm, setFormError, setServerError, submitForm, useIsDirty } from '@/shared/ui';
@@ -25,7 +25,6 @@ import { PhoneEditor } from './phone-editor';
  * несохранёнными правками спрашивает подтверждение.
  */
 export function ProductPage({ productId }: { productId: string }) {
-  const { t } = useLingui();
   const messages = useFormMessages();
   const draftMessage = useDraftMessages();
   const isDesktop = useIsDesktop();
@@ -58,23 +57,13 @@ export function ProductPage({ productId }: { productId: string }) {
     return navigate({ to: '/products' });
   };
 
-  const categories = [
-    { value: '', label: t`Без категории` },
-    ...flattenCategories(tree).map((category) => ({
-      value: category.id,
-      label: `${' '.repeat(category.depth * 3)}${category.name}`,
-    })),
-  ];
   const view: ProductView = {
     product,
     photos,
     form,
-    categories,
     category: flattenCategories(tree).find((category) => category.id === product.categoryId)?.name,
     attributeName: attributes.find((attribute) => attribute.id === defaultValues.attributeId)?.name,
-    storefrontLink: shop.subdomain
-      ? `${storefrontUrl(shop.subdomain, window.location.origin)}/${product.slug}-${product.shortId}`
-      : undefined,
+    storefrontPath: shop.subdomain ? `/${product.slug}-${product.shortId}` : undefined,
     onCancel: () => void navigate({ to: '/products' }),
     // удалённый товар убираем из кеша, когда с его страницы уже ушли
     onDeleted: () =>

@@ -3,12 +3,15 @@ import { cx, Icon } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 
-import { ShopAvatar, ShopStatus } from '@/entities/shop';
 import { useNavLabels, useNavSections } from '@/widgets/app-shell/hooks';
 
+import { ShopCard } from '../shop-card';
 import { StorefrontCard } from '../storefront-card';
 
-/** Колонка компьютера на сиреневом: магазин со статусом, разделы (у «Товаров» — число), внизу «Ваша витрина». */
+/**
+ * Колонка компьютера на сиреневом: магазин со статусом (нажатие — аккаунт и публикация), разделы (у «Товаров» —
+ * число), внизу «Ваша витрина».
+ */
 export function SideNav({
   name,
   logo,
@@ -24,19 +27,13 @@ export function SideNav({
 }) {
   const { t } = useLingui();
   const labels = useNavLabels();
-  const sections = useNavSections(status);
+  const sections = useNavSections();
   return (
     <aside className="fixed inset-y-0 left-0 z-20 hidden w-[248px] flex-col bg-lilac-field px-4 py-[22px] lg:flex">
-      <div className="flex items-center gap-2.5 rounded-[20px] bg-glass p-2.5">
-        <ShopAvatar name={name} logo={logo} />
-        <div className="min-w-0">
-          <div className="truncate text-[15px] font-bold">{name}</div>
-          <ShopStatus status={status} stacked />
-        </div>
-      </div>
+      <ShopCard name={name} logo={logo} status={status} desk />
       <nav aria-label={t`Разделы`} className="mt-[22px] flex flex-col gap-1">
         {sections.map((item) => (
-          <Link key={item.key} to={item.to} className="press">
+          <Link key={item.key} to={'deskTo' in item ? item.deskTo : item.to} className="press">
             <span
               className={cx(
                 'flex h-12 items-center gap-3 rounded-2xl px-3.5 text-[15px]',

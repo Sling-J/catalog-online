@@ -3,6 +3,7 @@ export { ChangingValue, type ChangingValueProps } from './components/ChangingVal
 export { Chip, type ChipProps } from './components/Chip.js';
 export { SizeChip, type SizeChipProps } from './components/SizeChip.js';
 export { Field, type FieldProps } from './components/Field.js';
+export { Select, type SelectAction, type SelectOption, type SelectProps } from './components/Select.js';
 export { Sheet, type SheetPlacement, type SheetProps } from './components/Sheet.js';
 export { StockPill, type StockLevel, type StockPillProps } from './components/StockPill.js';
 export { Switch, type SwitchProps } from './components/Switch.js';

@@ -1,28 +1,30 @@
-import { getStatsOptions } from '@catalog/contract/query';
-import { Plural, Trans } from '@lingui/react/macro';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 
-import { LogoutButton } from '@/features/logout';
+import { PublishedSheet } from '@/features/publish-shop';
 import { attributesQueryOptions } from '@/entities/attribute';
 import { categoriesQueryOptions, flattenCategories } from '@/entities/category';
-import { meQueryOptions } from '@/entities/session';
 import { shopQueryOptions, storefrontUrl } from '@/entities/shop';
-import { PageTitle } from '@/shared/ui';
+import { PageTitle, Toast } from '@/shared/ui';
 
 import { SettingsRow } from './settings-row';
 import { StorefrontCard } from './storefront-card';
 
 /**
- * Раздел «Магазин» (FR-A9; макет AdminPhone2, экран 8): карточка витрины с публикацией, пункты настроек и «Выйти».
- * На компьютере макета нет — та же колонка шириной 560 px, как «Вход и пароль».
+ * Раздел «Магазин» — настройки витрины (FR-A9; макет AdminPhone2, экран 8; структура — A31). Телефон: публикация и
+ * пункты настроек. Компьютер: пункты — в подменю слева (`ShopSettingsLayout`), здесь только «Публикация» — последний пункт;
+ * «Магазин» в колонке открывает «О магазине».
+ * Статистика переехала на главную, аккаунт — к карточке магазина (UX-аудит, U2, U10).
  */
 export function ShopPage() {
+  const { t } = useLingui();
   const { data: shop } = useSuspenseQuery(shopQueryOptions());
-  const { data: me } = useSuspenseQuery(meQueryOptions());
   const { data: tree } = useSuspenseQuery(categoriesQueryOptions());
   const { data: attributes } = useSuspenseQuery(attributesQueryOptions());
-  // статистика подписи не задерживает: пока не пришла — общая подпись
-  const { data: stats } = useQuery(getStatsOptions({ query: { period: '7d' } }));
+  const [published, setPublished] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const hideMessage = useCallback(() => setMessage(null), []);
   const url = shop.subdomain ? storefrontUrl(shop.subdomain, window.location.origin) : null;
   const categoryCount = flattenCategories(tree).length;
   const threshold = shop.lowStockThreshold;
@@ -30,11 +32,21 @@ export function ShopPage() {
   return (
     <>
       <PageTitle>
-        <Trans>Магазин</Trans>
+        <span className="lg:hidden">
+          <Trans>Магазин</Trans>
+        </span>
+        <span className="hidden lg:inline">
+          <Trans>Публикация</Trans>
+        </span>
       </PageTitle>
       <div className="lg:w-[560px]">
-        <StorefrontCard status={shop.status} url={url} />
-        <nav className="mt-3.5 overflow-hidden rounded-[22px] bg-white shadow-[0_1px_0_#eceaf5]">
+        <StorefrontCard
+          shop={shop}
+          url={url}
+          onPublished={() => setPublished(true)}
+          onUnpublished={() => setMessage(t`Витрина скрыта`)}
+        />
+        <nav className="mt-3.5 overflow-hidden rounded-[22px] bg-white shadow-[0_1px_0_#eceaf5] lg:hidden">
           <SettingsRow
             first
             to="/shop/info"
@@ -45,7 +57,7 @@ export function ShopPage() {
           <SettingsRow
             to="/shop/categories"
             icon="tag"
-            title={<Trans>Категории и размеры</Trans>}
+            title={<Trans>Категории и свойства</Trans>}
             sub={
               <>
                 <Plural
@@ -62,7 +74,7 @@ export function ShopPage() {
           <SettingsRow
             to="/shop/stock"
             icon="eye"
-            title={<Trans>Как показывать наличие</Trans>}
+            title={<Trans>Наличие на витрине</Trans>}
             sub={
               shop.stockDisplay === 'levels' ? (
                 <Trans>«есть / мало / нет», мало — {threshold} и меньше</Trans>
@@ -71,31 +83,10 @@ export function ShopPage() {
               )
             }
           />
-          <SettingsRow
-            to="/shop/stats"
-            icon="chart"
-            title={<Trans>Статистика</Trans>}
-            sub={
-              stats ? (
-                <Trans>
-                  За неделю:{' '}
-                  <Plural value={stats.totals.views} one="# просмотр" few="# просмотра" other="# просмотров" />,{' '}
-                  <Plural
-                    value={stats.totals.orderClicks}
-                    one="# нажатие «Заказать»"
-                    few="# нажатия «Заказать»"
-                    other="# нажатий «Заказать»"
-                  />
-                </Trans>
-              ) : (
-                <Trans>Просмотры и нажатия «Заказать»</Trans>
-              )
-            }
-          />
-          <SettingsRow to="/shop/account" icon="lock" title={<Trans>Вход и пароль</Trans>} sub={me.account.email} />
         </nav>
-        <LogoutButton className="mt-4 block w-full text-center text-[15px] font-semibold text-coral-underside hover:underline" />
       </div>
+      <PublishedSheet open={published} onClose={() => setPublished(false)} />
+      <Toast message={message} onHide={hideMessage} />
     </>
   );
 }

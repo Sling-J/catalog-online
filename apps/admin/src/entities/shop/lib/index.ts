@@ -9,6 +9,8 @@ export {
   WEEKDAYS,
   type WeekdayKey,
 } from './schedule';
+export { type PublishBlocker, publishBlockers } from './publish-blockers';
+export { whatsappShareUrl } from './share';
 export { getInitials } from './shop-initials';
-export { storefrontHost, storefrontRootDomain, storefrontUrl } from './storefront-url';
+export { storefrontHost, storefrontRootDomain, storefrontUrl, withPreview } from './storefront-url';
 export { SUBDOMAIN_PATTERN, subdomainFromName } from './subdomain';

@@ -2,15 +2,10 @@ import { Button, Icon } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 
-import {
-  DeleteProduct,
-  ExcelMark,
-  ImportNote,
-  SelectField,
-  VariantsTable,
-  VisibilitySwitch,
-} from '@/features/product-form';
+import { DeleteProduct, ExcelMark, ImportNote, VariantsTable, VisibilitySwitch } from '@/features/product-form';
+import { CategoryField } from '@/widgets/category-field';
 import { PhotoPanel } from '@/features/product-photos';
+import { StorefrontLink } from '@/entities/shop';
 import { FieldNote, PageTitle, TextAreaField } from '@/shared/ui';
 
 import type { ProductView } from '../../types';
@@ -23,10 +18,9 @@ export function DeskEditor({
   product,
   photos,
   form,
-  categories,
   category,
   attributeName,
-  storefrontLink,
+  storefrontPath,
   onCancel,
   onDeleted,
   onSubmit,
@@ -44,16 +38,14 @@ export function DeskEditor({
         <PageTitle
           actions={
             <>
-              {storefrontLink && (
-                <a
-                  href={storefrontLink}
-                  target="_blank"
-                  rel="noreferrer"
+              {storefrontPath && (
+                <StorefrontLink
+                  path={storefrontPath}
                   className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-iris"
                 >
                   <Icon name="eye" size={16} />
                   <Trans>На витрине</Trans>
-                </a>
+                </StorefrontLink>
               )}
               <Button variant="soft" size="compact" className="px-[18px]!" onClick={onCancel}>
                 <Trans>Отменить</Trans>
@@ -82,12 +74,11 @@ export function DeskEditor({
             </form.AppField>
             <form.Field name="categoryId">
               {(field) => (
-                <SelectField
+                <CategoryField
                   label={t`Категория`}
                   note={imported('category') && <ExcelMark />}
-                  value={field.state.value ?? ''}
-                  options={categories}
-                  onChange={(value) => field.handleChange(value || null)}
+                  value={field.state.value ?? null}
+                  onChange={field.handleChange}
                 />
               )}
             </form.Field>

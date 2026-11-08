@@ -6,8 +6,13 @@ import { productCountsQueryOptions } from './product-counts.api';
 
 export type ProductFilter = Exclude<NonNullable<NonNullable<ListProductsData['query']>['filter']>, 'all'>;
 
+/** Порядок списка (FR-A5): новые, по названию, по цене, сначала с маленьким остатком. */
+export type ProductSort = NonNullable<NonNullable<ListProductsData['query']>['sort']>;
+
+export const PRODUCT_SORTS: readonly ProductSort[] = ['new', 'name', 'price_asc', 'price_desc', 'stock_asc'];
+
 /** Что выбрано в списке товаров; живёт в адресе страницы. */
-export type ProductListParams = { q?: string; categoryId?: string; filter?: ProductFilter };
+export type ProductListParams = { q?: string; categoryId?: string; filter?: ProductFilter; sort?: ProductSort };
 
 export const PRODUCTS_PAGE_SIZE = 30;
 

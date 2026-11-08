@@ -1,16 +1,37 @@
 import { Icon } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
-import { Link, type LinkProps } from '@tanstack/react-router';
+import { Link, type LinkProps, useCanGoBack, useRouter } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 
-/** Шапка вложенного экрана на телефоне: круглая «Назад», заголовок и действие справа (макеты админки, backBar). */
-export function BackBar({ to, action, children }: { to: LinkProps['to']; action?: ReactNode; children: ReactNode }) {
+/**
+ * Шапка вложенного экрана на телефоне: круглая «Назад», заголовок и действие справа (макеты админки, backBar).
+ * `returnBack` — экран открывают из разных мест (аккаунт): «Назад» возвращает туда, откуда пришли, а `to` —
+ * только если идти некуда (открыли по ссылке).
+ */
+export function BackBar({
+  to,
+  returnBack,
+  action,
+  children,
+}: {
+  to: LinkProps['to'];
+  returnBack?: boolean;
+  action?: ReactNode;
+  children: ReactNode;
+}) {
   const { t } = useLingui();
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
   return (
     <div className="flex items-center gap-2.5 px-4 pt-3.5 lg:hidden">
       <Link
         to={to}
         aria-label={t`Назад`}
+        onClick={(event) => {
+          if (!returnBack || !canGoBack) return;
+          event.preventDefault();
+          router.history.back();
+        }}
         className="press flex size-11 flex-none items-center justify-center rounded-full bg-chip-haze hover:bg-haze-hover"
       >
         <Icon name="chevron-left" size={20} strokeWidth={2.4} />

@@ -1,6 +1,6 @@
 import type { Shop } from '@catalog/contract';
 
-export type ChecklistKey = 'settings' | 'products' | 'photos' | 'email' | 'publish';
+export type ChecklistKey = 'created' | 'products' | 'photos' | 'email' | 'publish';
 
 export type ChecklistItem = {
   key: ChecklistKey;
@@ -9,17 +9,16 @@ export type ChecklistItem = {
   muted?: boolean;
 };
 
-/** Что мешает опубликовать: товаров нет (сначала это), почта не подтверждена (A9) — или ничего. */
-export type PublishBlocker = 'products' | 'email' | null;
-
 /**
- * Чек-лист главной до публикации (FR-A2, макеты AdminPhone экран 1, AdminAuthPhone экран 10, AdminHome).
- * Пункт почты — только пока она не подтверждена; публикация — всегда последний и всегда не сделан.
+ * Чек-лист главной до публикации (FR-A2; UX-аудит, L1). Мастер пройден — значит, «Магазин создан» уже сделан:
+ * человек только что настроил магазин, и «0 из 5» звучало бы как «ничего не сделано». Адрес и график — отдельный
+ * необязательный пункт «Расскажите о магазине» (`about`), в счёт готовности не входит. Пункт почты — только пока
+ * она не подтверждена; публикация — всегда последняя и всегда не сделана.
  */
 export function buildChecklist(readiness: Shop['readiness'], emailVerified: boolean) {
   const { settingsFilled, productCount, productsWithoutPhoto } = readiness;
   const items: ChecklistItem[] = [
-    { key: 'settings', done: settingsFilled },
+    { key: 'created', done: true },
     { key: 'products', done: productCount > 0 },
     productCount === 0
       ? { key: 'photos', done: false, muted: true }
@@ -27,6 +26,10 @@ export function buildChecklist(readiness: Shop['readiness'], emailVerified: bool
     ...(emailVerified ? [] : [{ key: 'email' as const, done: false }]),
     { key: 'publish', done: false },
   ];
-  const blocker: PublishBlocker = productCount === 0 ? 'products' : emailVerified ? null : 'email';
-  return { items, done: items.filter((item) => item.done).length, total: items.length, blocker };
+  return {
+    items,
+    done: items.filter((item) => item.done).length,
+    total: items.length,
+    about: { done: settingsFilled },
+  };
 }

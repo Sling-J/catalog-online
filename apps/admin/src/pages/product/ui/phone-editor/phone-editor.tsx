@@ -1,7 +1,9 @@
 import { Trans, useLingui } from '@lingui/react/macro';
 
-import { DeleteProduct, ExcelMark, SelectField, VariantsCard, VisibilitySwitch } from '@/features/product-form';
+import { CategoryField } from '@/widgets/category-field';
+import { DeleteProduct, ExcelMark, VariantsCard, VisibilitySwitch } from '@/features/product-form';
 import { PhotoStrip } from '@/features/product-photos';
+import { StorefrontLink } from '@/entities/shop';
 import { BackBar, SaveBar } from '@/shared/ui';
 
 import type { ProductView } from '../../types';
@@ -11,9 +13,8 @@ export function PhoneEditor({
   product,
   photos,
   form,
-  categories,
   attributeName,
-  storefrontLink,
+  storefrontPath,
   onDeleted,
   onSubmit,
 }: ProductView) {
@@ -24,10 +25,10 @@ export function PhoneEditor({
       <BackBar
         to="/products"
         action={
-          storefrontLink && (
-            <a href={storefrontLink} target="_blank" rel="noreferrer" className="text-[14px] font-bold text-iris">
+          storefrontPath && (
+            <StorefrontLink path={storefrontPath} className="text-[14px] font-bold text-iris">
               <Trans>Витрина ↗</Trans>
-            </a>
+            </StorefrontLink>
           )
         }
       >
@@ -40,12 +41,11 @@ export function PhoneEditor({
         </form.AppField>
         <form.Field name="categoryId">
           {(field) => (
-            <SelectField
+            <CategoryField
               label={t`Категория`}
               note={imported('category') && <ExcelMark />}
-              value={field.state.value ?? ''}
-              options={categories}
-              onChange={(value) => field.handleChange(value || null)}
+              value={field.state.value ?? null}
+              onChange={field.handleChange}
             />
           )}
         </form.Field>

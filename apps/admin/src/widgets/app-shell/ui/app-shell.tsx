@@ -10,7 +10,8 @@ import { TopBar } from './top-bar';
 
 /**
  * Оболочка рабочих разделов (A1): сиреневое меню снизу на телефоне и колонкой слева на компьютере,
- * рабочая область на бумаге. Магазин, статус витрины и «Витрина» — в шапке телефона и в колонке компьютера.
+ * рабочая область на бумаге. Разделы — «Главная», «Товары», «Магазин» (A31). Магазин, статус витрины и «Витрина» —
+ * в шапке телефона и в колонке компьютера.
  * Вложенный экран (`staticData.subScreen`) на телефоне — без шапки и меню: «Назад» и кнопку рисует сам экран.
  */
 export function AppShell({ children }: { children: ReactNode }) {
@@ -20,7 +21,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh lg:pl-[248px]">
       <SideNav name={name} logo={shop.logo} status={shop.status} url={url} productCount={productCount} />
-      {!subScreen && <TopBar name={name} logo={shop.logo} status={shop.status} url={url} />}
+      {!subScreen && <TopBar name={name} logo={shop.logo} status={shop.status} />}
       <main
         className={cx(
           'lg:px-8',
@@ -31,7 +32,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         {children}
       </main>
-      {!subScreen && <BottomNav status={shop.status} />}
+      {!subScreen && <BottomNav />}
     </div>
   );
 }

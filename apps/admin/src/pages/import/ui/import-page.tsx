@@ -35,11 +35,18 @@ type OpenImport = (importId: string | undefined) => void;
  * Раздел «Импорт» (FR-A3): «Файл → Колонки → Проверка → Готово». Открытый импорт живёт в адресе (`?id=`), шаг —
  * по его статусу с сервера, поэтому переживает перезагрузку и уход с экрана. Телефон — заголовок «Импорт» (макет
  * AdminPhone, экран 5), компьютер — «Импорт товаров» с «Историей импортов» и «Скачать шаблон» (макет AdminDesk,
- * экран 3). Пока прошлый импорт не закончен, раздел открывает его.
+ * экран 3). Пока прошлый импорт не закончен, раздел открывает его. В меню пункта нет — импорт открывается из
+ * «Товаров» и с главной (A31), поэтому сверху путь «Товары / Импорт».
  */
 export function ImportPage({ importId, onOpen }: { importId: string | undefined; onOpen: OpenImport }) {
   return (
     <>
+      <div className="mb-1 text-[14px] text-ink-quiet">
+        <Link to="/products" className="hover:text-ink-night">
+          <Trans>Товары</Trans>
+        </Link>{' '}
+        / <Trans>Импорт</Trans>
+      </div>
       <PageTitle
         actions={
           <div className="hidden items-center gap-2.5 lg:flex">

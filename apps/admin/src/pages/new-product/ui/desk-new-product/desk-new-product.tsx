@@ -2,7 +2,8 @@ import { Button } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 
-import { PriceField, SelectField, SizesEditor } from '@/features/product-form';
+import { CategoryField } from '@/widgets/category-field';
+import { PriceField, SizesEditor } from '@/features/product-form';
 import { FieldNote, TextAreaField } from '@/shared/ui';
 import { PhotoPanel } from '@/features/product-photos';
 import { PageTitle } from '@/shared/ui';
@@ -13,7 +14,7 @@ import type { NewProductView } from '../../types';
  * Новый товар на компьютере (макет AdminDesk2, экран 6): «Товары / Новый», заголовок с «Сохранить черновик» и
  * «Сохранить и показать»; слева фото, справа поля и белая карточка «Размеры и количество».
  */
-export function DeskNewProduct({ form, photos, attributes, categories, onSave }: NewProductView) {
+export function DeskNewProduct({ form, photos, attributes, onSave }: NewProductView) {
   const { t } = useLingui();
   return (
     <form
@@ -65,12 +66,11 @@ export function DeskNewProduct({ form, photos, attributes, categories, onSave }:
           <div className="grid grid-cols-[1fr_200px] gap-3.5">
             <form.Field name="categoryId">
               {(field) => (
-                <SelectField
+                <CategoryField
                   chevron
                   label={t`Категория`}
-                  value={field.state.value ?? ''}
-                  options={categories}
-                  onChange={(value) => field.handleChange(value || null)}
+                  value={field.state.value ?? null}
+                  onChange={field.handleChange}
                 />
               )}
             </form.Field>

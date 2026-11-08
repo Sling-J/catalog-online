@@ -124,6 +124,8 @@
   --animate-pop: pop 0.28s var(--ease-out-soft);
   --animate-fade: fade 0.25s ease;
   --animate-fade-fast: fade 0.2s ease;
+  /* выпадающий список (Select): раскрывается от края, к которому привязан (transform-origin задаёт сам список) */
+  --animate-menu-in: menu-in 0.18s var(--ease-out-soft);
   /* подгруженные плитки сетки: прозрачны, пока ждут своей задержки (animation-delay у плитки) */
   --animate-tile-in: fade 0.25s ease backwards;
   /* смена текста или иконки на месте («Скопировано»): новое проявляется, элемент с key */
@@ -148,6 +150,12 @@
   }
   @keyframes fade {
     from {
+      opacity: 0;
+    }
+  }
+  @keyframes menu-in {
+    from {
+      transform: scale(0.96);
       opacity: 0;
     }
   }

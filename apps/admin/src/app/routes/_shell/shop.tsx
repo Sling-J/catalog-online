@@ -1,15 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 
-import { attributesQueryOptions } from '@/entities/attribute';
-import { categoriesQueryOptions } from '@/entities/category';
-import { ShopPage } from '@/pages/shop';
+import { ShopSettingsLayout } from '@/widgets/shop-settings-layout';
 
-// Раздел «Магазин» (T-310): публикация и пункты настроек. В подписях строк — число категорий и свойства.
+// Раздел «Магазин» — настройки витрины (A31). На компьютере слева подменю настроек, справа выбранный экран (D1);
+// на телефоне — экраны как были: список и вложенные экраны.
 export const Route = createFileRoute('/_shell/shop')({
-  loader: ({ context: { queryClient } }) =>
-    Promise.all([
-      queryClient.ensureQueryData(categoriesQueryOptions()),
-      queryClient.ensureQueryData(attributesQueryOptions()),
-    ]),
-  component: ShopPage,
+  component: () => (
+    <ShopSettingsLayout>
+      <Outlet />
+    </ShopSettingsLayout>
+  ),
 });

@@ -1,13 +1,15 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { getStatsOptions } from '@catalog/contract/query';
+import { createFileRoute } from '@tanstack/react-router';
 
-import { shopQueryOptions } from '@/entities/shop';
+import { importsQueryOptions } from '@/entities/import';
 import { HomePage } from '@/pages/home';
 
-// Главная: до публикации — чек-лист (T-304), после — стартовый экран «Товары» (A2).
+// «Главная» (A31): до публикации — чек-лист и публикация, после — сводка «что происходит и что сделать».
+// Один адрес в любом статусе: статус меняет содержимое, а не адрес. Сводку не ждём — пока грузится, видна загрузка.
 export const Route = createFileRoute('/_shell/')({
-  loader: async ({ context: { queryClient } }) => {
-    const shop = await queryClient.ensureQueryData(shopQueryOptions());
-    if (shop.status !== 'draft') throw redirect({ to: '/products', replace: true });
+  loader: ({ context: { queryClient } }) => {
+    void queryClient.prefetchQuery(getStatsOptions({ query: { period: '7d' } }));
+    void queryClient.prefetchInfiniteQuery(importsQueryOptions());
   },
   component: HomePage,
 });

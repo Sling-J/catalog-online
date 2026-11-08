@@ -46,7 +46,7 @@ export function AttributesSection() {
     <section className="px-4 pt-[18px] pb-8 lg:px-0 lg:pt-[22px]">
       <div className="flex items-center justify-between">
         <h2 className="text-[15px] font-bold">
-          <Trans>Размеры и другие свойства</Trans>
+          <Trans>Свойства</Trans>
         </h2>
         <button
           type="button"

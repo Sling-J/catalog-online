@@ -1,7 +1,7 @@
 import { cx, useIsDesktop, useLoadMore } from '@catalog/ui';
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 
-import { type ProductListParams, productsQueryOptions } from '@/entities/product';
+import { type ProductListParams, type ProductSort, productsQueryOptions } from '@/entities/product';
 
 import { ListSkeleton } from './list-skeleton';
 import { ListState } from './list-state';
@@ -21,6 +21,7 @@ export function ProductList({
   onClear,
   onDone,
   onResetSearch,
+  onSortChange,
 }: {
   params: ProductListParams;
   lowStockThreshold: number;
@@ -30,6 +31,8 @@ export function ProductList({
   /** Массовое действие выполнено — текст сообщения. */
   onDone: (message: string) => void;
   onResetSearch: () => void;
+  /** Порядок меняют заголовки таблицы на компьютере; на телефоне — шторка страницы. */
+  onSortChange: (sort: ProductSort | undefined) => void;
 }) {
   const isDesktop = useIsDesktop();
   // пока грузится новая выборка (поиск, вкладка), видна прежняя
@@ -66,6 +69,8 @@ export function ProductList({
         onToggle={onToggle}
         onClear={onClear}
         onDone={onDone}
+        sort={params.sort}
+        onSortChange={onSortChange}
       >
         {loadMore}
       </ProductTable>

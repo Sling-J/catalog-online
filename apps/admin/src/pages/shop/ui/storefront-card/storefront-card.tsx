@@ -1,10 +1,12 @@
-import type { ShopStatus } from '@catalog/contract';
+import type { Shop, ShopStatus } from '@catalog/contract';
 import { cx, Icon } from '@catalog/ui';
 import { Trans } from '@lingui/react/macro';
-import { useEffect, useState } from 'react';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
-import { PublishAgain, UnpublishShop } from '@/features/publish-shop';
-import { storefrontHost } from '@/entities/shop';
+import { PublishButton, UnpublishShop } from '@/features/publish-shop';
+import { meQueryOptions } from '@/entities/session';
+import { publishBlockers, storefrontHost, StorefrontLink, whatsappShareUrl } from '@/entities/shop';
+import { useCopied } from '@/shared/hooks';
 
 const tones: Record<ShopStatus, { pill: string; dot: string }> = {
   published: { pill: 'bg-mint-soft text-mint-ink', dot: 'bg-stock-in' },
@@ -16,17 +18,25 @@ const tones: Record<ShopStatus, { pill: string; dot: string }> = {
 const button = 'press flex h-[42px] items-center justify-center gap-1.5 rounded-[14px] text-[14px]';
 
 /**
- * Карточка витрины в разделе «Магазин» (FR-A9; макет AdminPhone2, экран 8 — опубликованная): адрес, «Скопировать
- * ссылку», «Снять». Снятая и заблокированная — в макете нет, сделаны в коде так же: «Опубликовать» вместо «Снять»;
- * у заблокированной кнопок нет, только пояснение.
+ * Публикация — в одном месте (UX-аудит, D2, L4): карточка витрины в разделе «Магазин» (FR-A9; макет AdminPhone2,
+ * экран 8 — опубликованная). Опубликованная: адрес, «Скопировать ссылку», «Снять», «Отправить ссылку в WhatsApp».
+ * Черновик: адрес открывает превью, ниже та же «Опубликовать витрину», что на главной, со всеми причинами, если нельзя.
+ * Заблокированная — только пояснение. После «Опубликовать» и «Снять» остаёмся здесь (U4).
  */
-export function StorefrontCard({ status, url }: { status: ShopStatus; url: string | null }) {
-  const [copied, setCopied] = useState(false);
-  useEffect(() => {
-    if (!copied) return;
-    const timer = setTimeout(() => setCopied(false), 2000);
-    return () => clearTimeout(timer);
-  }, [copied]);
+export function StorefrontCard({
+  shop,
+  url,
+  onPublished,
+  onUnpublished,
+}: {
+  shop: Shop;
+  url: string | null;
+  onPublished: () => void;
+  onUnpublished: () => void;
+}) {
+  const { data: me } = useSuspenseQuery(meQueryOptions());
+  const { status } = shop;
+  const { copied, copy } = useCopied();
 
   return (
     <div className="mt-3.5 rounded-[22px] bg-lilac-mist p-4">
@@ -48,17 +58,22 @@ export function StorefrontCard({ status, url }: { status: ShopStatus; url: strin
           {status === 'blocked' && <Trans>Не видна</Trans>}
         </span>
       </div>
-      {url && <div className="mt-1.5 truncate text-[18px] font-extrabold">{storefrontHost(url)}</div>}
-      {status === 'blocked' ? (
+      {url && (
+        <StorefrontLink className="mt-1.5 block truncate text-[18px] font-extrabold hover:underline">
+          {storefrontHost(url)}
+        </StorefrontLink>
+      )}
+      {status === 'blocked' && (
         <p className="mt-2 text-[13px] leading-[1.5] text-ink-quiet">
           <Trans>Покупатели её не видят. Напишите в поддержку — разберёмся.</Trans>
         </p>
-      ) : (
-        url && (
+      )}
+      {status === 'published' && url && (
+        <>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => void navigator.clipboard.writeText(url).then(() => setCopied(true))}
+              onClick={() => copy(url)}
               className={cx(button, 'flex-1 bg-ink-night font-bold text-white hover:bg-ink-hover')}
             >
               <span key={String(copied)} className="flex items-center gap-1.5 motion-safe:animate-swap">
@@ -66,13 +81,30 @@ export function StorefrontCard({ status, url }: { status: ShopStatus; url: strin
                 {copied ? <Trans>Скопировано</Trans> : <Trans>Скопировать ссылку</Trans>}
               </span>
             </button>
-            {status === 'published' ? (
-              <UnpublishShop className={cx(button, 'bg-white px-3.5 font-semibold hover:bg-lilac-hover')} />
-            ) : (
-              <PublishAgain className={cx(button, 'bg-white px-3.5 font-semibold hover:bg-lilac-hover')} />
-            )}
+            <UnpublishShop
+              onDone={onUnpublished}
+              className={cx(button, 'bg-white px-3.5 font-semibold hover:bg-lilac-hover')}
+            />
           </div>
-        )
+          <a
+            href={whatsappShareUrl(url)}
+            target="_blank"
+            rel="noreferrer"
+            className={cx(button, 'mt-2 bg-white font-semibold hover:bg-lilac-hover')}
+          >
+            <Icon name="whatsapp" size={16} />
+            <Trans>Отправить ссылку в WhatsApp</Trans>
+          </a>
+        </>
+      )}
+      {status === 'draft' && (
+        <div className="mt-3">
+          <PublishButton
+            blockers={publishBlockers(shop.readiness, me.account.emailVerified)}
+            withoutPhotos={shop.readiness.productsWithoutPhoto > 0}
+            onPublished={onPublished}
+          />
+        </div>
       )}
     </div>
   );

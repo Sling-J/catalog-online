@@ -26,6 +26,7 @@ export function CategorySheet({
   actions,
   onClose,
   onDelete,
+  onCreated,
 }: {
   open: boolean;
   tree: Category[];
@@ -34,6 +35,8 @@ export function CategorySheet({
   actions: CategoryActions;
   onClose: () => void;
   onDelete: (category: Category) => void;
+  /** Новая категория создана — например, сразу выбрать её в карточке товара (UX-аудит, U8). */
+  onCreated?: (category: Category) => void;
 }) {
   const { t } = useLingui();
   const messages = useFormMessages();
@@ -57,7 +60,7 @@ export function CategorySheet({
       const name = value.name.trim();
       const parentId = value.parent === TOP ? null : value.parent;
       try {
-        if (!category) await actions.create(name, parentId);
+        if (!category) onCreated?.(await actions.create(name, parentId));
         else {
           if (name !== category.name) await actions.rename(category.id, name);
           if (parentId !== category.parentId) await actions.move(moveToParent(tree, category.id, parentId));
@@ -82,6 +85,8 @@ export function CategorySheet({
         noValidate
         onSubmit={(event) => {
           event.preventDefault();
+          // шторка бывает внутри формы товара (U8): отправка не должна всплыть к ней
+          event.stopPropagation();
           void submitForm(form);
         }}
       >

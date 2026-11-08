@@ -1,4 +1,3 @@
-import type { ShopStatus } from '@catalog/contract';
 import { cx, Icon } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
@@ -6,10 +5,10 @@ import { Link } from '@tanstack/react-router';
 import { useNavLabels, useNavSections } from '@/widgets/app-shell/hooks';
 
 /** Нижнее меню телефона на сиреневом: три раздела, выбранный — на белой плашке. */
-export function BottomNav({ status }: { status: ShopStatus }) {
+export function BottomNav() {
   const { t } = useLingui();
   const labels = useNavLabels();
-  const sections = useNavSections(status);
+  const sections = useNavSections();
   return (
     <nav
       aria-label={t`Разделы`}

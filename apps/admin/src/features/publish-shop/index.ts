@@ -1,1 +1,1 @@
-export { PublishAgain, PublishButton, UnpublishShop } from './ui';
+export { PublishButton, PublishedSheet, UnpublishShop } from './ui';

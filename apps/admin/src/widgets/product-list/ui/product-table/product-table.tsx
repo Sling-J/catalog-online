@@ -4,13 +4,16 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import type { ReactNode } from 'react';
 
 import { BulkBar } from '@/features/bulk-edit-products';
+import { type ProductSort, useSortLabels } from '@/entities/product';
 
 import { COLUMNS, SKELETON_ROWS } from '../../constants';
+import { nextSort, type SortColumn, sortDirection } from '../../lib';
+import { SortHeader } from '../sort-header';
 import { TableRow } from './table-row';
 
 /**
  * Таблица товаров на компьютере (макет AdminDesk, экран 1): полоса массовых действий, когда что-то выбрано,
- * заголовки колонок, строки и подвал «Показано N из M». Вместо строк — загрузка (`loading`) или состояние
+ * заголовки колонок («Название», «Цена», «Остаток» упорядочивают список — UX-аудит, E3), строки и подвал «Показано N из M». Вместо строк — загрузка (`loading`) или состояние
  * (`placeholder`: ничего не нашлось, пустая вкладка, ошибка — доска AdminProductsStates). Карточка без
  * overflow-hidden: иначе у короткой таблицы обрезался бы список категорий.
  */
@@ -25,6 +28,8 @@ export function ProductTable({
   onToggle,
   onClear,
   onDone,
+  sort,
+  onSortChange,
   children,
 }: {
   products: ProductListItem[];
@@ -37,10 +42,25 @@ export function ProductTable({
   onToggle: (id: string) => void;
   onClear: () => void;
   onDone: (message: string) => void;
+  sort: ProductSort | undefined;
+  onSortChange: (sort: ProductSort | undefined) => void;
   /** Маркер подгрузки следующей страницы. */
   children?: ReactNode;
 }) {
   const { t } = useLingui();
+  const labels = useSortLabels();
+  const header = (column: SortColumn, label: ReactNode) => {
+    const next = nextSort(column, sort);
+    return (
+      <SortHeader
+        direction={sortDirection(column, sort)}
+        hint={labels[next ?? 'new']}
+        onClick={() => onSortChange(next)}
+      >
+        {label}
+      </SortHeader>
+    );
+  };
   return (
     <div className="mt-4 rounded-[24px] bg-white shadow-[0_1px_0_#eceaf5,0_6px_16px_rgb(40_30_110/0.05)]">
       {selected.size > 0 && <BulkBar productIds={[...selected]} onClear={onClear} onDone={onDone} />}
@@ -50,21 +70,15 @@ export function ProductTable({
           <span role="columnheader">
             <Trans>Фото</Trans>
           </span>
-          <span role="columnheader">
-            <Trans>Название</Trans>
-          </span>
+          {header('name', <Trans>Название</Trans>)}
           <span role="columnheader">
             <Trans>Категория</Trans>
           </span>
           <span role="columnheader">
             <Trans>Варианты</Trans>
           </span>
-          <span role="columnheader">
-            <Trans>Цена</Trans>
-          </span>
-          <span role="columnheader">
-            <Trans>Остаток</Trans>
-          </span>
+          {header('price', <Trans>Цена</Trans>)}
+          {header('stock', <Trans>Остаток</Trans>)}
           <span role="columnheader">
             <Trans>Витрина</Trans>
           </span>

@@ -13,6 +13,18 @@ describe('validateProductsSearch', () => {
   });
 
   it('в запрос — categoryId', () => {
-    expect(toListParams({ q: 'шапка', category: 'c1' })).toEqual({ q: 'шапка', filter: undefined, categoryId: 'c1' });
+    expect(toListParams({ q: 'шапка', category: 'c1' })).toEqual({
+      q: 'шапка',
+      filter: undefined,
+      categoryId: 'c1',
+      sort: undefined,
+    });
+  });
+
+  it('сортировка (E3): знакомая — в адрес, «новые» и незнакомая — нет', () => {
+    expect(validateProductsSearch({ sort: 'price_desc' })).toEqual({ sort: 'price_desc' });
+    expect(validateProductsSearch({ sort: 'new' })).toEqual({});
+    expect(validateProductsSearch({ sort: 'cheap' })).toEqual({});
+    expect(toListParams({ sort: 'stock_asc' }).sort).toBe('stock_asc');
   });
 });

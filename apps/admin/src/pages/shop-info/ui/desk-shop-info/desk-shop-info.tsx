@@ -1,6 +1,5 @@
 import { Button, Field, Icon } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { Link } from '@tanstack/react-router';
 
 import { ScheduleCard, WhatsappField } from '@/features/edit-shop-info';
 import { FieldNote, PageTitle, TextAreaField } from '@/shared/ui';
@@ -9,8 +8,10 @@ import type { ShopInfoView } from '../../types';
 import { LogoPicker } from '../logo-picker';
 
 /**
- * «О магазине» на компьютере (макет AdminDesk2, экран 7): «Магазин / О магазине», заголовок с «Превью витрины» и
- * «Сохранить»; слева сведения, справа график ровной сеткой. Уже 1280 px колонки идут друг под другом.
+ * «О магазине» на компьютере (макет AdminDesk2, экран 7): заголовок (путь «Магазин / О магазине» из макета
+ * убран — слева подменю настроек) с «Превью витрины» и
+ * «Сохранить»; слева сведения, справа график ровной сеткой. Слева от экрана — подменю настроек (D1), поэтому
+ * колонки рядом только от 1600 px, уже — друг под другом.
  */
 export function DeskShopInfo({
   shop,
@@ -22,13 +23,7 @@ export function DeskShopInfo({
   const { t } = useLingui();
   return (
     <form noValidate onSubmit={onSubmit}>
-      <div className="text-[14px] text-ink-quiet">
-        <Link to="/shop" className="hover:text-ink-night">
-          <Trans>Магазин</Trans>
-        </Link>{' '}
-        / <Trans>О магазине</Trans>
-      </div>
-      <div className="mt-1.5">
+      <div>
         <PageTitle
           actions={
             <>
@@ -53,7 +48,7 @@ export function DeskShopInfo({
           <Trans>О магазине</Trans>
         </PageTitle>
       </div>
-      <div className="mt-[18px] flex flex-col gap-8 xl:grid xl:grid-cols-[1fr_480px]">
+      <div className="mt-[18px] flex flex-col gap-8 min-[1600px]:grid min-[1600px]:grid-cols-[1fr_480px]">
         <div className="flex flex-col gap-3.5">
           <LogoPicker desktop name={shop.name ?? ''} logo={shop.logo ?? null}>
             <form.AppField name="name">

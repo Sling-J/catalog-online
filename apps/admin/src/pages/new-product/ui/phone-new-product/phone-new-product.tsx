@@ -1,7 +1,8 @@
 import { Button } from '@catalog/ui';
 import { Trans, useLingui } from '@lingui/react/macro';
 
-import { PriceField, SelectField, SizesEditor } from '@/features/product-form';
+import { CategoryField } from '@/widgets/category-field';
+import { PriceField, SizesEditor } from '@/features/product-form';
 import { SaveBar } from '@/shared/ui';
 import { PhotoStrip } from '@/features/product-photos';
 import { BackBar } from '@/shared/ui';
@@ -9,7 +10,7 @@ import { BackBar } from '@/shared/ui';
 import type { NewProductView } from '../../types';
 
 /** Новый товар на телефоне (макет AdminPhone2, экран 7): фото, название, категория и цена, размеры. */
-export function PhoneNewProduct({ form, photos, attributes, categories, onSave }: NewProductView) {
+export function PhoneNewProduct({ form, photos, attributes, onSave }: NewProductView) {
   const { t } = useLingui();
   return (
     <form
@@ -29,12 +30,11 @@ export function PhoneNewProduct({ form, photos, attributes, categories, onSave }
         <div className="flex gap-2">
           <form.Field name="categoryId">
             {(field) => (
-              <SelectField
+              <CategoryField
                 chevron
                 label={t`Категория`}
-                value={field.state.value ?? ''}
-                options={categories}
-                onChange={(value) => field.handleChange(value || null)}
+                value={field.state.value ?? null}
+                onChange={field.handleChange}
                 className="min-w-0 flex-1"
               />
             )}

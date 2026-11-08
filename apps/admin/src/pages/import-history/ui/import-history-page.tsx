@@ -134,6 +134,10 @@ export function ImportHistoryPage() {
       </BackBar>
       <div className="hidden lg:block">
         <div className="text-[14px] text-ink-quiet">
+          <Link to="/products">
+            <Trans>Товары</Trans>
+          </Link>{' '}
+          /{' '}
           <Link to="/import">
             <Trans>Импорт</Trans>
           </Link>{' '}

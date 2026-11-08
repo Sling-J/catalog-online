@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { newProductDraft, useCreateProduct, useDraftMessages, useProductForm } from '@/features/product-form';
 import { PhotosNotUploadedError, useNewProductPhotos } from '@/features/product-photos';
 import { attributesQueryOptions } from '@/entities/attribute';
-import { categoriesQueryOptions, flattenCategories } from '@/entities/category';
 import { fieldErrors } from '@/shared/api';
 import { useFormMessages, useLeaveGuard } from '@/shared/hooks';
 import { LeaveConfirm, setFormError, setServerError, submitForm, useIsDirty } from '@/shared/ui';
@@ -29,7 +28,6 @@ export function NewProductPage() {
   const draftMessage = useDraftMessages();
   const isDesktop = useIsDesktop();
   const navigate = useNavigate();
-  const { data: tree } = useSuspenseQuery(categoriesQueryOptions());
   const { data: attributes } = useSuspenseQuery(attributesQueryOptions());
   const create = useCreateProduct();
   const photos = useNewProductPhotos();
@@ -59,13 +57,6 @@ export function NewProductPage() {
     form,
     photos,
     attributes,
-    categories: [
-      { value: '', label: t`Без категории` },
-      ...flattenCategories(tree).map((category) => ({
-        value: category.id,
-        label: `${' '.repeat(category.depth * 3)}${category.name}`,
-      })),
-    ],
     onSave: (visible) => void submitForm(form, { visible }),
   };
   return (

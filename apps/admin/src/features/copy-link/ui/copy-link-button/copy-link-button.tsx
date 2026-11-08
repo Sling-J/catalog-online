@@ -1,6 +1,7 @@
 import { cx, Icon } from '@catalog/ui';
 import { useLingui } from '@lingui/react/macro';
-import { useEffect, useState } from 'react';
+
+import { useCopied } from '@/shared/hooks';
 
 /**
  * «Скопировать ссылку»; после копирования на две секунды показывает галочку. Обычно — белый квадрат 36 px
@@ -8,22 +9,12 @@ import { useEffect, useState } from 'react';
  */
 export function CopyLinkButton({ url, bare, className }: { url: string; bare?: boolean; className?: string }) {
   const { t } = useLingui();
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (!copied) return;
-    const timer = setTimeout(() => setCopied(false), 2000);
-    return () => clearTimeout(timer);
-  }, [copied]);
-
-  const copy = () => {
-    void navigator.clipboard.writeText(url).then(() => setCopied(true));
-  };
+  const { copied, copy } = useCopied();
 
   return (
     <button
       type="button"
-      onClick={copy}
+      onClick={() => copy(url)}
       aria-label={copied ? t`Ссылка скопирована` : t`Скопировать ссылку`}
       className={cx(
         'flex flex-none items-center justify-center',

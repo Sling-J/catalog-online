@@ -16,6 +16,7 @@ import { type ProductsSearch, toListParams } from '@/pages/products/lib';
 import { CategorySelect } from './category-select';
 import { EmptyProducts } from './empty-products';
 import { FilterTabs } from './filter-tabs';
+import { FiltersButton } from './filters-sheet';
 import { PhotoBanner } from './photo-banner';
 import { SelectionHeader } from './selection-header';
 
@@ -23,6 +24,9 @@ import { SelectionHeader } from './selection-header';
  * Раздел «Товары» (FR-A5). Телефон — макет AdminPhone, экран 2: поиск, вкладки, баннер «N без фото», список;
  * выбор долгим нажатием — шапка «Выбрано N» и тёмная панель действий вместо меню (A20).
  * Компьютер — макет AdminDesk, экран 1: «Загрузить Excel» и «Товар», поиск, вкладки, категория, таблица.
+ * Порядок списка (E3): на компьютере — заголовки колонок таблицы, на телефоне — шторка у поиска вместе с категорией
+ * (UX-аудит, U9); категория на компьютере — пилюля справа.
+ * Импорт — действие с товарами (A31): «Загрузить Excel» в заголовке, на телефоне — значком.
  * Пока товаров нет — «Добавьте первые товары» (AdminPhone2, экран 6; компьютер — доска AdminProductsStates).
  * Выбор в списке живёт в адресе; после массового действия — сообщение внизу.
  */
@@ -92,10 +96,13 @@ export function ProductsPage({
               )}
               <Link
                 to="/import"
-                className="press hidden h-11 items-center gap-2 rounded-pill border-[1.5px] border-line bg-white px-[18px] text-[14px] font-bold hover:border-line-hover lg:inline-flex"
+                aria-label={t`Загрузить Excel`}
+                className="press flex size-11 items-center justify-center rounded-full bg-chip-haze hover:bg-haze-hover lg:size-auto lg:h-11 lg:gap-2 lg:rounded-pill lg:border-[1.5px] lg:border-line lg:bg-white lg:px-[18px] lg:text-[14px] lg:font-bold lg:hover:border-line-hover"
               >
-                <Icon name="upload" size={18} />
-                <Trans>Загрузить Excel</Trans>
+                <Icon name="upload" size={20} className="lg:size-[18px]" />
+                <span className="hidden lg:inline">
+                  <Trans>Загрузить Excel</Trans>
+                </span>
               </Link>
               <Link
                 to="/products/new"
@@ -114,7 +121,16 @@ export function ProductsPage({
         </PageTitle>
       )}
       <div className="mt-3 lg:mt-[18px] lg:flex lg:items-center lg:gap-3">
-        <ProductSearch value={search.q ?? ''} onChange={(q) => change({ q: q || undefined })} />
+        <div className="flex gap-2 lg:contents">
+          <ProductSearch
+            value={search.q ?? ''}
+            onChange={(q) => change({ q: q || undefined })}
+            className="min-w-0 flex-1"
+          />
+          <Suspense>
+            <FiltersButton sort={search.sort} category={search.category} onChange={change} />
+          </Suspense>
+        </div>
         <FilterTabs
           value={search.filter}
           counts={counts}
@@ -142,6 +158,7 @@ export function ProductsPage({
         onClear={clear}
         onDone={setMessage}
         onResetSearch={() => change({ q: undefined })}
+        onSortChange={(sort) => change({ sort })}
       />
       {selectingOnPhone && <PhoneBulkBar productIds={[...selected]} onClear={clear} onDone={setMessage} />}
       <Toast message={message} onHide={hideMessage} />

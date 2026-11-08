@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { storefrontHost, storefrontUrl } from '../storefront-url';
+import { storefrontHost, storefrontUrl, withPreview } from '../storefront-url';
 
 afterEach(() => vi.unstubAllEnvs());
 
@@ -18,5 +18,12 @@ describe('storefrontUrl', () => {
 
   it('показывает адрес без протокола и порта', () => {
     expect(storefrontHost('http://aigerim-kids.localhost:3000')).toBe('aigerim-kids.localhost');
+  });
+
+  it('превью черновика — токен в параметре, к уже заданным параметрам через &', () => {
+    expect(withPreview('http://a.localhost:3000/kurtka-1', 't/1')).toBe(
+      'http://a.localhost:3000/kurtka-1?preview=t%2F1',
+    );
+    expect(withPreview('http://a.localhost:3000/?q=1', 't')).toBe('http://a.localhost:3000/?q=1&preview=t');
   });
 });
