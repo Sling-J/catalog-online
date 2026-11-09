@@ -28,6 +28,8 @@ const envSchema = z.object({
   /** SMTP для писем (`smtp://user:pass@host:587`); пусто — письма пишутся в лог (разработка). */
   SMTP_URL: z.url({ protocol: /^smtps?$/ }).optional(),
   MAIL_FROM: z.string().min(3).default('Каталог <no-reply@localhost>'),
+  /** Секрет для подписи токенов (превью витрины); не короче 32 символов, в продакшене — свой. */
+  APP_SECRET: z.string().min(32),
 });
 
 export type Config = {
@@ -41,6 +43,7 @@ export type Config = {
   cookieDomain: string | undefined;
   smtpUrl: string | undefined;
   mailFrom: string;
+  appSecret: string;
 };
 
 /** Читает и проверяет окружение; при ошибке — исключение со списком переменных. */
@@ -62,6 +65,7 @@ export function parseConfig(env: Record<string, string | undefined>): Config {
     cookieDomain: e.COOKIE_DOMAIN,
     smtpUrl: e.SMTP_URL,
     mailFrom: e.MAIL_FROM,
+    appSecret: e.APP_SECRET,
   };
 }
 

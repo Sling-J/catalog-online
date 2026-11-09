@@ -45,6 +45,7 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 | `docker compose up -d --wait` | PostgreSQL и S3-хранилище для разработки (настройки — `.env.example`); `--wait` — дождаться готовности |
 | `pnpm --filter @catalog/api dev` | API на http://localhost:3001 (`tsc --watch` + `node --watch`; переменные — корневой `.env`, образец — `.env.example`; проверка — http://localhost:3001/health). Входит и в `pnpm dev`. Контракт API берёт из `dist`: после правки `openapi.yaml` — `pnpm generate` и `pnpm --filter @catalog/contract build` |
 | `pnpm --filter @catalog/api db:generate` / `db:migrate` | Миграция из схемы `apps/api/src/core/db/schema` (drizzle-kit, в `apps/api/drizzle`) / применить к базе из `DATABASE_URL`. Сразу после `docker compose up` база ещё стартует — поднимать с `--wait` |
+| Токен превью витрины | Подписывается `APP_SECRET` (не короче 32 символов; в `.env.example` — значение для разработки, в продакшене — свой случайный) |
 | Письма API в разработке | Без `SMTP_URL` письма (подтверждение почты, новый пароль) пишутся в лог API — ссылку из лога можно открыть в админке; адрес админки для ссылок — `ADMIN_URL` |
 | `pnpm --filter @catalog/api db:seed` | Демо-магазины в базу (после `db:migrate`): «Айгерим Kids» — вход `aigerim.kids@example.com` / `demo-password`, и скрытый `skrytyj-magazin`. Повторный запуск пересоздаёт их; файлов фото в хранилище пока нет (T-405) |
 | `pnpm --filter @catalog/api test` | Тесты API: `unit` и `e2e` на PostgreSQL в контейнере (Testcontainers) — нужен запущенный Docker; входит в `pnpm check` |

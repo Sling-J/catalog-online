@@ -47,6 +47,7 @@ export async function createTestApp(options: { controllers?: Type[] } = {}): Pro
     CORS_ORIGINS: TEST_CORS_ORIGINS,
     LOG_LEVEL: 'silent',
     ADMIN_URL: TEST_ADMIN_URL,
+    APP_SECRET: 'test-secret-test-secret-test-secret',
   });
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule.forRoot(config)],

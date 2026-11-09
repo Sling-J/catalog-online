@@ -193,7 +193,7 @@ PK (shop_id, date, product_id). Пишем `INSERT … ON CONFLICT DO UPDATE SET
 > - **variant_values:** удаление значения свойства снимает его с вариантов каскадом (так в `deleteAttribute`); запрет удалить используемое значение (409 `attribute_value_in_use`) — в сервисе. Внешний ключ без каскада ломал удаление магазина (`06-process/pitfalls.md`). Родитель категории — без каскада: категорию с подкатегориями база удалить не даст (A28).
 > - **imports** — поля как у `Import` в контракте: статусы `parsing … cancelled`, `row_count`, `headers`, `sample_rows`, `mapping`, `mapping_remembered`, `zero_missing`, `preview`, `result`, `failure_code` вместо `stats`; незаконченный импорт у магазина один (частичный уникальный индекс). **import_errors:** `row`, `column`, `value`, `code` (как `ImportRowError`) вместо `message`.
 > - **daily_stats:** вместо первичного ключа — `unique nulls not distinct (shop_id, date, product_id)`: в первичном ключе не может быть `NULL`.
-> - **preview-токен** витрины — без таблицы (решается в T-404).
+> - **preview-токен** витрины — без таблицы: подписанный токен (T-404, `api.md`).
 > - UUID v7 по умолчанию — функция `uuidv7()` PostgreSQL 18: база в продакшене тоже должна быть 18+ (T-601).
 > - Тарифов в схеме нет (D16).
 
