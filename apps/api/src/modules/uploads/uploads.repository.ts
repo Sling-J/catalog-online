@@ -1,4 +1,4 @@
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, inArray, isNull, lt } from 'drizzle-orm';
 import type { InferSelectModel } from 'drizzle-orm';
 
 import type { DbOrTx } from '../../core/db/index.js';
@@ -40,6 +40,25 @@ export const uploadsRepository = {
       )
       .for('update');
     return row ?? null;
+  },
+
+  /**
+   * Брошенные загрузки: не использованы, ссылка истекла раньше `before`. Системная уборка по всем магазинам —
+   * поэтому без `shopId` (исключение из раздела 6).
+   */
+  async listAbandoned(db: DbOrTx, before: Date, limit: number): Promise<Pick<UploadRow, 'id' | 'key'>[]> {
+    return db
+      .select({ id: uploads.id, key: uploads.key })
+      .from(uploads)
+      .where(and(isNull(uploads.usedAt), lt(uploads.expiresAt, before)))
+      .orderBy(uploads.expiresAt)
+      .limit(limit);
+  },
+
+  /** Удалить строки брошенных загрузок (только неиспользованные — вдруг загрузку приняли, пока убирали). */
+  async deleteAbandoned(db: DbOrTx, ids: string[]): Promise<void> {
+    if (ids.length === 0) return;
+    await db.delete(uploads).where(and(inArray(uploads.id, ids), isNull(uploads.usedAt)));
   },
 
   async markUsed(db: DbOrTx, shopId: string, uploadId: string, at: Date): Promise<void> {

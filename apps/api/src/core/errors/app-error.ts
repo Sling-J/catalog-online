@@ -35,6 +35,7 @@ export type ProblemCode =
   | 'import_not_ready'
   | 'photo_limit_reached'
   | 'upload_not_found'
+  | 'image_unreadable'
   | 'token_expired';
 
 export type AppErrorOptions = {

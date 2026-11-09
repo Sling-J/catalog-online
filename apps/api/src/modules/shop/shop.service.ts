@@ -4,6 +4,8 @@ import type { Shop, ShopUpdate } from '@catalog/contract';
 import { PreviewTokens } from '../../core/auth/index.js';
 import { InjectDb, isUniqueViolation, type Db, type DbOrTx } from '../../core/db/index.js';
 import { AppError } from '../../core/errors/index.js';
+import { Images, ImageUnreadableError, type StoredImage } from '../../core/images/index.js';
+import { UploadsService } from '../uploads/uploads.service.js';
 import { computeReadiness } from './lib/readiness.js';
 import { prepareShopPatch } from './lib/shop-update.js';
 import { subdomainProblem } from './lib/subdomain.js';
@@ -18,6 +20,8 @@ export class ShopService {
   constructor(
     @InjectDb() private readonly db: Db,
     private readonly previewTokens: PreviewTokens,
+    private readonly images: Images,
+    private readonly uploads: UploadsService,
   ) {}
 
   async get(shopId: string): Promise<Shop> {
@@ -71,7 +75,7 @@ export class ShopService {
         throw new AppError('shop_not_ready', 409);
       }
       const row = await shopRepository.setStatus(tx, shopId, 'published', new Date());
-      return toShop(row!, readiness);
+      return toShop(row!, readiness, this.logoOf(row!));
     });
   }
 
@@ -83,13 +87,38 @@ export class ShopService {
     return this.present(this.db, row!);
   }
 
-  /** Загрузка логотипа — в T-406; до появления загрузок (T-405) любой `uploadId` не найден. */
-  setLogo(): never {
-    throw new AppError('upload_not_found', 422);
+  /**
+   * Логотип из загрузки — сжимается сразу, в запросе (решение основателя 2026-11-09, T-406): одна картинка, и
+   * админка показывает её в ответе. Не открылся — 422 `image_unreadable`. Прежний логотип удаляется после.
+   */
+  async setLogo(shopId: string, uploadId: string): Promise<Shop> {
+    let published: StoredImage | null = null;
+    try {
+      const { row, previous } = await this.db.transaction(async (tx) => {
+        const shop = await shopRepository.findByIdForUpdate(tx, shopId);
+        if (!shop) throw new AppError('not_found', 404);
+        const upload = await this.uploads.consume(shopId, uploadId, 'logo', tx);
+        published = await this.publishLogo(upload.key, `shops/${shopId}/logo/${uploadId}`);
+        const row = await shopRepository.setLogo(tx, shopId, { ...published, originalKey: upload.key });
+        return { row: row!, previous: shop.logo };
+      });
+      if (previous) await this.images.remove(previous);
+      return this.present(this.db, row);
+    } catch (error) {
+      // запись откатилась — выложенные размеры никому не нужны
+      if (published) await this.images.remove(published);
+      throw error;
+    }
   }
 
   async deleteLogo(shopId: string): Promise<void> {
-    await shopRepository.clearLogo(this.db, shopId);
+    const previous = await this.db.transaction(async (tx) => {
+      const shop = await shopRepository.findByIdForUpdate(tx, shopId);
+      if (!shop?.logo) return null;
+      await shopRepository.setLogo(tx, shopId, null);
+      return shop.logo;
+    });
+    if (previous) await this.images.remove(previous);
   }
 
   /**
@@ -108,6 +137,19 @@ export class ShopService {
   }
 
   private async present(db: DbOrTx, row: ShopRow): Promise<Shop> {
-    return toShop(row, computeReadiness(row, await shopRepository.productCounts(db, row.id)));
+    return toShop(row, computeReadiness(row, await shopRepository.productCounts(db, row.id)), this.logoOf(row));
+  }
+
+  private logoOf(row: ShopRow): Shop['logo'] {
+    return row.logo ? this.images.toImage(row.logo) : null;
+  }
+
+  private async publishLogo(originalKey: string, prefix: string): Promise<StoredImage> {
+    try {
+      return await this.images.publish(originalKey, prefix);
+    } catch (error) {
+      if (error instanceof ImageUnreadableError) throw new AppError('image_unreadable', 422);
+      throw error;
+    }
   }
 }

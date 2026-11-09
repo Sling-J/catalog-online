@@ -72,4 +72,27 @@ export class UploadsService {
     };
     return tx ? run(tx) : this.db.transaction(run);
   }
+
+  /**
+   * Уборка (раз в сутки): загрузки, которыми не воспользовались за сутки после конца ссылки, — файл из хранилища и
+   * строка. Возвращает, сколько убрано.
+   */
+  async cleanupAbandoned(now = new Date()): Promise<number> {
+    const before = new Date(now.getTime() - ABANDONED_AFTER_MS);
+    let removed = 0;
+    for (;;) {
+      const batch = await uploadsRepository.listAbandoned(this.db, before, CLEANUP_BATCH);
+      // файла может и не быть (ссылку не использовали) — удаление в S3 это не считает ошибкой
+      await Promise.all(batch.map((upload) => this.storage.delete('private', upload.key)));
+      await uploadsRepository.deleteAbandoned(
+        this.db,
+        batch.map((upload) => upload.id),
+      );
+      removed += batch.length;
+      if (batch.length < CLEANUP_BATCH) return removed;
+    }
+  }
 }
+
+const ABANDONED_AFTER_MS = 24 * 60 * 60 * 1000;
+const CLEANUP_BATCH = 200;

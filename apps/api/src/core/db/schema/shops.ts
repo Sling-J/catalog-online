@@ -14,6 +14,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
+import type { StoredImage } from '../../images/index.js';
 import { at, createdAt, id, updatedAt } from './columns.js';
 import { staffUsers } from './staff.js';
 
@@ -23,6 +24,9 @@ export const stockDisplay = pgEnum('stock_display', ['levels', 'exact']);
 export type DayHours = { open: string; close: string } | null;
 /** 7 дней; `null` — выходной. Время — по часовому поясу магазина. */
 export type Schedule = Record<'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun', DayHours>;
+
+/** Логотип: готовые размеры в публичном хранилище и исходник в закрытом (удаляются вместе при замене). */
+export type ShopLogo = StoredImage & { originalKey: string };
 
 export const EMPTY_SCHEDULE: Schedule = { mon: null, tue: null, wed: null, thu: null, fri: null, sat: null, sun: null };
 
@@ -36,7 +40,7 @@ export const shops = pgTable(
     id: id(),
     subdomain: text(),
     name: text(),
-    logoKey: text(),
+    logo: jsonb().$type<ShopLogo>(),
     description: text(),
     whatsapp: text(),
     instagram: text(),

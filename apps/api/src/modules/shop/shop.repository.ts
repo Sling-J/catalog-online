@@ -2,7 +2,7 @@ import { and, count, eq, ne, notExists, sql } from 'drizzle-orm';
 import type { InferSelectModel } from 'drizzle-orm';
 
 import type { DbOrTx } from '../../core/db/index.js';
-import { accounts, productPhotos, products, shops } from '../../core/db/schema/index.js';
+import { accounts, productPhotos, products, shops, type ShopLogo } from '../../core/db/schema/index.js';
 import type { ProductCounts } from './lib/readiness.js';
 import type { ShopPatch } from './lib/shop-update.js';
 
@@ -35,8 +35,15 @@ export const shopRepository = {
     return row ?? null;
   },
 
-  async clearLogo(db: DbOrTx, shopId: string): Promise<void> {
-    await db.update(shops).set({ logoKey: null }).where(eq(shops.id, shopId));
+  /** Строка магазина, заблокированная до конца транзакции (замена логотипа: прежний удаляем после). */
+  async findByIdForUpdate(db: DbOrTx, shopId: string): Promise<ShopRow | null> {
+    const [row] = await db.select().from(shops).where(eq(shops.id, shopId)).for('update');
+    return row ?? null;
+  },
+
+  async setLogo(db: DbOrTx, shopId: string, logo: ShopLogo | null): Promise<ShopRow | null> {
+    const [row] = await db.update(shops).set({ logo }).where(eq(shops.id, shopId)).returning();
+    return row ?? null;
   },
 
   /** Занят ли адрес другим магазином. */

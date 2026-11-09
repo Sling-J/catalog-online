@@ -47,8 +47,17 @@ export class MemoryStorage extends Storage {
     this.files.delete(`${bucket}/${key}`);
   }
 
-  /** Как будто браузер отправил файл по ссылке из `createUpload`. */
-  upload(key: string, size: number, contentType = 'image/jpeg'): void {
-    this.files.set(`private/${key}`, { body: Buffer.alloc(size), contentType });
+  /** Как будто браузер отправил файл по ссылке из `createUpload`: размер (нули) или настоящее содержимое. */
+  upload(key: string, content: number | Buffer, contentType = 'image/jpeg'): void {
+    const body = typeof content === 'number' ? Buffer.alloc(content) : content;
+    this.files.set(`private/${key}`, { body, contentType });
+  }
+
+  /** Ключи файлов хранилища, начинающиеся с `prefix`. */
+  keys(bucket: BucketKind, prefix = ''): string[] {
+    return [...this.files.keys()]
+      .filter((key) => key.startsWith(`${bucket}/${prefix}`))
+      .map((key) => key.slice(bucket.length + 1))
+      .sort();
   }
 }

@@ -472,7 +472,7 @@ paths:
                 uploadId: { type: string, format: uuid }
       responses:
         '200':
-          description: Логотип принят
+          description: Логотип сжат и принят (сразу, без фоновой задачи); 422 image_unreadable — файл не открывается как картинка
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Shop' }
@@ -1399,7 +1399,7 @@ components:
             email_taken, sku_taken, category_name_taken, category_has_children, attribute_name_taken,
             attribute_value_in_use, attribute_value_taken,
             shop_not_ready, shop_hidden, shop_blocked, import_in_progress, import_not_ready,
-            photo_limit_reached, upload_not_found, token_expired, rate_limited
+            photo_limit_reached, upload_not_found, image_unreadable, token_expired, rate_limited
         errors:
           type: array
           description: Для validation_failed и attribute_value_taken — ошибки по полям

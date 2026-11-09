@@ -1,21 +1,30 @@
+import { eq } from 'drizzle-orm';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { createTestApp, type TestApp } from '../../../test/helpers/app.js';
+import { connectTestDb } from '../../../test/helpers/db.js';
 import { signUp, XRW, type Browser } from '../../../test/helpers/session.js';
+import type { Db } from '../../core/db/index.js';
+import { uploads as uploadsTable } from '../../core/db/schema/index.js';
 import { UploadsService } from './uploads.service.js';
+import { CLEANUP_UPLOADS } from './workers/cleanup-uploads.worker.js';
 
 const PHOTO = { purpose: 'product_photo', fileName: 'Куртка (1).HEIC', contentType: 'image/heic', size: 2_000_000 };
 
 describe('загрузки', () => {
   let t: TestApp;
   let uploads: UploadsService;
+  let db: Db;
+  let closeDb: () => Promise<void>;
 
   beforeAll(async () => {
     t = await createTestApp();
     uploads = t.app.get(UploadsService);
+    ({ db, close: closeDb } = connectTestDb(t.config.databaseUrl));
   });
   afterAll(async () => {
+    await closeDb?.();
     await t?.close();
   });
 
@@ -97,6 +106,41 @@ describe('загрузки', () => {
       });
       // а своим и по назначению — принимается
       await uploads.consume(owner.me.shop.id, body.uploadId, 'product_photo');
+    });
+  });
+
+  describe('уборка брошенных загрузок (раз в сутки)', () => {
+    const DAY = 24 * 60 * 60 * 1000;
+    const expire = (id: string, msAgo: number) =>
+      db
+        .update(uploadsTable)
+        .set({ expiresAt: new Date(Date.now() - msAgo) })
+        .where(eq(uploadsTable.id, id));
+    const exists = async (id: string) =>
+      (await db.select().from(uploadsTable).where(eq(uploadsTable.id, id))).length > 0;
+
+    it('убирает неиспользованные старше суток — строку и файл; свежие и принятые остаются', async () => {
+      const { agent, me } = await signUp(t, 'cleanup@example.com');
+      const abandoned = (await create(agent, PHOTO).expect(201)).body;
+      const recent = (await create(agent, PHOTO).expect(201)).body;
+      const used = (await create(agent, PHOTO).expect(201)).body;
+      for (const upload of [abandoned, recent, used]) t.storage.upload(keyOf(upload.url), PHOTO.size);
+      await uploads.consume(me.shop.id, used.uploadId, 'product_photo');
+      await expire(abandoned.uploadId, 2 * DAY);
+      await expire(recent.uploadId, DAY / 2);
+      await expire(used.uploadId, 2 * DAY);
+
+      await t.jobs.run(CLEANUP_UPLOADS, {});
+
+      expect(await exists(abandoned.uploadId)).toBe(false);
+      expect(await t.storage.head('private', keyOf(abandoned.url))).toBeNull();
+      expect(await exists(recent.uploadId)).toBe(true);
+      expect(await exists(used.uploadId)).toBe(true);
+      expect(await t.storage.head('private', keyOf(used.url))).not.toBeNull();
+    });
+
+    it('стоит в расписании: 21:30 UTC (02:30 в Алматы)', () => {
+      expect(t.jobs.scheduled()).toContainEqual(['uploads.cleanup', '30 21 * * *']);
     });
   });
 });

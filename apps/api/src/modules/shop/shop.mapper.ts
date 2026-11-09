@@ -2,17 +2,14 @@ import type { Shop } from '@catalog/contract';
 
 import type { ShopRow } from './shop.repository.js';
 
-/**
- * Строка магазина → `Shop` контракта. Логотип пока всегда `null`: загрузка и сжатие логотипа — в T-406
- * (решение основателя 2026-11-09, T-404), там же — адреса картинок из хранилища.
- */
-export function toShop(row: ShopRow, readiness: Shop['readiness']): Shop {
+/** Строка магазина → `Shop` контракта. Логотип — уже с адресами картинок (`Images.toImage`). */
+export function toShop(row: ShopRow, readiness: Shop['readiness'], logo: Shop['logo']): Shop {
   return {
     id: row.id,
     status: row.status,
     subdomain: row.subdomain,
     name: row.name,
-    logo: null,
+    logo,
     description: row.description,
     whatsapp: row.whatsapp,
     instagram: row.instagram,

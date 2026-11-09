@@ -7,6 +7,8 @@ import { RequestContextModule } from './context/index.js';
 import { DbModule } from './db/index.js';
 import { ProblemFilter } from './errors/index.js';
 import { HealthController } from './health/health.controller.js';
+import { ImagesModule } from './images/index.js';
+import { JobsModule } from './jobs/index.js';
 import { LoggingModule } from './logging/index.js';
 import { MailModule } from './mail/index.js';
 import { RateLimitGuard, RateLimitModule } from './rate-limit/index.js';
@@ -28,6 +30,8 @@ export class CoreModule {
         MailModule,
         SessionModule,
         StorageModule,
+        ImagesModule,
+        JobsModule,
       ],
       controllers: [HealthController],
       providers: [

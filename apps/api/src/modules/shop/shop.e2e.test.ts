@@ -1,14 +1,17 @@
+import { readFileSync } from 'node:fs';
+
 import { eq } from 'drizzle-orm';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { createTestApp, type TestApp } from '../../../test/helpers/app.js';
+import { createTestApp, TEST_PUBLIC_URL, type TestApp } from '../../../test/helpers/app.js';
 import { connectTestDb } from '../../../test/helpers/db.js';
 import { signUp, XRW, type Browser } from '../../../test/helpers/session.js';
 import { PreviewTokens } from '../../core/auth/index.js';
 import type { Db } from '../../core/db/index.js';
 import { accounts, productPhotos, products, shops } from '../../core/db/schema/index.js';
 
+const JPEG = readFileSync(new URL('../../../test/fixtures/photo.jpg', import.meta.url));
 const WIZARD = { name: 'Айгерим Kids', subdomain: 'aigerim-kids', whatsapp: '+77001234567', setupCompleted: true };
 
 describe('магазин', () => {
@@ -159,15 +162,74 @@ describe('магазин', () => {
     expect((await agent.post('/v1/admin/shop/unpublish').set(XRW).expect(200)).body.status).toBe('blocked');
   });
 
-  it('логотип: загрузок ещё нет — 422 upload_not_found; удаление — 204', async () => {
-    const { agent } = await signUp(t, 'logo@example.com');
-    const res = await agent
-      .put('/v1/admin/shop/logo')
-      .set(XRW)
-      .send({ uploadId: '0192d000-0000-7000-8000-000000000001' })
-      .expect(422);
-    expect(res.body.code).toBe('upload_not_found');
-    await agent.delete('/v1/admin/shop/logo').set(XRW).expect(204);
+  describe('логотип', () => {
+    /** Загрузить файл, как админка: ссылка → «PUT» в хранилище → `uploadId`. */
+    const uploadLogo = async (agent: Browser, body: Buffer, purpose = 'logo') => {
+      const res = await agent
+        .post('/v1/admin/uploads')
+        .set(XRW)
+        .send({ purpose, fileName: 'logo.jpg', contentType: 'image/jpeg', size: body.length })
+        .expect(201);
+      const key = new URL(res.body.url).pathname.replace(/^\/catalog-private\//, '');
+      t.storage.upload(key, body);
+      return { uploadId: res.body.uploadId as string, key };
+    };
+    const setLogo = (agent: Browser, uploadId: string) => agent.put('/v1/admin/shop/logo').set(XRW).send({ uploadId });
+
+    it('сжимается сразу: в ответе три размера с адресами публичного хранилища; второй раз тот же uploadId — 422', async () => {
+      const { agent, me } = await signUp(t, 'logo@example.com');
+      const { uploadId } = await uploadLogo(agent, JPEG);
+      const res = await setLogo(agent, uploadId).expect(200);
+      const base = `${TEST_PUBLIC_URL}/shops/${me.shop.id}/logo/${uploadId}`;
+      expect(res.body.logo).toEqual({
+        width: 400,
+        height: 300,
+        sizes: { '320': `${base}/320.webp`, '640': `${base}/640.webp`, '1280': `${base}/1280.webp` },
+      });
+      expect((await agent.get('/v1/admin/shop').expect(200)).body.logo).toEqual(res.body.logo);
+      expect((await setLogo(agent, uploadId).expect(422)).body.code).toBe('upload_not_found');
+    });
+
+    it('замена: файлы прежнего логотипа (размеры и исходник) удаляются', async () => {
+      const { agent, me } = await signUp(t, 'logo-replace@example.com');
+      const first = await uploadLogo(agent, JPEG);
+      await setLogo(agent, first.uploadId).expect(200);
+      const second = await uploadLogo(agent, JPEG);
+      await setLogo(agent, second.uploadId).expect(200);
+
+      const logoPrefix = `shops/${me.shop.id}/logo/`;
+      expect(t.storage.keys('public', logoPrefix).every((key) => key.includes(second.uploadId))).toBe(true);
+      expect(t.storage.keys('public', logoPrefix)).toHaveLength(3);
+      expect(t.storage.keys('private', `uploads/${me.shop.id}/`)).toEqual([second.key]);
+    });
+
+    it('не картинка — 422 image_unreadable, логотип прежний, файлов не осталось', async () => {
+      const { agent, me } = await signUp(t, 'logo-broken@example.com');
+      const { uploadId } = await uploadLogo(agent, Buffer.from('not an image at all'));
+      expect((await setLogo(agent, uploadId).expect(422)).body.code).toBe('image_unreadable');
+      expect((await agent.get('/v1/admin/shop').expect(200)).body.logo).toBeNull();
+      expect(t.storage.keys('public', `shops/${me.shop.id}/`)).toEqual([]);
+    });
+
+    it('загрузка фото товара или чужая — 422 upload_not_found', async () => {
+      const owner = await signUp(t, 'logo-owner@example.com');
+      const stranger = await signUp(t, 'logo-stranger@example.com');
+      const photo = await uploadLogo(owner.agent, JPEG, 'product_photo');
+      expect((await setLogo(owner.agent, photo.uploadId).expect(422)).body.code).toBe('upload_not_found');
+      const logo = await uploadLogo(owner.agent, JPEG);
+      expect((await setLogo(stranger.agent, logo.uploadId).expect(422)).body.code).toBe('upload_not_found');
+    });
+
+    it('удаление: 204, логотипа нет, файлы удалены; без логотипа — тоже 204', async () => {
+      const { agent, me } = await signUp(t, 'logo-delete@example.com');
+      const { uploadId } = await uploadLogo(agent, JPEG);
+      await setLogo(agent, uploadId).expect(200);
+      await agent.delete('/v1/admin/shop/logo').set(XRW).expect(204);
+      expect((await agent.get('/v1/admin/shop').expect(200)).body.logo).toBeNull();
+      expect(t.storage.keys('public', `shops/${me.shop.id}/`)).toEqual([]);
+      expect(t.storage.keys('private', `uploads/${me.shop.id}/`)).toEqual([]);
+      await agent.delete('/v1/admin/shop/logo').set(XRW).expect(204);
+    });
   });
 
   it('токен превью — на 30 минут, подписан для своего магазина', async () => {

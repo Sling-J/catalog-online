@@ -55,8 +55,8 @@ export class ShopController implements ShopControllerMethods {
   }
 
   @Put('shop/logo')
-  async setShopLogo(@Body({ schema: zSetShopLogoBody }) _body: SetShopLogoData['body']): Promise<Shop> {
-    return this.shop.setLogo();
+  setShopLogo(@Body({ schema: zSetShopLogoBody }) body: SetShopLogoData['body']): Promise<Shop> {
+    return this.shop.setLogo(this.ctx.shopId(), body.uploadId);
   }
 
   @Delete('shop/logo')

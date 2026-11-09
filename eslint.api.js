@@ -78,6 +78,11 @@ export function apiBoundaries() {
                 message: 'SQL — только в *.repository.ts (backend-structure.md, раздел 4).',
               },
               { group: ['express'], message: 'Типы Express — только в core (backend-structure.md, решение 3).' },
+              {
+                group: ['pg-boss', 'sharp', 'heic-decode'],
+                allowTypeImports: true,
+                message: 'Очередь и картинки — через Jobs (core/jobs) и Images (core/images).',
+              },
             ],
           },
         ],

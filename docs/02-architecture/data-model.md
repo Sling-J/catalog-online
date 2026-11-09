@@ -54,7 +54,7 @@ erDiagram
 | id | uuid | |
 | subdomain | text, unique | латиница, цифры, дефис, 3–30; список зарезервированных слов проверяется в коде |
 | name | text | |
-| logo_key | text, null | ключ в хранилище фото |
+| logo_key | text, null | ключ в хранилище фото (с T-406 — `logo` jsonb, см. примечание ниже) |
 | description | text, null | |
 | whatsapp | text | номер в формате E.164, `+7…` |
 | instagram | text, null | |
@@ -141,7 +141,7 @@ erDiagram
 | product_id | uuid | |
 | position | integer | 0 — обложка |
 | original_key | text | исходник в хранилище |
-| sizes | jsonb | `{ "320": "key", "640": "key", "1280": "key" }` в WebP/AVIF |
+| sizes | jsonb | `{ "320": "key", "640": "key", "1280": "key" }` в WebP (AVIF не делаем — T-406) |
 | width, height | integer | для правильного соотношения до загрузки |
 | status | enum | `processing` / `ready` / `failed` |
 
@@ -196,6 +196,8 @@ PK (shop_id, date, product_id). Пишем `INSERT … ON CONFLICT DO UPDATE SET
 > - **preview-токен** витрины — без таблицы: подписанный токен (T-404, `api.md`).
 > - UUID v7 по умолчанию — функция `uuidv7()` PostgreSQL 18: база в продакшене тоже должна быть 18+ (T-601).
 > - Тарифов в схеме нет (D16).
+
+> Примечание (2026-11-09, T-406): у **shops** вместо `logo_key` — `logo` jsonb, null: `{ width, height, sizes: { "320", "640", "1280" }, originalKey }` — ключи готовых размеров в публичном хранилище и исходника в закрытом (миграция `0001_shop_logo`). Логотип сжимается сразу при загрузке, поэтому статуса обработки у него нет. Таблицы очереди pg-boss — в схеме `pgboss` той же базы, их создаёт и обновляет сам pg-boss, не наши миграции.
 
 ## Адрес товара на витрине
 `/<slug>-<short_id>`, например `/kurtka-demisezonnaya-7f3k2` (DM3): читаемо в ссылке и не ломается при переименовании — товар ищем по `short_id`, а если slug устарел, отвечаем редиректом 301 на актуальный адрес.
