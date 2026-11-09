@@ -4,7 +4,9 @@ import { defineConfig } from '@hey-api/openapi-ts';
 // схемы Zod, моки MSW для фронтов и типы контроллеров для NestJS.
 export default defineConfig({
   input: './openapi.yaml',
-  output: { path: './src/gen' },
+  // `.js` в импортах: API собирается в режиме NodeNext — без расширения типы из dist превращались в any
+  // (pitfalls.md, T-407)
+  output: { path: './src/gen', module: { extension: '.js' } },
   plugins: [
     '@hey-api/client-fetch',
     '@hey-api/typescript',

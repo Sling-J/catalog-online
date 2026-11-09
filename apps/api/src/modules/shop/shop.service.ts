@@ -5,6 +5,7 @@ import { PreviewTokens } from '../../core/auth/index.js';
 import { InjectDb, isUniqueViolation, type Db, type DbOrTx } from '../../core/db/index.js';
 import { AppError } from '../../core/errors/index.js';
 import { Images, ImageUnreadableError, type StoredImage } from '../../core/images/index.js';
+import { ProductsService } from '../products/products.service.js';
 import { UploadsService } from '../uploads/uploads.service.js';
 import { computeReadiness } from './lib/readiness.js';
 import { prepareShopPatch } from './lib/shop-update.js';
@@ -22,6 +23,7 @@ export class ShopService {
     private readonly previewTokens: PreviewTokens,
     private readonly images: Images,
     private readonly uploads: UploadsService,
+    private readonly products: ProductsService,
   ) {}
 
   async get(shopId: string): Promise<Shop> {
@@ -70,7 +72,7 @@ export class ShopService {
     return this.db.transaction(async (tx) => {
       const shop = await this.load(tx, shopId);
       if (shop.status === 'blocked') throw new AppError('shop_blocked', 409);
-      const readiness = computeReadiness(shop, await shopRepository.productCounts(tx, shopId));
+      const readiness = computeReadiness(shop, await this.products.readiness(shopId, tx));
       if (!readiness.canPublish || !(await shopRepository.isEmailVerified(tx, shopId))) {
         throw new AppError('shop_not_ready', 409);
       }
@@ -137,7 +139,7 @@ export class ShopService {
   }
 
   private async present(db: DbOrTx, row: ShopRow): Promise<Shop> {
-    return toShop(row, computeReadiness(row, await shopRepository.productCounts(db, row.id)), this.logoOf(row));
+    return toShop(row, computeReadiness(row, await this.products.readiness(row.id, db)), this.logoOf(row));
   }
 
   private logoOf(row: ShopRow): Shop['logo'] {

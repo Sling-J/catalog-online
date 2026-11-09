@@ -1,14 +1,17 @@
 import { Module } from '@nestjs/common';
 
+import { UploadsModule } from '../uploads/uploads.module.js';
 import { ProductPhotosService } from './product-photos.service.js';
+import { ProductVariantsService } from './product-variants.service.js';
+import { ProductsController } from './products.controller.js';
+import { ProductsService } from './products.service.js';
 import { ProcessPhotoWorker } from './workers/process-photo.worker.js';
 
-/**
- * Товары (FR-A1, FR-A4), тег контракта `products`. Пока — только фоновая обработка фото (T-406); эндпоинты
- * товаров и фото — T-407.
- */
+/** Товары (FR-A5, FR-A4), тег контракта `products`. `ProductsService` — для чек-листа магазина. */
 @Module({
-  providers: [ProductPhotosService, ProcessPhotoWorker],
-  exports: [ProductPhotosService],
+  imports: [UploadsModule],
+  controllers: [ProductsController],
+  providers: [ProductsService, ProductVariantsService, ProductPhotosService, ProcessPhotoWorker],
+  exports: [ProductsService],
 })
 export class ProductsModule {}

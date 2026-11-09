@@ -1,9 +1,8 @@
-import { and, count, eq, ne, notExists, sql } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import type { InferSelectModel } from 'drizzle-orm';
 
 import type { DbOrTx } from '../../core/db/index.js';
-import { accounts, productPhotos, products, shops, type ShopLogo } from '../../core/db/schema/index.js';
-import type { ProductCounts } from './lib/readiness.js';
+import { accounts, shops, type ShopLogo } from '../../core/db/schema/index.js';
 import type { ShopPatch } from './lib/shop-update.js';
 
 export type ShopRow = InferSelectModel<typeof shops>;
@@ -54,27 +53,6 @@ export const shopRepository = {
       .where(and(eq(shops.subdomain, subdomain), ne(shops.id, shopId)))
       .limit(1);
     return row !== undefined;
-  },
-
-  /**
-   * Числа товаров для чек-листа. Только чтение чужих таблиц (каталог — область модуля товаров, T-407): когда он
-   * появится, подсчёт переедет в его сервис.
-   */
-  async productCounts(db: DbOrTx, shopId: string): Promise<ProductCounts> {
-    const [row] = await db
-      .select({
-        total: count(),
-        visible: sql<number>`count(*) filter (where ${products.isVisible})`.mapWith(Number),
-        withoutPhoto: sql<number>`count(*) filter (where ${notExists(
-          db
-            .select({ one: sql`1` })
-            .from(productPhotos)
-            .where(eq(productPhotos.productId, products.id)),
-        )})`.mapWith(Number),
-      })
-      .from(products)
-      .where(eq(products.shopId, shopId));
-    return { total: row?.total ?? 0, visible: row?.visible ?? 0, withoutPhoto: row?.withoutPhoto ?? 0 };
   },
 
   /** Подтверждена ли почта владельца — публикация до подтверждения закрыта (A9). Только чтение таблицы входа. */

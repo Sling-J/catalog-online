@@ -8,7 +8,7 @@ import { connectTestDb } from '../../../test/helpers/db.js';
 import { signUp } from '../../../test/helpers/session.js';
 import type { Db } from '../../core/db/index.js';
 import { productPhotos, products } from '../../core/db/schema/index.js';
-import { PROCESS_PHOTO } from './workers/process-photo.worker.js';
+import { PROCESS_PHOTO } from './lib/photo-jobs.js';
 
 const HEIC = readFileSync(new URL('../../../test/fixtures/photo.heic', import.meta.url));
 
