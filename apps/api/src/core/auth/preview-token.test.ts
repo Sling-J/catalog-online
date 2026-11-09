@@ -10,6 +10,12 @@ const configWith = (secret: string) =>
       CORS_ORIGINS: 'http://localhost',
       ADMIN_URL: 'http://localhost',
       APP_SECRET: secret,
+      S3_ENDPOINT: 'http://localhost:8333',
+      S3_ACCESS_KEY: 'key',
+      S3_SECRET_KEY: 'secret',
+      S3_PUBLIC_BUCKET: 'catalog-public',
+      S3_PRIVATE_BUCKET: 'catalog-private',
+      S3_PUBLIC_URL: 'http://localhost:8333/catalog-public/',
     }),
   );
 

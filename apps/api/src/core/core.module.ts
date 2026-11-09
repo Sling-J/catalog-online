@@ -10,6 +10,7 @@ import { HealthController } from './health/health.controller.js';
 import { LoggingModule } from './logging/index.js';
 import { MailModule } from './mail/index.js';
 import { RateLimitGuard, RateLimitModule } from './rate-limit/index.js';
+import { StorageModule } from './storage/index.js';
 import { ValidationPipe } from './validation/index.js';
 
 /** Инфраструктура без бизнес-смысла (backend-structure.md, раздел 3). Подключается один раз в AppModule. */
@@ -26,6 +27,7 @@ export class CoreModule {
         RateLimitModule,
         MailModule,
         SessionModule,
+        StorageModule,
       ],
       controllers: [HealthController],
       providers: [

@@ -9,8 +9,11 @@ import { AppModule } from '../../src/app.module.js';
 import { parseConfig, type Config } from '../../src/core/config/index.js';
 import { configureApp } from '../../src/core/http/index.js';
 import { Mailer, type MailMessage } from '../../src/core/mail/index.js';
+import { Storage } from '../../src/core/storage/index.js';
+import { MemoryStorage } from './storage.js';
 import { createTestDatabase } from './db.js';
 
+export const TEST_PUBLIC_URL = 'http://storage.test/catalog-public';
 export const TEST_ADMIN_URL = 'http://app.localhost:3002';
 export const TEST_CORS_ORIGINS = 'http://app.localhost:3002,http://*.localhost:3000';
 
@@ -22,6 +25,8 @@ export type TestApp = {
   close: () => Promise<void>;
   /** Письма, которые «отправило» приложение (вместо SMTP и лога). */
   mails: MailMessage[];
+  /** Хранилище в памяти вместо S3. */
+  storage: MemoryStorage;
 };
 
 /** Почта тестов: письма складываются в массив. */
@@ -48,13 +53,22 @@ export async function createTestApp(options: { controllers?: Type[] } = {}): Pro
     LOG_LEVEL: 'silent',
     ADMIN_URL: TEST_ADMIN_URL,
     APP_SECRET: 'test-secret-test-secret-test-secret',
+    S3_ENDPOINT: 'http://storage.test',
+    S3_ACCESS_KEY: 'test',
+    S3_SECRET_KEY: 'test',
+    S3_PUBLIC_BUCKET: 'catalog-public',
+    S3_PRIVATE_BUCKET: 'catalog-private',
+    S3_PUBLIC_URL: TEST_PUBLIC_URL,
   });
+  const storage = new MemoryStorage(config.s3);
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule.forRoot(config)],
     controllers: options.controllers ?? [],
   })
     .overrideProvider(Mailer)
     .useValue(new TestMailer(mails))
+    .overrideProvider(Storage)
+    .useValue(storage)
     .compile();
   const app = moduleRef.createNestApplication<NestExpressApplication>({ bufferLogs: true });
   configureApp(app, config);
@@ -65,5 +79,6 @@ export async function createTestApp(options: { controllers?: Type[] } = {}): Pro
     http: () => request(app.getHttpServer()),
     close: () => app.close(),
     mails,
+    storage,
   };
 }

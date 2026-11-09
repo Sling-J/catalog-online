@@ -8,9 +8,10 @@ import { buildDemoRows, HIDDEN_SHOP_ID } from './demo-shop.js';
 
 /**
  * Записывает демо-магазины одной транзакцией. Повторный запуск пересоздаёт их начисто: магазины удаляются, а всё
- * их содержимое уходит каскадом. Другие магазины базы не трогает.
+ * их содержимое уходит каскадом. Другие магазины базы не трогает. Возвращает ключи фото в публичном хранилище —
+ * файлы туда кладёт `run.ts`.
  */
-export async function seedDemo(db: Db, now = Date.now()): Promise<void> {
+export async function seedDemo(db: Db, now = Date.now()): Promise<string[]> {
   const rows = buildDemoRows(await argon2.hash(DEMO_ADMIN_PASSWORD), now);
   await db.transaction(async (tx) => {
     await tx.delete(schema.shops).where(inArray(schema.shops.id, [DEMO_SHOP_ID, HIDDEN_SHOP_ID]));
@@ -29,4 +30,5 @@ export async function seedDemo(db: Db, now = Date.now()): Promise<void> {
     await tx.insert(schema.productPhotos).values(rows.productPhotos);
     await tx.insert(schema.dailyStats).values(rows.dailyStats);
   });
+  return [...new Set(rows.productPhotos.flatMap((photo) => Object.values(photo.sizes ?? {})))];
 }

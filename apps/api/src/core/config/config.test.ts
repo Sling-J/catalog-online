@@ -7,6 +7,12 @@ const base = {
   CORS_ORIGINS: 'http://app.localhost:3002, http://*.localhost:3000',
   ADMIN_URL: 'http://app.localhost:3002/',
   APP_SECRET: 'x'.repeat(32),
+  S3_ENDPOINT: 'http://localhost:8333',
+  S3_ACCESS_KEY: 'key',
+  S3_SECRET_KEY: 'secret',
+  S3_PUBLIC_BUCKET: 'catalog-public',
+  S3_PRIVATE_BUCKET: 'catalog-private',
+  S3_PUBLIC_URL: 'http://localhost:8333/catalog-public/',
 };
 
 describe('parseConfig', () => {
@@ -23,6 +29,15 @@ describe('parseConfig', () => {
       smtpUrl: undefined,
       mailFrom: 'Каталог <no-reply@localhost>',
       appSecret: 'x'.repeat(32),
+      s3: {
+        endpoint: 'http://localhost:8333',
+        region: 'us-east-1',
+        accessKey: 'key',
+        secretKey: 'secret',
+        publicBucket: 'catalog-public',
+        privateBucket: 'catalog-private',
+        publicUrl: 'http://localhost:8333/catalog-public',
+      },
     });
   });
 

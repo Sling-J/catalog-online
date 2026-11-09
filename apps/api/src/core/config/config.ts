@@ -30,6 +30,17 @@ const envSchema = z.object({
   MAIL_FROM: z.string().min(3).default('Каталог <no-reply@localhost>'),
   /** Секрет для подписи токенов (превью витрины); не короче 32 символов, в продакшене — свой. */
   APP_SECRET: z.string().min(32),
+  /** S3-совместимое хранилище (в разработке — SeaweedFS из docker-compose.yml). */
+  S3_ENDPOINT: z.url({ protocol: /^https?$/ }),
+  S3_REGION: z.string().min(1).default('us-east-1'),
+  S3_ACCESS_KEY: z.string().min(1),
+  S3_SECRET_KEY: z.string().min(1),
+  /** Публичное: готовые фото и логотипы, их открывает кто угодно (решение основателя 2026-11-09, T-405). */
+  S3_PUBLIC_BUCKET: z.string().min(3),
+  /** Закрытое: исходники фото и файлы импорта — только для API. */
+  S3_PRIVATE_BUCKET: z.string().min(3),
+  /** Адрес, по которому покупатель открывает файлы публичного хранилища (без `/` в конце); позже — CDN. */
+  S3_PUBLIC_URL: z.url({ protocol: /^https?$/ }).transform((url) => url.replace(/\/+$/, '')),
 });
 
 export type Config = {
@@ -44,6 +55,15 @@ export type Config = {
   smtpUrl: string | undefined;
   mailFrom: string;
   appSecret: string;
+  s3: {
+    endpoint: string;
+    region: string;
+    accessKey: string;
+    secretKey: string;
+    publicBucket: string;
+    privateBucket: string;
+    publicUrl: string;
+  };
 };
 
 /** Читает и проверяет окружение; при ошибке — исключение со списком переменных. */
@@ -66,6 +86,15 @@ export function parseConfig(env: Record<string, string | undefined>): Config {
     smtpUrl: e.SMTP_URL,
     mailFrom: e.MAIL_FROM,
     appSecret: e.APP_SECRET,
+    s3: {
+      endpoint: e.S3_ENDPOINT,
+      region: e.S3_REGION,
+      accessKey: e.S3_ACCESS_KEY,
+      secretKey: e.S3_SECRET_KEY,
+      publicBucket: e.S3_PUBLIC_BUCKET,
+      privateBucket: e.S3_PRIVATE_BUCKET,
+      publicUrl: e.S3_PUBLIC_URL,
+    },
   };
 }
 
