@@ -60,7 +60,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - `pnpm i18n:extract` — строки Lingui в каталоги `.po`.
 - `docker compose up -d` — PostgreSQL и S3-хранилище для разработки (`.env.example`).
 - `pnpm e2e` — сценарии в браузере (`tools/e2e`, Playwright на моках); после правок админки, в `pnpm check` не входит.
-- `pnpm --filter @catalog/api dev` — API на :3001 (корневой `.env`); `db:generate` / `db:migrate` — миграции drizzle-kit. Тесты API (в `pnpm check`) — на Testcontainers, нужен запущенный Docker.
+- `pnpm --filter @catalog/api dev` — API на :3001 (корневой `.env`); `db:generate` / `db:migrate` — миграции drizzle-kit, `db:seed` — демо-магазины (вход как на моках). Тесты API (в `pnpm check`) — на Testcontainers, нужен запущенный Docker.
 - `pnpm design:compare --board <доска> --frame <экран> --url <адрес>` — сверка экрана с макетом (`tools/design-compare/README.md`); после вёрстки по макету — обязательно, вместо ручных замеров в браузере. Админку сверяем на http://localhost:3012 (`admin-check`).
 
 ## Код

@@ -100,14 +100,20 @@ import {
 } from './admin-catalog.js';
 import { createImportStore, importTemplateXlsx, mappingProblem } from './admin-imports.js';
 import { demoStats, emptyStats, type StatsPeriod } from './admin-stats.js';
+import {
+  DEMO_ACCOUNT_ID,
+  DEMO_ADMIN_EMAIL,
+  DEMO_ADMIN_PASSWORD,
+  DEMO_SHOP_ID,
+  demoShopSettings,
+} from './demo-admin.js';
 import { demoShop, HIDDEN_DEMO_SUBDOMAIN } from './demo-shop.js';
 
-const SHOP_ID = '0192d000-0000-7000-8000-00000000a001';
+const SHOP_ID = DEMO_SHOP_ID;
 const NEW_SHOP_ID = '0192d000-0000-7000-8000-00000000a002';
 const NEW_ACCOUNT_ID = '0192d000-0000-7000-8000-00000000b002';
 
-/** Пароль демо-владельца для входа на моках. */
-export const DEMO_ADMIN_PASSWORD = 'demo-password';
+export { DEMO_ADMIN_PASSWORD };
 /** Токен ссылки из письма, который моки считают устаревшим (410). */
 export const EXPIRED_EMAIL_TOKEN = 'expired';
 const MIN_PASSWORD = 8;
@@ -117,8 +123,8 @@ const PAGE_SIZE = 30;
 
 export const demoMe: Me = {
   account: {
-    id: '0192d000-0000-7000-8000-00000000b001',
-    email: 'aigerim.kids@example.com',
+    id: DEMO_ACCOUNT_ID,
+    email: DEMO_ADMIN_EMAIL,
     emailVerified: true,
     impersonated: false,
   },
@@ -153,9 +159,7 @@ export const demoAdminShop: Shop = {
   schedule,
   timezone,
   stockDisplay,
-  lowStockThreshold: 2,
-  showOutOfStock: true,
-  publishedAt: '2026-10-20T09:00:00Z',
+  ...demoShopSettings,
   readiness: {
     settingsFilled: true,
     productCount: counts.all,

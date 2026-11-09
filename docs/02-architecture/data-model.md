@@ -1,7 +1,7 @@
 ---
 status: accepted
 owner: founder
-updated: 2026-10-31
+updated: 2026-11-09
 ---
 
 # Модель данных
@@ -183,6 +183,19 @@ PK (shop_id, date, product_id). Пишем `INSERT … ON CONFLICT DO UPDATE SET
 **staff_users** — наши сотрудники: `id`, `email`, `password_hash`, `created_at`. Отдельно от магазинов.
 
 **audit_log** — `id`, `staff_user_id`, `shop_id`, `action` (`block`, `unblock`, `impersonate`, …), `payload` jsonb, `created_at` (FR-S3).
+
+> Примечание (2026-11-09, T-402, уточнения по контракту при переносе в схему Drizzle; схема — `apps/api/src/core/db/schema`, миграции — `apps/api/drizzle`):
+> - **shops:** `name`, `subdomain`, `whatsapp` необязательные — их заполняет мастер после регистрации (в контракте `Shop` они `null`); добавлено `setup_completed` (мастер пройден, `Me.shop.setupCompleted`). `show_out_of_stock` по умолчанию `false`, как выше.
+> - **accounts, staff_users:** почта — `text` с уникальным индексом по `lower(email)` вместо `citext` (без расширения PostgreSQL); код хранит её в нижнем регистре.
+> - **sessions:** `id` — хеш токена из cookie. Сессии сотрудников — отдельная таблица `staff_sessions` (cookie `staff_sid`).
+> - **uploads** — новая таблица для API2: выданные ссылки на загрузку (`purpose`, `key`, `file_name`, `content_type`, `size`, `expires_at`, `used_at`); по ней API проверяет `uploadId` (`upload_not_found`).
+> - **products:** ~~`manual_fields`~~ → `imported_fields` (`name` / `category` / `variants`) — как `Product.importedFields` в контракте: какие поля перезапишет следующий импорт (описание и видимость импорт не трогает, FR-A3). Добавлено `max_price` (для «от X ₸»). `shop_id` продублирован и в `attribute_values`, `product_photos` — каждый запрос фильтруется по магазину без соединений (`backend-structure.md`, раздел 6).
+> - **variant_values:** удаление значения свойства снимает его с вариантов каскадом (так в `deleteAttribute`); запрет удалить используемое значение (409 `attribute_value_in_use`) — в сервисе. Внешний ключ без каскада ломал удаление магазина (`06-process/pitfalls.md`). Родитель категории — без каскада: категорию с подкатегориями база удалить не даст (A28).
+> - **imports** — поля как у `Import` в контракте: статусы `parsing … cancelled`, `row_count`, `headers`, `sample_rows`, `mapping`, `mapping_remembered`, `zero_missing`, `preview`, `result`, `failure_code` вместо `stats`; незаконченный импорт у магазина один (частичный уникальный индекс). **import_errors:** `row`, `column`, `value`, `code` (как `ImportRowError`) вместо `message`.
+> - **daily_stats:** вместо первичного ключа — `unique nulls not distinct (shop_id, date, product_id)`: в первичном ключе не может быть `NULL`.
+> - **preview-токен** витрины — без таблицы (решается в T-404).
+> - UUID v7 по умолчанию — функция `uuidv7()` PostgreSQL 18: база в продакшене тоже должна быть 18+ (T-601).
+> - Тарифов в схеме нет (D16).
 
 ## Адрес товара на витрине
 `/<slug>-<short_id>`, например `/kurtka-demisezonnaya-7f3k2` (DM3): читаемо в ссылке и не ломается при переименовании — товар ищем по `short_id`, а если slug устарел, отвечаем редиректом 301 на актуальный адрес.

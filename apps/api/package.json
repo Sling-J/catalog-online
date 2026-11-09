@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsc -p tsconfig.build.json && node --env-file-if-exists=../../.env dist/core/db/seed/run.js"
   },
   "devDependencies": {
     "@catalog/tsconfig": "workspace:*",
@@ -31,6 +32,7 @@
     "@nestjs/core": "12.3.3",
     "@nestjs/platform-express": "12.3.3",
     "@nestjs/throttler": "6.7.1",
+    "argon2": "0.45.1",
     "drizzle-orm": "0.45.4",
     "nestjs-cls": "7.0.2",
     "nestjs-pino": "5.3.1",
