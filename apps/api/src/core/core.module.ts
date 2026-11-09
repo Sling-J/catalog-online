@@ -1,5 +1,5 @@
 import { Module, type DynamicModule } from '@nestjs/common';
-import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 
 import { RequestedWithGuard, SessionModule } from './auth/index.js';
 import { ConfigModule, type Config } from './config/index.js';
@@ -13,7 +13,7 @@ import { LoggingModule } from './logging/index.js';
 import { MailModule } from './mail/index.js';
 import { RateLimitGuard, RateLimitModule } from './rate-limit/index.js';
 import { StorageModule } from './storage/index.js';
-import { ValidationPipe } from './validation/index.js';
+import { ResponseCheckInterceptor, ValidationPipe } from './validation/index.js';
 
 /** Инфраструктура без бизнес-смысла (backend-structure.md, раздел 3). Подключается один раз в AppModule. */
 @Module({})
@@ -40,6 +40,8 @@ export class CoreModule {
         // Порядок важен: сначала ограничение частоты, потом заголовок CSRF
         { provide: APP_GUARD, useClass: RateLimitGuard },
         { provide: APP_GUARD, useClass: RequestedWithGuard },
+        // ответы по контракту — в разработке и тестах (ADR 0001)
+        ...(config.env === 'production' ? [] : [{ provide: APP_INTERCEPTOR, useClass: ResponseCheckInterceptor }]),
       ],
     };
   }

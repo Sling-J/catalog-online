@@ -277,6 +277,20 @@ describe('товары', () => {
       expect(cleared.body.categoryId).toBeNull();
     });
 
+    it('пустое название, чужая категория, неверный тип — 422 по полю, товар прежний', async () => {
+      const s = await shop('update-invalid@example.com');
+      const other = await shop('update-invalid-other@example.com');
+      const foreign = await addCategory(other.shopId, 'Чужая');
+      const { body: product } = await simple(s, 'Куртка');
+      const patch = (body: object) => s.agent.patch(`/v1/admin/products/${product.id}`).set(XRW).send(body);
+      expect((await patch({ name: '   ' }).expect(422)).body.errors).toEqual([{ field: 'name', code: 'required' }]);
+      expect((await patch({ categoryId: foreign }).expect(422)).body.errors).toEqual([
+        { field: 'categoryId', code: 'not_found' },
+      ]);
+      expect((await patch({ isVisible: 'да' }).expect(422)).body.errors).toMatchObject([{ field: 'isVisible' }]);
+      expect((await s.agent.get(`/v1/admin/products/${product.id}`).expect(200)).body).toEqual(product);
+    });
+
     it('несуществующий, чужой или не UUID — 404', async () => {
       const s = await shop('missing@example.com');
       const other = await shop('missing-other@example.com');

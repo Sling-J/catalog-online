@@ -21,13 +21,20 @@ class ProbeController {
   }
 
   @Post('login')
-  login(@Body({ schema: zLoginBody }) body: LoginData['body']) {
+  // не `login`: метод с именем операции контракта сверялся бы со схемой её ответа
+  echoLogin(@Body({ schema: zLoginBody }) body: LoginData['body']) {
     return { email: body.email };
   }
 
   @Get('products')
   products(@Query({ schema: zListProductsQuery }) query: ListProductsData['query']) {
     return query;
+  }
+
+  /** Имя операции контракта — ответ сверяется со схемой `getProductCounts`. */
+  @Get('counts')
+  getProductCounts() {
+    return { all: 1, noPhoto: 0, outOfStock: 0, hidden: 0, internal: 'утечка' };
   }
 
   @Post('limited')
@@ -69,6 +76,11 @@ describe('core', () => {
       code: 'category_has_children',
       categoryId: 'c1',
     });
+  });
+
+  it('ответ не по контракту (лишнее поле) — 500 в разработке и тестах', async () => {
+    const res = await t.http().get('/test/counts').expect(500);
+    expect(res.body.code).toBe('internal_error');
   });
 
   it('неожиданное исключение — 500 internal_error без деталей', async () => {

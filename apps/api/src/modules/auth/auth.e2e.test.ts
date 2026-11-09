@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { createTestApp, TEST_ADMIN_URL, type TestApp } from '../../../test/helpers/app.js';
 import { connectTestDb } from '../../../test/helpers/db.js';
+import { signUp } from '../../../test/helpers/session.js';
 import { accounts, authTokens, shops } from '../../core/db/schema/index.js';
 
 const PASSWORD = 'correct-horse-1';
@@ -221,5 +222,81 @@ describe('ограничение частоты входа', () => {
     const res = await login(browser(app.t), 'flood@example.com').expect(429);
     expect(res.body.code).toBe('rate_limited');
     expect(Number(res.headers['retry-after'])).toBeGreaterThan(0);
+  });
+});
+
+describe('ограничение частоты остальных запросов входа', () => {
+  const app = useApp();
+
+  // счётчик у каждого маршрута свой (класс + метод + IP); 422 / 401 / 410 тоже считаются — подбор не бесплатный
+  const cases: { name: string; limit: number; send: (agent: ReturnType<typeof browser>) => request.Test }[] = [
+    {
+      name: 'регистрация — 10 в час',
+      limit: 10,
+      send: (agent) => agent.post('/v1/auth/register').set(XRW).send({ email: 'bad', password: PASSWORD }),
+    },
+    {
+      name: 'подтверждение почты — 20 за 15 минут',
+      limit: 20,
+      send: (agent) => agent.post('/v1/auth/email/verify').set(XRW).send({ token: 'nope' }),
+    },
+    {
+      name: '«Забыли пароль» — 5 за 15 минут',
+      limit: 5,
+      send: (agent) => agent.post('/v1/auth/password/forgot').set(XRW).send({ email: 'nobody@example.com' }),
+    },
+    {
+      name: 'новый пароль по ссылке — 10 за 15 минут',
+      limit: 10,
+      send: (agent) =>
+        agent.post('/v1/auth/password/reset').set(XRW).send({ token: 'nope', password: 'long-enough-1' }),
+    },
+  ];
+
+  for (const { name, limit, send } of cases) {
+    it(`${name}, дальше — 429`, async () => {
+      for (let i = 0; i < limit; i++) expect((await send(browser(app.t))).status).not.toBe(429);
+      const res = await send(browser(app.t)).expect(429);
+      expect(res.body.code).toBe('rate_limited');
+    });
+  }
+
+  it('письмо подтверждения ещё раз — 3 за 15 минут; смена пароля — 10 за 15 минут', async () => {
+    const { agent: owner } = await signUp(app.t, 'limits@example.com');
+    for (let i = 0; i < 3; i++) await owner.post('/v1/auth/email/resend').set(XRW).expect(204);
+    expect((await owner.post('/v1/auth/email/resend').set(XRW).expect(429)).body.code).toBe('rate_limited');
+    const change = () =>
+      owner.post('/v1/auth/password/change').set(XRW).send({ currentPassword: 'wrong', newPassword: 'changed-pass-1' });
+    for (let i = 0; i < 10; i++) await change().expect(401);
+    await change().expect(429);
+  });
+});
+
+describe('пароль: проверка нового', () => {
+  const app = useApp();
+
+  it('короткий новый пароль при сбросе и смене — 422 по полю', async () => {
+    const agent = browser(app.t);
+    await register(agent, 'short@example.com').expect(201);
+    await browser(app.t).post('/v1/auth/password/forgot').set(XRW).send({ email: 'short@example.com' }).expect(204);
+    const token = tokenFromLastMail(app.t, '/reset-password');
+    const reset = await browser(app.t)
+      .post('/v1/auth/password/reset')
+      .set(XRW)
+      .send({ token, password: 'short' })
+      .expect(422);
+    expect(reset.body.errors).toMatchObject([{ field: 'password' }]);
+    const change = await agent
+      .post('/v1/auth/password/change')
+      .set(XRW)
+      .send({ currentPassword: PASSWORD, newPassword: 'short' })
+      .expect(422);
+    expect(change.body.errors).toMatchObject([{ field: 'newPassword' }]);
+    // ссылка не сгорела от неудачной попытки
+    await browser(app.t)
+      .post('/v1/auth/password/reset')
+      .set(XRW)
+      .send({ token, password: 'long-enough-1' })
+      .expect(204);
   });
 });
