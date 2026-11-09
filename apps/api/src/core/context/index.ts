@@ -1,1 +1,1 @@
-export { RequestContext, RequestContextModule } from './request-context.js';
+export { RequestContext, RequestContextModule, type AccountSession } from './request-context.js';

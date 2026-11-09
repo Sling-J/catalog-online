@@ -1,13 +1,14 @@
 import { Module, type DynamicModule } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 
-import { RequestedWithGuard } from './auth/index.js';
+import { RequestedWithGuard, SessionModule } from './auth/index.js';
 import { ConfigModule, type Config } from './config/index.js';
 import { RequestContextModule } from './context/index.js';
 import { DbModule } from './db/index.js';
 import { ProblemFilter } from './errors/index.js';
 import { HealthController } from './health/health.controller.js';
 import { LoggingModule } from './logging/index.js';
+import { MailModule } from './mail/index.js';
 import { RateLimitGuard, RateLimitModule } from './rate-limit/index.js';
 import { ValidationPipe } from './validation/index.js';
 
@@ -17,7 +18,15 @@ export class CoreModule {
   static forRoot(config: Config): DynamicModule {
     return {
       module: CoreModule,
-      imports: [ConfigModule.forRoot(config), LoggingModule, RequestContextModule, DbModule, RateLimitModule],
+      imports: [
+        ConfigModule.forRoot(config),
+        LoggingModule,
+        RequestContextModule,
+        DbModule,
+        RateLimitModule,
+        MailModule,
+        SessionModule,
+      ],
       controllers: [HealthController],
       providers: [
         { provide: APP_FILTER, useClass: ProblemFilter },

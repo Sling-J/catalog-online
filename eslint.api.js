@@ -8,6 +8,8 @@ const SRC = `${API}/src`;
 
 /** Сервисы, контроллеры и прочее внутри модуля — только чужой `*.module.ts` и экспортированный `*.service.ts`. */
 const MODULE_PUBLIC = ['*.module.ts', '*.service.ts'];
+/** Публичное у папки core — её index.ts; у core/db ещё таблицы схемы (их читают репозитории). */
+const CORE_PUBLIC = ['index.ts', 'schema/index.ts'];
 
 export function apiBoundaries() {
   const absDir = resolve(import.meta.dirname, API);
@@ -39,15 +41,15 @@ export function apiBoundaries() {
           {
             default: 'disallow',
             policies: [
-              // core — только сам себя, через index.ts папки; modules не видит
+              // core — только сам себя, через index.ts папки (и схему БД); modules не видит
               {
                 from: { element: { type: 'core' } },
-                allow: { to: { element: { type: 'core', fileInternalPath: 'index.ts' } } },
+                allow: { to: { element: { type: 'core', fileInternalPath: CORE_PUBLIC } } },
               },
-              // Модуль: core через index.ts, чужой модуль — только его module и service (не репозиторий)
+              // Модуль: core через index.ts (и схему БД), чужой модуль — только его module и service (не репозиторий)
               {
                 from: { element: { type: 'module' } },
-                allow: { to: { element: { type: 'core', fileInternalPath: 'index.ts' } } },
+                allow: { to: { element: { type: 'core', fileInternalPath: CORE_PUBLIC } } },
               },
               {
                 from: { element: { type: 'module' } },
@@ -105,6 +107,11 @@ export function apiBoundaries() {
           { patterns: [{ group: ['express'], message: 'Типы Express — только в core.' }] },
         ],
       },
+    },
+    {
+      // Тесты готовят данные прямым SQL (просрочить токен, заблокировать магазин) — им можно
+      files: [`${SRC}/**/*.test.ts`],
+      rules: { 'no-restricted-imports': 'off' },
     },
   ];
 }

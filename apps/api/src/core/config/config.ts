@@ -21,6 +21,13 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   /** Сколько прокси перед API (Caddy — 1): от этого зависит IP клиента для ограничения частоты. */
   TRUST_PROXY: z.coerce.number().int().min(0).default(0),
+  /** Адрес админки — для ссылок в письмах (api.md, «Ссылки из писем»). */
+  ADMIN_URL: z.url({ protocol: /^https?$/ }).transform((url) => url.replace(/\/+$/, '')),
+  /** Общий домен админки и API для cookie сессии (`.example.kz`); пусто — cookie только для адреса API. */
+  COOKIE_DOMAIN: z.string().min(1).optional(),
+  /** SMTP для писем (`smtp://user:pass@host:587`); пусто — письма пишутся в лог (разработка). */
+  SMTP_URL: z.url({ protocol: /^smtps?$/ }).optional(),
+  MAIL_FROM: z.string().min(3).default('Каталог <no-reply@localhost>'),
 });
 
 export type Config = {
@@ -30,6 +37,10 @@ export type Config = {
   corsOrigins: string[];
   logLevel: z.infer<typeof envSchema>['LOG_LEVEL'];
   trustProxy: number;
+  adminUrl: string;
+  cookieDomain: string | undefined;
+  smtpUrl: string | undefined;
+  mailFrom: string;
 };
 
 /** Читает и проверяет окружение; при ошибке — исключение со списком переменных. */
@@ -47,6 +58,10 @@ export function parseConfig(env: Record<string, string | undefined>): Config {
     corsOrigins: e.CORS_ORIGINS,
     logLevel: e.LOG_LEVEL,
     trustProxy: e.TRUST_PROXY,
+    adminUrl: e.ADMIN_URL,
+    cookieDomain: e.COOKIE_DOMAIN,
+    smtpUrl: e.SMTP_URL,
+    mailFrom: e.MAIL_FROM,
   };
 }
 

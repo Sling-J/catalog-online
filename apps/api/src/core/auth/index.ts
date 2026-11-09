@@ -1,2 +1,6 @@
-// Guards сессии магазина и сотрудника появятся в T-403 и T-412.
+// Guard сессии сотрудника — в T-412.
 export { RequestedWithGuard } from './requested-with.guard.js';
+export { Authenticated, SessionGuard } from './session.guard.js';
+export { SessionModule } from './session.module.js';
+export { SESSION_COOKIE, SESSION_TTL_MS, SessionService } from './session.service.js';
+export { hashToken, newToken } from './tokens.js';

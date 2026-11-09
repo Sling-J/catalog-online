@@ -5,6 +5,7 @@ import { parseConfig } from './config.js';
 const base = {
   DATABASE_URL: 'postgres://catalog:catalog@localhost:5432/catalog',
   CORS_ORIGINS: 'http://app.localhost:3002, http://*.localhost:3000',
+  ADMIN_URL: 'http://app.localhost:3002/',
 };
 
 describe('parseConfig', () => {
@@ -16,6 +17,10 @@ describe('parseConfig', () => {
       corsOrigins: ['http://app.localhost:3002', 'http://*.localhost:3000'],
       logLevel: 'info',
       trustProxy: 0,
+      adminUrl: 'http://app.localhost:3002',
+      cookieDomain: undefined,
+      smtpUrl: undefined,
+      mailFrom: 'Каталог <no-reply@localhost>',
     });
   });
 
@@ -24,7 +29,7 @@ describe('parseConfig', () => {
   });
 
   it('нет обязательных переменных — понятная ошибка со списком', () => {
-    expect(() => parseConfig({})).toThrow(/DATABASE_URL[\s\S]*CORS_ORIGINS/);
+    expect(() => parseConfig({})).toThrow(/DATABASE_URL[\s\S]*CORS_ORIGINS[\s\S]*ADMIN_URL/);
     expect(() => parseConfig({ ...base, DATABASE_URL: 'mysql://x' })).toThrow(/DATABASE_URL/);
   });
 });
