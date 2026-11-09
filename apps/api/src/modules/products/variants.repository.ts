@@ -12,7 +12,6 @@ export type VariantValueRow = {
   valueId: string;
   value: string;
 };
-export type AttributeValueRow = { id: string; attributeId: string; value: string; position: number };
 export type VariantFields = Pick<VariantRow, 'sku' | 'barcode' | 'price' | 'stock' | 'position'>;
 
 /**
@@ -111,40 +110,5 @@ export const variantsRepository = {
   ): Promise<void> {
     if (variantIds.length) await db.delete(variantValues).where(inArray(variantValues.variantId, variantIds));
     if (pairs.length) await db.insert(variantValues).values(pairs);
-  },
-
-  /** Свойства магазина из списка id. */
-  async findAttributes(db: DbOrTx, shopId: string, attributeIds: string[]): Promise<{ id: string; name: string }[]> {
-    if (attributeIds.length === 0) return [];
-    return db
-      .select({ id: attributes.id, name: attributes.name })
-      .from(attributes)
-      .where(and(eq(attributes.shopId, shopId), inArray(attributes.id, attributeIds)));
-  },
-
-  async valuesOfAttributes(db: DbOrTx, shopId: string, attributeIds: string[]): Promise<AttributeValueRow[]> {
-    if (attributeIds.length === 0) return [];
-    return db
-      .select({
-        id: attributeValues.id,
-        attributeId: attributeValues.attributeId,
-        value: attributeValues.value,
-        position: attributeValues.position,
-      })
-      .from(attributeValues)
-      .where(and(eq(attributeValues.shopId, shopId), inArray(attributeValues.attributeId, attributeIds)));
-  },
-
-  /** «Свой размер»: новые значения в конец свойства; уже созданное параллельно — пропускается. */
-  async insertValues(
-    db: DbOrTx,
-    shopId: string,
-    rows: { attributeId: string; value: string; position: number }[],
-  ): Promise<void> {
-    if (rows.length === 0) return;
-    await db
-      .insert(attributeValues)
-      .values(rows.map((row) => ({ ...row, shopId })))
-      .onConflictDoNothing();
   },
 };

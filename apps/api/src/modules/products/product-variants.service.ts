@@ -3,8 +3,9 @@ import { Injectable } from '@nestjs/common';
 
 import type { DbOrTx } from '../../core/db/index.js';
 import { AppError, type FieldError } from '../../core/errors/index.js';
+import { AttributesService } from '../attributes/attributes.service.js';
 import { generateSkus } from './lib/slug.js';
-import { cleanVariants, variantTableErrors, type CleanVariant } from './lib/variants.js';
+import { cleanVariants, variantTableErrors } from './lib/variants.js';
 import { productsRepository, type ProductRow } from './products.repository.js';
 import { variantsRepository, type VariantFields } from './variants.repository.js';
 
@@ -14,6 +15,8 @@ import { variantsRepository, type VariantFields } from './variants.repository.js
  */
 @Injectable()
 export class ProductVariantsService {
+  constructor(private readonly attributes: AttributesService) {}
+
   /** Только внутри транзакции (`tx`) и под блокировкой товара. */
   async replace(tx: DbOrTx, shopId: string, product: ProductRow, inputs: VariantInput[]): Promise<void> {
     const rows = cleanVariants(inputs);
@@ -27,7 +30,22 @@ export class ProductVariantsService {
     );
     if (foreign.length) throw new AppError('validation_failed', 422, { errors: foreign });
 
-    const valueIds = await this.resolveValues(tx, shopId, rows);
+    const known = await this.attributes.existing(
+      shopId,
+      rows.flatMap((row) => row.values.map((item) => item.attributeId)),
+      tx,
+    );
+    const unknown = rows.flatMap((row, i) =>
+      row.values.flatMap((item, j): FieldError[] =>
+        known.has(item.attributeId) ? [] : [{ field: `variants.${i}.values.${j}.attributeId`, code: 'not_found' }],
+      ),
+    );
+    if (unknown.length) throw new AppError('validation_failed', 422, { errors: unknown });
+    const valueIds = await this.attributes.resolveValues(
+      shopId,
+      rows.map((row) => row.values),
+      tx,
+    );
 
     // артикул стёрли у существующей строки — остаётся прежний (как в моках); у новой — придумываем
     const existingSku = new Map(existing.map((variant) => [variant.id, variant.sku]));
@@ -74,49 +92,5 @@ export class ProductVariantsService {
     );
     await productsRepository.recalcTotals(tx, shopId, product.id);
     await productsRepository.touch(tx, shopId, product.id);
-  }
-
-  /**
-   * Id значений свойств по тексту для каждой строки. Неизвестное свойство — 422 по ячейке; значения, которого
-   * нет («Свой размер»), — создаётся в конце свойства. Сравнение без учёта регистра.
-   */
-  private async resolveValues(tx: DbOrTx, shopId: string, rows: CleanVariant[]): Promise<string[][]> {
-    const attributeIds = [...new Set(rows.flatMap((row) => row.values.map((item) => item.attributeId)))];
-    const known = new Set((await variantsRepository.findAttributes(tx, shopId, attributeIds)).map((a) => a.id));
-    const unknown = rows.flatMap((row, i) =>
-      row.values.flatMap((item, j): FieldError[] =>
-        known.has(item.attributeId) ? [] : [{ field: `variants.${i}.values.${j}.attributeId`, code: 'not_found' }],
-      ),
-    );
-    if (unknown.length) throw new AppError('validation_failed', 422, { errors: unknown });
-
-    const keyOf = (attributeId: string, value: string) => `${attributeId}:${value.toLowerCase()}`;
-    const load = async () =>
-      new Map(
-        (await variantsRepository.valuesOfAttributes(tx, shopId, attributeIds)).map((value) => [
-          keyOf(value.attributeId, value.value),
-          value,
-        ]),
-      );
-    let values = await load();
-    const nextPosition = new Map<string, number>();
-    for (const value of values.values()) {
-      nextPosition.set(value.attributeId, Math.max(nextPosition.get(value.attributeId) ?? 0, value.position + 1));
-    }
-    const toCreate = new Map<string, { attributeId: string; value: string; position: number }>();
-    for (const row of rows) {
-      for (const item of row.values) {
-        const key = keyOf(item.attributeId, item.value);
-        if (values.has(key) || toCreate.has(key)) continue;
-        const position = nextPosition.get(item.attributeId) ?? 0;
-        nextPosition.set(item.attributeId, position + 1);
-        toCreate.set(key, { attributeId: item.attributeId, value: item.value, position });
-      }
-    }
-    if (toCreate.size) {
-      await variantsRepository.insertValues(tx, shopId, [...toCreate.values()]);
-      values = await load();
-    }
-    return rows.map((row) => row.values.map((item) => values.get(keyOf(item.attributeId, item.value))!.id));
   }
 }

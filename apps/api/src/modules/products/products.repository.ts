@@ -235,17 +235,4 @@ export const productsRepository = {
       })
       .where(and(eq(products.id, productId), eq(products.shopId, shopId)));
   },
-
-  /**
-   * Есть ли категория у магазина. Только чтение таблицы категорий (их область — модуль категорий, T-408): когда он
-   * появится, проверка переедет в его сервис.
-   */
-  async categoryExists(db: DbOrTx, shopId: string, categoryId: string): Promise<boolean> {
-    const [row] = await db
-      .select({ id: categories.id })
-      .from(categories)
-      .where(and(eq(categories.id, categoryId), eq(categories.shopId, shopId)))
-      .limit(1);
-    return row !== undefined;
-  },
 };

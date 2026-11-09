@@ -13,6 +13,7 @@ import { InjectDb, isUniqueViolation, type Db, type DbOrTx } from '../../core/db
 import { AppError } from '../../core/errors/index.js';
 import { Images } from '../../core/images/index.js';
 import { decodeCursor, encodeCursor } from '../../core/pagination/index.js';
+import { CategoriesService } from '../categories/categories.service.js';
 import { newShortId, slugify } from './lib/slug.js';
 import { ProductPhotosService } from './product-photos.service.js';
 import { productPhotosRepository } from './product-photos.repository.js';
@@ -38,6 +39,7 @@ export class ProductsService {
     images: Images,
     private readonly variants: ProductVariantsService,
     private readonly photos: ProductPhotosService,
+    private readonly categories: CategoriesService,
   ) {
     this.toImage = (image) => images.toImage(image);
   }
@@ -195,7 +197,7 @@ export class ProductsService {
   }
 
   private async checkCategory(db: DbOrTx, shopId: string, categoryId: string | null): Promise<void> {
-    if (categoryId && !(await productsRepository.categoryExists(db, shopId, categoryId))) {
+    if (categoryId && !(await this.categories.exists(shopId, categoryId, db))) {
       throw new AppError('validation_failed', 422, { errors: [{ field: 'categoryId', code: 'not_found' }] });
     }
   }

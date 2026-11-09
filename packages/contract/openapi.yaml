@@ -839,6 +839,7 @@ paths:
               properties:
                 items:
                   type: array
+                  maxItems: 500
                   items:
                     type: object
                     required: [id, parentId, position]
@@ -923,6 +924,7 @@ paths:
                 inFilters: { type: boolean, default: true }
                 values:
                   type: array
+                  maxItems: 200
                   items: { type: string, minLength: 1, maxLength: 60 }
       responses:
         '201':
@@ -987,6 +989,7 @@ paths:
               properties:
                 values:
                   type: array
+                  maxItems: 200
                   items:
                     type: object
                     required: [value]
