@@ -8,12 +8,13 @@ let configured = false;
  * Адрес API: VITE_API_URL, иначе адрес из контракта (в разработке его перехватывает MSW).
  * В превью токен из адреса страницы уходит во все запросы витрины — так API отдаёт неопубликованный магазин.
  * Клиент SDK один на процесс, поэтому настраиваем его один раз, а токен берём на каждый запрос.
+ * `X-Requested-With` API требует у изменяющих запросов (корзина, события) — защита от CSRF (api.md, «Вход»).
  */
 export function configureApi(): void {
   if (configured) return;
   configured = true;
   const baseUrl = import.meta.env.VITE_API_URL;
-  if (baseUrl) client.setConfig({ baseUrl });
+  client.setConfig({ headers: { 'X-Requested-With': 'XMLHttpRequest' }, ...(baseUrl ? { baseUrl } : {}) });
   client.interceptors.request.use((request) => {
     const token = getPreviewToken();
     const url = new URL(request.url);

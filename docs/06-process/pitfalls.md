@@ -1,7 +1,7 @@
 ---
 status: draft
 owner: founder
-updated: 2026-11-08
+updated: 2026-11-09
 ---
 
 # Грабли: технические ошибки и обходы
@@ -27,12 +27,24 @@ $//' <файл>` (2026-11-08, T-311).
 - **Git Bash переписывает аргументы, начинающиеся с `/`,** в пути Windows: `node script.mjs "/,/shop"` дал адрес `http://localhost:3002C:/Program Files/Git/`. → Перед командой `MSYS_NO_PATHCONV=1` (2026-11-08, T-314).
 - **`git mv` папки в `apps/admin/src` падает с `Permission denied`**, пока работает дев-сервер (Windows держит каталог под наблюдением). Файлы переносятся, папки — нет. → Скопировать (`cp -r`) и удалить старую; плагин роутера сам перепишет пути в `createFileRoute(...)` переименованных файлов маршрутов (2026-11-08, T-314).
 - **Дев-сервер админки на :3012, запущенный до перехода контракта на исходники**, берёт `@catalog/contract` из `dist`: новые обработчики MSW в браузере не работают, запрос уходит мимо моков (в сети его нет, форма пишет «Не получилось»). Видно по `curl -s http://localhost:3012/src/app/mocks/start-mocks.ts` — в импорте `contract/dist/msw.js`. → Не перезапуская сервер основателя: `pnpm --filter @catalog/contract build` (2026-11-08, T-311).
+- **Docker Desktop не запущен** — `docker ps`: `failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine`; e2e API (Testcontainers) и `pnpm check` падают. Docker Desktop стоит в профиле пользователя, а не в Program Files. → `Start-Process "$env:LOCALAPPDATA\Programs\DockerDesktop\Docker Desktop.exe"`, через ~30 с `docker ps` отвечает (2026-11-09, T-401).
 
 ## Пакеты монорепо
 
 - **`@catalog/contract` отдавался только из `dist`** (до 2026-11-08): поменял моки — дев-сервер молча показывал старое, пока пакет не пересобран. Исправлено (решение основателя 2026-11-08): в `exports` контракта условие `development` → `src/*.ts`; Vite в разработке (браузер и SSR) и Vitest берут исходники, `vite build` (`production`) и `tsc` — `dist`. Остался хвост: после правки **типов** контракта `tsc` приложений видит старые `.d.ts`, пока не прошёл `pnpm build` / `pnpm check` (turbo собирает контракт сам). Запущенный до правки `package.json` дев-сервер надо перезапустить. `@catalog/ui` отдаётся из исходников всегда (2026-11-08, T-310).
 - **`routeTree.gen.ts` админки** создаёт плагин роутера при `vite build` / `vite dev`. Добавил файл маршрута — `tsc` ругается на неизвестный путь, пока не прошла сборка. → После нового маршрута сначала `vite build` (или дать поработать дев-серверу), потом `tsc` (2026-11-08, T-310).
 - **FSD запрещает импорт между срезами одного слоя** (`features/a` → `features/b`). Нужное двум фичам — переносить вниз: общий UI без бизнес-контекста — в `shared/ui`, данные и форматирование сущности — в `entities/<сущность>/lib`. Хук одной фичи можно отдать странице через `index.ts` фичи (страница выше слоем) (2026-11-08, T-310).
+
+## API (NestJS)
+
+- **Nest без метаданных декораторов молча не внедряет зависимости** (`undefined` в конструкторе): esbuild (Vitest по умолчанию, tsx) их не выдаёт. → Тесты собирает SWC (`unplugin-swc` в `apps/api/vitest.config.ts`), разработка — `tsc --watch` + `node --watch` (`apps/api/scripts/dev.ts`), не tsx (2026-11-09, T-401).
+- **`consistent-type-imports` превращает внедряемый класс в `import type`** — из метаданных пропадает тип, DI ломается. → ESLint должен знать о декораторах: в `eslint.api.js` у парсера `emitDecoratorMetadata: true, experimentalDecorators: true` — тогда правило такие импорты не трогает (2026-11-09, T-401).
+- **`@nestjs/throttler` ставит `Retry-After` только набору с именем `default`** (у других — `Retry-After-<имя>`) и бросает своё исключение. → `RateLimitGuard` переопределяет `throwThrottlingException`: сам ставит `Retry-After` и бросает `AppError('rate_limited', 429)` (2026-11-09, T-401).
+- **Встроенная `StandardSchemaValidationPipe` Nest 12** отдаёт в `exceptionFactory` только issues, без исходного значения, а между `transform` и фабрикой есть `await` — хранить значение в поле pipe нельзя (гонка запросов). Ещё она не приводит строки адреса к числам. → Своя `ValidationPipe` (`core/validation`) целиком (2026-11-09, T-401).
+- **Zod при ошибке длины массива (`.max()`) не проверяет его элементы** — ошибок по `items.N.поле` не будет, пока длина неверна. Не баг маппинга ошибок (2026-11-09, T-401).
+- **`eslint-plugin-boundaries` 7: `mode: 'file'` устарел** (предупреждение в выводе). Элемент — всегда папка; полный путь от корня — `partialMatch: false`. Файлы сборки в корне `src/` (`main.ts`, `app.module.ts`, `core/core.module.ts`) не входят ни в один элемент — и не проверяются (2026-11-09, T-401).
+- **drizzle-kit не читает `.env`** — `DATABASE_URL` пустой. → `drizzle.config.ts` сам грузит корневой `.env` (`process.loadEnvFile`), API — `node --env-file-if-exists=../../.env` (2026-11-09, T-401).
+- **`pnpm dev` без корневого `.env`** запускает и API, которое падает на проверке конфига (`DATABASE_URL`, `CORS_ORIGINS`) и ждёт правок (`node --watch`); фронты при этом работают. → `cp .env.example .env` (2026-11-09, T-401).
 
 ## Сверка с макетом (`design:compare`)
 

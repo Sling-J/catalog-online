@@ -1,9 +1,12 @@
 {
-  "extends": "@catalog/tsconfig/base.json",
+  // Проверка типов всего пакета: код, тесты, конфиги. Сборка — tsconfig.build.json.
+  "extends": "@catalog/tsconfig/node.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "types": []
+    // Декораторы Nest и метаданные типов для внедрения зависимостей (ADR 0004)
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "noEmit": true
   },
-  "include": ["src"]
+  "include": ["src", "test", "scripts", "vitest.config.ts", "drizzle.config.ts"]
 }

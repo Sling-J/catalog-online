@@ -1,7 +1,7 @@
 ---
 status: accepted
 owner: founder
-updated: 2026-11-08
+updated: 2026-11-09
 ---
 
 # История проекта
@@ -132,6 +132,11 @@ updated: 2026-11-08
 ## E4 «API»
 
 - Подготовка (2026-11-08): закрыты вопросы контракта — из `cart/check` убраны `price_changed` / `quantity_reduced` / `previousPrice`, подтверждены 410 `StorefrontShopGone` и `Import.rowCount` (`02-architecture/api.md`, «Уточнения контракта»). Принята структура бэкенда: модульный монолит на модулях NestJS, контроллер → сервис → репозиторий, Express, Testcontainers, RLS позже (ADR 0004, `02-architecture/backend-structure.md`).
+- T-401 готов (2026-11-09): каркас `apps/api` по `02-architecture/backend-structure.md`. Nest 12.3.3 (ESM) на Express, сборка `tsc`, разработка — `pnpm --filter @catalog/api dev` (`tsc --watch` + `node --watch`, без Nest CLI и tsx). `core`: конфиг на Zod (`AppConfig`), Drizzle + postgres.js (`DB`, `Db | Tx`, `drizzle.config.ts`, `db:generate` / `db:migrate`; таблиц и миграций нет до T-402), ошибки RFC 9457 (`AppError` + глобальный фильтр: свои коды, ошибки Nest и Express, битый JSON → 400, неожиданное → 500 без деталей), проверка входа схемами Zod контракта (`@Body({ schema })` + своя `ValidationPipe`: 422 с `errors[]`, строки адреса приводятся к числам), `X-Requested-With` на изменяющих запросах (403), ограничение частоты (`@nestjs/throttler` в памяти: 300 в минуту с IP, строже — `@RateLimit()`; 429 с `Retry-After`), логи pino с id запроса, контекст запроса `RequestContext` (nestjs-cls), CORS по списку с поддоменами, служебный `GET /health`.
+  - Решения по ходу (основатель, 2026-11-08): запуск без Nest CLI; `/health` вне контракта; счётчики ограничения частоты в памяти процесса. В контракт добавлены коды `forbidden`, `bad_request`, `internal_error`. Фронты шлют `X-Requested-With: XMLHttpRequest` (`configure-api.ts` витрины и админки). `postgres` — 3.4.9, а не свежая 4.x (вышла за 10 дней до задачи).
+  - Линтер границ `eslint.api.js`: `core` не видит `modules`, модуль берёт из чужого только `*.module.ts` / `*.service.ts`, core — через `index.ts`; `drizzle-orm` вне репозиториев и `core/db` — только типы; Express — только в core; `process.env` — только в `core/config`.
+  - Тесты: Vitest с `unplugin-swc`, два проекта — `unit` и `e2e` (Testcontainers: контейнер `postgres:18-alpine` на прогон, база-шаблон, своя база на файл; `test/helpers`). 25 тестов: конфиг, CORS, коды ошибок по полям, приведение параметров; e2e — health, 404, `AppError`, 500, 403, 422, 400, 429 с `Retry-After`, CORS, id запроса. `pnpm check` проходит (нужен запущенный Docker).
+  - Не сделано: guards сессий и `RequestContext` в деле — T-403; миграции — T-402; запуск миграций при деплое — T-601.
 
 ## Документация и процесс
 

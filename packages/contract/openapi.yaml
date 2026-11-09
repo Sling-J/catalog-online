@@ -1394,7 +1394,8 @@ components:
         code:
           type: string
           description: |
-            Машинный код: not_found, unauthorized, validation_failed, subdomain_taken, subdomain_reserved,
+            Машинный код: not_found, unauthorized, forbidden, bad_request, internal_error, validation_failed,
+            subdomain_taken, subdomain_reserved,
             email_taken, sku_taken, category_name_taken, category_has_children, attribute_name_taken,
             attribute_value_in_use, attribute_value_taken,
             shop_not_ready, shop_hidden, shop_blocked, import_in_progress, import_not_ready,

@@ -28,7 +28,7 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 ## Что нужно для разработки
 - Node.js 22 LTS или новее (версиями удобно управлять через nvm; на Windows — nvm-windows)
 - pnpm 10: `corepack enable`, версия берётся из `packageManager` в `package.json`, поэтому команды `pnpm` запускайте из каталога репозитория (вне проекта `corepack` выберет самую свежую версию, она может не запуститься; закрепить нужную: `corepack prepare pnpm@10.18.1 --activate`)
-- Docker — для PostgreSQL и S3-хранилища (в разработке SeaweedFS)
+- Docker — для PostgreSQL и S3-хранилища (в разработке SeaweedFS) и для тестов API (`pnpm check` без запущенного Docker не пройдёт)
 
 ## Команды
 | Команда | Что делает |
@@ -43,3 +43,6 @@ SaaS для малых магазинов Казахстана: онлайн-к�
 | `pnpm format` | Prettier |
 | `pnpm i18n:extract` | Строки Lingui в каталоги `.po` (`apps/web` и `apps/admin`: `src/app/i18n/locales`, общий каталог — `packages/ui/src/locales`; каталоги в git, после правки строк запустить и закоммитить) |
 | `docker compose up -d` | PostgreSQL и S3-хранилище для разработки (настройки — `.env.example`) |
+| `pnpm --filter @catalog/api dev` | API на http://localhost:3001 (`tsc --watch` + `node --watch`; переменные — корневой `.env`, образец — `.env.example`; проверка — http://localhost:3001/health). Входит и в `pnpm dev`. Контракт API берёт из `dist`: после правки `openapi.yaml` — `pnpm generate` и `pnpm --filter @catalog/contract build` |
+| `pnpm --filter @catalog/api db:generate` / `db:migrate` | Миграция из схемы `apps/api/src/core/db/schema` (drizzle-kit, в `apps/api/drizzle`) / применить к базе из `DATABASE_URL` |
+| `pnpm --filter @catalog/api test` | Тесты API: `unit` и `e2e` на PostgreSQL в контейнере (Testcontainers) — нужен запущенный Docker; входит в `pnpm check` |

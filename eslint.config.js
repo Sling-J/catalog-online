@@ -4,6 +4,7 @@ import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import { apiBoundaries } from './eslint.api.js';
 import { fsdBoundaries } from './eslint.fsd.js';
 
 export default tseslint.config(
@@ -37,5 +38,6 @@ export default tseslint.config(
   },
   ...fsdBoundaries('apps/web'),
   ...fsdBoundaries('apps/admin'),
+  ...apiBoundaries(),
   prettier,
 );
