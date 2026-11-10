@@ -179,6 +179,8 @@ modules/products/
 
 > Примечание (2026-11-10, T-409): модуль `imports` — два сервиса: `ImportsService` (то, что делает человек: начать, колонки, применить, отменить, история) и `ImportProcessingService` (фоновые шаги `imports.parse` / `imports.preview` / `imports.apply`, один `ImportWorker`). В `lib/` — чтение файла (в отдельном потоке с потолком памяти и времени — `readTableIsolated`; поток запускает тот же `read-table.ts`, поэтому в нём только стираемый TypeScript и без относительных импортов), сопоставление колонок, проверка строк, шаблон. В каталог импорт сам не пишет: правила «что станет со строками» (`products/lib/import-plan.ts`) и запись пачками (`product-import.repository.ts`) — в модуле товаров, наружу — `ProductImportService` (`preview`, `apply`); категории и свойства создаются через `CategoriesService.ensurePaths` и `AttributesService.ensureByNames`. Смена статуса импорта — только условным переходом `importsRepository.transition(…, из каких статусов, правка)`.
 
+> Примечание (2026-11-10, T-410): модуль `storefront` — один `StorefrontService`. Каждый метод получает открытый магазин (`open(поддомен, токен превью)`, 404 — недоступен; у `shop()` — 410 с контактами). Таблицы магазина и каталога читает свой `storefront.repository.ts`; от других модулей не зависит, из core берёт `PreviewTokens` и `Images`. В `lib/` — наличие и подпись варианта, дерево категорий, фасеты (счёт в памяти). Курсор `core/pagination` понимает несколько ключей порядка (`decodeCursor(значение, порядок, сколько ключей)`); `ValidationPipe` разбирает массивы в адресе через запятую (`?values=a,b`, `explode: false` в контракте).
+
 ## 4. Слои и правила зависимостей
 
 ```

@@ -1,6 +1,6 @@
 /**
  * Параметры адреса приходят строками (`?limit=30`), а схемы Zod из контракта ждут числа и логические
- * значения (`z.int()`). Приводим значения по типу поля схемы до проверки; что не приводится — оставляем
+ * значения (`z.int()`), а массивы — списком через запятую (`?values=a,b`). Приводим значения по типу поля схемы до проверки; что не приводится — оставляем
  * как есть, пусть схема вернёт ошибку по полю.
  */
 
@@ -32,7 +32,8 @@ function unwrap(schema: ZodLike): ZodDef {
 
 function coerceValue(def: ZodDef, value: unknown): unknown {
   if (def.type === 'array') {
-    const items = Array.isArray(value) ? value : [value];
+    // `explode: false` в контракте: `?values=a,b` — один параметр со значениями через запятую
+    const items = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',').filter(Boolean) : [value];
     return def.element ? items.map((item) => coerceValue(unwrap(def.element!), item)) : items;
   }
   if (typeof value !== 'string') return value;

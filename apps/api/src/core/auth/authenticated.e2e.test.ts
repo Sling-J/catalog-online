@@ -13,6 +13,13 @@ const PUBLIC = new Set([
   'POST /v1/auth/email/verify',
   'POST /v1/auth/password/forgot',
   'POST /v1/auth/password/reset',
+  'GET /v1/storefront/:subdomain',
+  'GET /v1/storefront/:subdomain/categories',
+  'GET /v1/storefront/:subdomain/products',
+  'GET /v1/storefront/:subdomain/facets',
+  'GET /v1/storefront/:subdomain/products/:shortId',
+  'POST /v1/storefront/:subdomain/cart/check',
+  'POST /v1/storefront/:subdomain/events',
 ]);
 
 type Layer = { route?: { path: string; methods: Record<string, boolean> } };

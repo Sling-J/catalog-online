@@ -8,6 +8,7 @@ import { CategoriesModule } from './modules/categories/categories.module.js';
 import { ImportsModule } from './modules/imports/imports.module.js';
 import { ProductsModule } from './modules/products/products.module.js';
 import { ShopModule } from './modules/shop/shop.module.js';
+import { StorefrontModule } from './modules/storefront/storefront.module.js';
 import { UploadsModule } from './modules/uploads/uploads.module.js';
 
 /** Корень: core и модули предметных областей (по одному на тег контракта). */
@@ -25,6 +26,7 @@ export class AppModule {
         AttributesModule,
         ProductsModule,
         ImportsModule,
+        StorefrontModule,
       ],
     };
   }

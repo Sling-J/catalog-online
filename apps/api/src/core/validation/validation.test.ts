@@ -20,6 +20,8 @@ describe('coerceQuery', () => {
       ids: [7],
     });
     expect(coerceQuery(schema, { ids: ['1', '2'] })).toEqual({ ids: [1, 2] });
+    expect(coerceQuery(schema, { ids: '1,2,' })).toEqual({ ids: [1, 2] });
+    expect(coerceQuery(schema, { ids: '' })).toEqual({ ids: [] });
   });
 
   it('неприводимое оставляет как есть — ошибку вернёт схема', () => {
