@@ -181,6 +181,8 @@ modules/products/
 
 > Примечание (2026-11-10, T-410): модуль `storefront` — один `StorefrontService`. Каждый метод получает открытый магазин (`open(поддомен, токен превью)`, 404 — недоступен; у `shop()` — 410 с контактами). Таблицы магазина и каталога читает свой `storefront.repository.ts`; от других модулей не зависит, из core берёт `PreviewTokens` и `Images`. В `lib/` — наличие и подпись варианта, дерево категорий, фасеты (счёт в памяти). Курсор `core/pagination` понимает несколько ключей порядка (`decodeCursor(значение, порядок, сколько ключей)`); `ValidationPipe` разбирает массивы в адресе через запятую (`?values=a,b`, `explode: false` в контракте).
 
+> Примечание (2026-11-10, T-411): модуль `stats` — `StatsController` (`getStats`) и `StatsService`. Его `record` экспортируется для витрины: `trackStorefrontEvent` проверяет магазин и товар в `storefront`, роботов отсекает `record`. Зависимость в одну сторону — витрина → статистика. Счётчики пишет `stats.repository.ts` (`insert … on conflict do update`); название товара, обложку и часовой пояс магазина он только читает. Даты и периоды — `stats/lib/dates.ts`, роботы — `stats/lib/bots.ts`. User-Agent модуль берёт через `RequestContext.userAgent()`, не из Express.
+
 ## 4. Слои и правила зависимостей
 
 ```

@@ -176,7 +176,7 @@ erDiagram
 | views | integer | |
 | order_clicks | integer | нажатия «Заказать через WhatsApp» |
 
-PK (shop_id, date, product_id). Пишем `INSERT … ON CONFLICT DO UPDATE SET views = views + 1`. Сырых событий не храним — нет персональных данных и таблица не растёт (DM4). Ботов и повторные просмотры отсекаем по User-Agent и cookie на сутки.
+PK (shop_id, date, product_id). Пишем `INSERT … ON CONFLICT DO UPDATE SET views = views + 1`. Сырых событий не храним — нет персональных данных и таблица не растёт (DM4). ~~Ботов и повторные просмотры отсекаем по User-Agent и cookie на сутки.~~ → Решение основателя 2026-11-10 (T-411): повторы отсекает витрина (раз в сутки, `localStorage`), API cookie не ставит — только роботы по User-Agent и лимит частоты (`api.md`, «Статистика»).
 
 ### Суперадминка
 

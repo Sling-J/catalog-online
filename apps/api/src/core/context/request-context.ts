@@ -58,6 +58,11 @@ export class RequestContext {
     this.cls.set('staffId', staffId);
   }
 
+  /** User-Agent запроса (отсев ботов в статистике витрины); нет заголовка — пустая строка. */
+  userAgent(): string {
+    return this.request().headers['user-agent'] ?? '';
+  }
+
   /** Запрос и ответ Express — только для core (cookie, заголовки); модули их не берут. */
   request(): Request {
     return this.cls.get(CLS_REQ);

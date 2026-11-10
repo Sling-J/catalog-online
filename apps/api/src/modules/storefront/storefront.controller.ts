@@ -22,10 +22,15 @@ import {
   zGetStorefrontShopQuery,
   zListStorefrontCategoriesQuery,
   zListStorefrontProductsQuery,
+  zTrackStorefrontEventBody,
 } from '@catalog/contract/zod';
 import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
 
+import { RequestContext } from '../../core/context/index.js';
+import { RateLimit } from '../../core/rate-limit/index.js';
 import { StorefrontService } from './storefront.service.js';
+
+const MINUTE = 60_000;
 
 /**
  * `/v1/storefront/{subdomain}/…` (контракт, тег storefront) — публично, без входа (API1). Поддомен и `shortId` без
@@ -33,7 +38,10 @@ import { StorefrontService } from './storefront.service.js';
  */
 @Controller('v1/storefront/:subdomain')
 export class StorefrontController implements StorefrontControllerMethods {
-  constructor(private readonly storefront: StorefrontService) {}
+  constructor(
+    private readonly storefront: StorefrontService,
+    private readonly ctx: RequestContext,
+  ) {}
 
   @Get()
   getStorefrontShop(
@@ -85,11 +93,17 @@ export class StorefrontController implements StorefrontControllerMethods {
     return this.storefront.checkCart(await this.storefront.open(path.subdomain, query?.preview), body);
   }
 
-  /** Запись событий — T-411 (следующая задача); пока принимаем и отбрасываем, ответ по контракту тот же. */
+  /**
+   * Просмотр или «Заказать через WhatsApp» для статистики (FR-A10). Ответ всегда 204 — и когда событие отброшено
+   * (робот, магазин закрыт, чужой товар). Строгий лимит частоты с IP — api.md.
+   */
   @Post('events')
   @HttpCode(204)
-  async trackStorefrontEvent(
-    @Param() _path: TrackStorefrontEventData['path'],
-    @Body() _body: TrackStorefrontEventData['body'],
-  ): Promise<void> {}
+  @RateLimit(60, MINUTE)
+  trackStorefrontEvent(
+    @Param() path: TrackStorefrontEventData['path'],
+    @Body({ schema: zTrackStorefrontEventBody }) body: TrackStorefrontEventData['body'],
+  ): Promise<void> {
+    return this.storefront.track(path.subdomain, body, this.ctx.userAgent());
+  }
 }

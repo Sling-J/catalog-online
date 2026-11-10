@@ -8,6 +8,7 @@ import type {
   StorefrontFacets,
   StorefrontProduct,
   StorefrontShop,
+  TrackStorefrontEventData,
 } from '@catalog/contract';
 import { Injectable } from '@nestjs/common';
 
@@ -18,6 +19,7 @@ import { Images } from '../../core/images/index.js';
 import { decodeCursor, encodeCursor } from '../../core/pagination/index.js';
 import { storefrontCategoryTree } from './lib/categories.js';
 import { computeFacets, groupValues, hasVariantFilter } from './lib/facets.js';
+import { StatsService } from '../stats/stats.service.js';
 import { variantLabel } from './lib/stock.js';
 import { toCard, toGoneShop, toStorefrontProduct, toStorefrontShop, type ToImage } from './storefront.mapper.js';
 import { storefrontRepository, type ListQuery, type StorefrontShopRow } from './storefront.repository.js';
@@ -41,6 +43,7 @@ export class StorefrontService {
   constructor(
     @InjectDb() private readonly db: Db,
     private readonly previewTokens: PreviewTokens,
+    private readonly stats: StatsService,
     images: Images,
   ) {
     this.toImage = (image) => images.toImage(image);
@@ -181,6 +184,19 @@ export class StorefrontService {
       };
     });
     return { items, total };
+  }
+
+  /**
+   * Событие статистики (FR-A10) — только у опубликованного магазина: превью и закрытые витрины не считаются.
+   * Просмотр карточки — только видимого товара этого магазина; иначе событие отбрасывается. Записывает модуль
+   * статистики.
+   */
+  async track(subdomain: string, body: TrackStorefrontEventData['body'], userAgent: string): Promise<void> {
+    const shop = await storefrontRepository.findShop(this.db, subdomain);
+    if (shop?.status !== 'published') return;
+    const productId = body.type === 'view' ? (body.productId ?? null) : null;
+    if (productId && !(await storefrontRepository.isVisibleProduct(this.db, shop.id, productId))) return;
+    await this.stats.record(shop, { type: body.type, productId }, userAgent);
   }
 
   /** Опубликованный — всем; черновик — по действующему токену превью этого магазина; заблокированный — никому. */

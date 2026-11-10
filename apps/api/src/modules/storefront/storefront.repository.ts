@@ -306,6 +306,15 @@ export const storefrontRepository = {
     return rows.map(toStored);
   },
 
+  /** Товар виден на витрине этого магазина (для событий статистики). */
+  async isVisibleProduct(db: DbOrTx, shopId: string, productId: string): Promise<boolean> {
+    const [row] = await db
+      .select({ id: products.id })
+      .from(products)
+      .where(and(...visibleProducts(shopId, {}), eq(products.id, productId)));
+    return row !== undefined;
+  },
+
   /** Видимый товар по `shortId` (DM3) с категорией. */
   async findProduct(db: DbOrTx, shopId: string, shortId: string): Promise<ProductDetailRow | null> {
     const [row] = await db
