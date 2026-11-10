@@ -314,6 +314,7 @@ paths:
       security: [{ cookieAuth: [] }]
       responses:
         '204': { description: 'Письмо отправлено повторно' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /v1/auth/password/forgot:
@@ -370,6 +371,7 @@ paths:
       responses:
         '204': { description: 'Пароль изменён, остальные сессии закрыты' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
   # ───────────────────────── Магазин ─────────────────────────
@@ -1247,7 +1249,10 @@ paths:
               properties:
                 reason: { type: string, maxLength: 500 }
       responses:
-        '204': { description: 'Заблокирован, сессии магазина закрыты' }
+        '204':
+          {
+            description: 'Заблокирован (повторно — без изменений). Сессии магазина не закрываются: владелец видит статус в админке (FR-S2)',
+          }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/staff/shops/{shopId}/unblock:
@@ -1258,7 +1263,7 @@ paths:
       operationId: staffUnblockShop
       security: [{ staffCookieAuth: [] }]
       responses:
-        '204': { description: 'Разблокирован' }
+        '204': { description: 'Разблокирован — статус, который был до блокировки (не заблокирован — без изменений)' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/staff/shops/{shopId}/impersonate:
@@ -1270,7 +1275,10 @@ paths:
       summary: Войти в админку «от имени» магазина (FR-S3), пишется в журнал
       security: [{ staffCookieAuth: [] }]
       responses:
-        '204': { description: 'Установлен cookie `sid` с отметкой impersonated_by' }
+        '204':
+          {
+            description: 'Установлен cookie `sid` с отметкой impersonated_by: 2 часа без продления, смена пароля и повторное письмо — 403',
+          }
         '404': { $ref: '#/components/responses/NotFound' }
 
 components:
@@ -1360,6 +1368,11 @@ components:
           schema: { $ref: '#/components/schemas/Problem' }
     Unauthorized:
       description: Нет сессии или неверный пароль
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Forbidden:
+      description: Нельзя во входе сотрудника «от имени» магазина (смена пароля, письма владельцу) — `forbidden`
       content:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problem' }

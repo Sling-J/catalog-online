@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { Me } from '@catalog/contract';
 
-import { hashToken, newToken, SessionService } from '../../core/auth/index.js';
 import { AppConfig } from '../../core/config/index.js';
 import { InjectDb, isUniqueViolation, type Db, type DbOrTx } from '../../core/db/index.js';
 import { AppError } from '../../core/errors/index.js';
@@ -15,7 +14,15 @@ import {
   verifyEmailMail,
   type MailContent,
 } from './lib/mails.js';
-import { hashPassword, normalizeEmail, verifyAgainstDummy, verifyPassword } from './lib/password.js';
+import {
+  hashPassword,
+  hashToken,
+  newToken,
+  normalizeEmail,
+  SessionService,
+  verifyAgainstDummy,
+  verifyPassword,
+} from '../../core/auth/index.js';
 
 const HOUR_MS = 3_600_000;
 
@@ -85,8 +92,13 @@ export class AuthService {
     await authRepository.markEmailVerified(this.db, accountId, now);
   }
 
-  /** Новое письмо подтверждения; прежние ссылки гаснут. Почта уже подтверждена — ничего не делаем. */
-  async resendVerificationEmail(accountId: string): Promise<void> {
+  /**
+   * Новое письмо подтверждения; прежние ссылки гаснут. Почта уже подтверждена — ничего не делаем. Во входе
+   * сотрудника «от имени» — 403: письма владельцу шлёт только он сам (решение основателя 2026-11-10, T-412).
+   */
+  async resendVerificationEmail(session: { accountId: string; impersonated: boolean }): Promise<void> {
+    if (session.impersonated) throw new AppError('forbidden', 403);
+    const { accountId } = session;
     const me = await this.me(accountId, false);
     if (me.account.emailVerified) return;
     const token = await this.db.transaction(async (tx) => {
@@ -119,11 +131,15 @@ export class AuthService {
     });
   }
 
-  /** Смена пароля из «Аккаунта»: нужен текущий; остальные сессии закрываются, текущая остаётся. */
+  /**
+   * Смена пароля из «Аккаунта»: нужен текущий; остальные сессии закрываются, текущая остаётся. Во входе сотрудника
+   * «от имени» — 403 (решение основателя 2026-11-10, T-412).
+   */
   async changePassword(
-    session: { accountId: string; sessionId: string },
+    session: { accountId: string; sessionId: string; impersonated: boolean },
     input: { currentPassword: string; newPassword: string },
   ): Promise<void> {
+    if (session.impersonated) throw new AppError('forbidden', 403);
     const account = await authRepository.findById(this.db, session.accountId);
     if (!account || !(await verifyPassword(account.passwordHash, input.currentPassword))) {
       throw new AppError('unauthorized', 401);

@@ -18,7 +18,14 @@ export type SessionRow = {
 export const sessionsRepository = {
   async create(
     db: DbOrTx,
-    row: { id: string; accountId: string; expiresAt: Date; userAgent: string | null; ip: string | null },
+    row: {
+      id: string;
+      accountId: string;
+      expiresAt: Date;
+      userAgent: string | null;
+      ip: string | null;
+      impersonatedBy?: string | null;
+    },
   ): Promise<void> {
     await db.insert(sessions).values(row);
   },

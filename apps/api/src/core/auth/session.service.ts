@@ -4,6 +4,7 @@ import type { CookieOptions } from 'express';
 import { AppConfig } from '../config/index.js';
 import { RequestContext, type AccountSession } from '../context/index.js';
 import { InjectDb, type Db, type DbOrTx } from '../db/index.js';
+import { sessionCookieOptions } from './cookie-options.js';
 import { sessionsRepository } from './sessions.repository.js';
 import { hashToken, newToken, readCookie } from './tokens.js';
 
@@ -12,6 +13,8 @@ export const SESSION_COOKIE = 'sid';
 const DAY_MS = 86_400_000;
 /** Вход живёт 30 дней и продлевается при заходе (решение основателя 2026-11-09, T-403). */
 export const SESSION_TTL_MS = 30 * DAY_MS;
+/** Вход сотрудника «от имени» магазина — 2 часа без продления (решение основателя 2026-11-10, T-412). */
+export const IMPERSONATION_TTL_MS = 2 * 60 * 60_000;
 /** Продлеваем не чаще раза в сутки, чтобы не писать в базу на каждый запрос. */
 const EXTEND_AFTER_MS = DAY_MS;
 
@@ -30,17 +33,27 @@ export class SessionService {
 
   /** Открыть сессию для аккаунта и поставить cookie. Возвращает id сессии (хеш). */
   async start(accountId: string, tx: DbOrTx = this.db): Promise<string> {
+    return this.open(accountId, null, SESSION_TTL_MS, tx);
+  }
+
+  /** Вход сотрудника «от имени» магазина (FR-S3): сессия с отметкой `impersonatedBy`, короткая и без продления. */
+  async startImpersonated(accountId: string, staffId: string, tx: DbOrTx = this.db): Promise<string> {
+    return this.open(accountId, staffId, IMPERSONATION_TTL_MS, tx);
+  }
+
+  private async open(accountId: string, impersonatedBy: string | null, ttlMs: number, tx: DbOrTx): Promise<string> {
     const token = newToken();
     const id = hashToken(token);
     const req = this.ctx.request();
     await sessionsRepository.create(tx, {
       id,
       accountId,
-      expiresAt: new Date(Date.now() + SESSION_TTL_MS),
+      impersonatedBy,
+      expiresAt: new Date(Date.now() + ttlMs),
       userAgent: req.headers['user-agent']?.slice(0, 500) ?? null,
       ip: req.ip ?? null,
     });
-    this.setCookie(token);
+    this.setCookie(token, ttlMs);
     return id;
   }
 
@@ -52,7 +65,7 @@ export class SessionService {
     const now = new Date();
     const row = await sessionsRepository.findActive(this.db, hashToken(token), now);
     if (!row) return null;
-    if (row.expiresAt.getTime() - now.getTime() < SESSION_TTL_MS - EXTEND_AFTER_MS) {
+    if (row.impersonatedBy === null && row.expiresAt.getTime() - now.getTime() < SESSION_TTL_MS - EXTEND_AFTER_MS) {
       await sessionsRepository.extend(this.db, row.id, new Date(now.getTime() + SESSION_TTL_MS));
       this.setCookie(token);
     }
@@ -75,18 +88,11 @@ export class SessionService {
     await sessionsRepository.deleteForAccount(tx, accountId, exceptSessionId);
   }
 
-  private setCookie(token: string): void {
-    this.ctx.response().cookie(SESSION_COOKIE, token, { ...this.cookieOptions(), maxAge: SESSION_TTL_MS });
+  private setCookie(token: string, maxAge = SESSION_TTL_MS): void {
+    this.ctx.response().cookie(SESSION_COOKIE, token, { ...this.cookieOptions(), maxAge });
   }
 
   private cookieOptions(): CookieOptions {
-    const domain = this.config.get('cookieDomain');
-    return {
-      httpOnly: true,
-      secure: this.config.get('env') === 'production',
-      sameSite: 'lax',
-      path: '/',
-      ...(domain ? { domain } : {}),
-    };
+    return sessionCookieOptions(this.config);
   }
 }

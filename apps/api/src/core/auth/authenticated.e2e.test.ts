@@ -20,6 +20,7 @@ const PUBLIC = new Set([
   'GET /v1/storefront/:subdomain/products/:shortId',
   'POST /v1/storefront/:subdomain/cart/check',
   'POST /v1/storefront/:subdomain/events',
+  'POST /v1/staff/login',
 ]);
 
 type Layer = { route?: { path: string; methods: Record<string, boolean> } };

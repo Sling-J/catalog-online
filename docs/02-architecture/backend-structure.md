@@ -183,6 +183,8 @@ modules/products/
 
 > Примечание (2026-11-10, T-411): модуль `stats` — `StatsController` (`getStats`) и `StatsService`. Его `record` экспортируется для витрины: `trackStorefrontEvent` проверяет магазин и товар в `storefront`, роботов отсекает `record`. Зависимость в одну сторону — витрина → статистика. Счётчики пишет `stats.repository.ts` (`insert … on conflict do update`); название товара, обложку и часовой пояс магазина он только читает. Даты и периоды — `stats/lib/dates.ts`, роботы — `stats/lib/bots.ts`. User-Agent модуль берёт через `RequestContext.userAgent()`, не из Express.
 
+> Примечание (2026-11-10, T-412): в `core/auth` добавлены сессии сотрудника (`StaffSessionService`, guard `@StaffAuthenticated()`, `staff-sessions.repository.ts`, cookie `staff_sid`) и вход «от имени» (`SessionService.startImpersonated`: короткая сессия без продления). Туда же из модуля входа перенесены хеш и проверка пароля (`core/auth/password.ts`): они нужны и входу магазина, и входу сотрудника. В `core/db` — `connectDb` для разовых команд вне Nest. Модуль `staff` — контроллер, сервис и репозиторий; репозиторий видит все магазины (исключение из правила `shopId`, как `auth`), пишет статус магазина и журнал. Команда `staff:create` — `modules/staff/create-staff.run.ts`.
+
 ## 4. Слои и правила зависимостей
 
 ```

@@ -13,7 +13,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsc -p tsconfig.build.json && node --env-file-if-exists=../../.env dist/core/db/seed/run.js",
-    "storage:setup": "tsc -p tsconfig.build.json && node --env-file-if-exists=../../.env dist/core/storage/setup/run.js"
+    "storage:setup": "tsc -p tsconfig.build.json && node --env-file-if-exists=../../.env dist/core/storage/setup/run.js",
+    "staff:create": "tsc -p tsconfig.build.json && node --env-file-if-exists=../../.env dist/modules/staff/create-staff.run.js"
   },
   "devDependencies": {
     "@catalog/tsconfig": "workspace:*",

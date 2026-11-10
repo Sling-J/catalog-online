@@ -8,6 +8,7 @@ import { CategoriesModule } from './modules/categories/categories.module.js';
 import { ImportsModule } from './modules/imports/imports.module.js';
 import { ProductsModule } from './modules/products/products.module.js';
 import { ShopModule } from './modules/shop/shop.module.js';
+import { StaffModule } from './modules/staff/staff.module.js';
 import { StatsModule } from './modules/stats/stats.module.js';
 import { StorefrontModule } from './modules/storefront/storefront.module.js';
 import { UploadsModule } from './modules/uploads/uploads.module.js';
@@ -29,6 +30,7 @@ export class AppModule {
         ImportsModule,
         StorefrontModule,
         StatsModule,
+        StaffModule,
       ],
     };
   }

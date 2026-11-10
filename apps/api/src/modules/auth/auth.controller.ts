@@ -72,7 +72,7 @@ export class AuthController implements AuthControllerMethods {
   @Authenticated()
   @RateLimit(3, 15 * MINUTE)
   resendVerificationEmail(): Promise<void> {
-    return this.auth.resendVerificationEmail(this.ctx.accountId());
+    return this.auth.resendVerificationEmail(this.ctx.session());
   }
 
   @Post('password/forgot')
