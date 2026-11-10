@@ -174,7 +174,7 @@ export const productsRepository = {
     db: DbOrTx,
     shopId: string,
     productId: string,
-    patch: Partial<Pick<ProductRow, 'name' | 'slug' | 'description' | 'categoryId' | 'isVisible'>>,
+    patch: Partial<Pick<ProductRow, 'name' | 'slug' | 'description' | 'categoryId' | 'isVisible' | 'importedFields'>>,
   ): Promise<ProductRow | null> {
     const [row] = await db
       .update(products)
@@ -214,7 +214,12 @@ export const productsRepository = {
   async setCategory(db: DbOrTx, shopId: string, productIds: string[], categoryId: string | null): Promise<number> {
     const rows = await db
       .update(products)
-      .set({ categoryId })
+      .set({
+        categoryId,
+        // категорию сменили руками — следующий импорт её не перезапишет (T-409)
+        importedFields: sql`case when ${products.categoryId} is distinct from ${categoryId}::uuid
+          then array_remove(${products.importedFields}, 'category') else ${products.importedFields} end`,
+      })
       .where(and(eq(products.shopId, shopId), inArray(products.id, productIds)))
       .returning({ id: products.id });
     return rows.length;

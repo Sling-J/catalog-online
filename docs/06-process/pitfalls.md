@@ -1,7 +1,7 @@
 ---
 status: draft
 owner: founder
-updated: 2026-11-09
+updated: 2026-11-10
 ---
 
 # Грабли: технические ошибки и обходы
@@ -28,6 +28,9 @@ $//' <файл>` (2026-11-08, T-311).
 - **`git mv` папки в `apps/admin/src` падает с `Permission denied`**, пока работает дев-сервер (Windows держит каталог под наблюдением). Файлы переносятся, папки — нет. → Скопировать (`cp -r`) и удалить старую; плагин роутера сам перепишет пути в `createFileRoute(...)` переименованных файлов маршрутов (2026-11-08, T-314).
 - **Дев-сервер админки на :3012, запущенный до перехода контракта на исходники**, берёт `@catalog/contract` из `dist`: новые обработчики MSW в браузере не работают, запрос уходит мимо моков (в сети его нет, форма пишет «Не получилось»). Видно по `curl -s http://localhost:3012/src/app/mocks/start-mocks.ts` — в импорте `contract/dist/msw.js`. → Не перезапуская сервер основателя: `pnpm --filter @catalog/contract build` (2026-11-08, T-311).
 - **Docker Desktop не запущен** — `docker ps`: `failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine`; e2e API (Testcontainers) и `pnpm check` падают. Docker Desktop стоит в профиле пользователя, а не в Program Files. → `Start-Process "$env:LOCALAPPDATA\Programs\DockerDesktop\Docker Desktop.exe"`, через ~30 с `docker ps` отвечает (2026-11-09, T-401).
+- **Heredoc в Bash съедает обратные косые** даже с ограничителем в кавычках: `\\\\.\\pipe` в скрипте превратилось в `\\.\pipe`, Python-словарь замен `\\u00a0` — в сам символ. → Скрипт с обратными косыми писать инструментом Write, а в Python собирать их через `chr(92)` (2026-11-10, T-409).
+- **Инструмент Write превращает `\u00a0`, `\u202f`, `\ufeff` в сами символы** (управляющие `\u0000`–`\u0004` остаются записью): в коде появляется невидимый пробел, `eslint` падает с `no-irregular-whitespace`. → После записи файла с такими символами заменить их обратно скриптом (`chr(код)` → `chr(92) + "u00a0"`), проверка — `pnpm lint` (2026-11-10, T-409).
+- **Docker Desktop упал посреди сессии** (дважды за день): Vitest при этом пишет не про Docker, а `No test files found` и `Startup Error: TypeError: code.charCodeAt is not a function` — настоящая ошибка Testcontainers (`Could not find a working container runtime strategy`) спрятана сбоем разбора стека. → При таком выводе сначала `docker version`; не отвечает — запустить Docker Desktop (запись выше) и дождаться ответа. Канал `docker_engine` при этом не нужен: Testcontainers сам находит Docker Desktop, когда тот запущен; задать канал через `DOCKER_HOST=npipe:////./pipe/…` нельзя — разбор адреса теряет `./` (2026-11-10, T-409).
 
 ## Пакеты монорепо
 
@@ -62,6 +65,10 @@ $//' <файл>` (2026-11-08, T-311).
 - **pg-boss `work` с `includeMetadata`**: при явном `work<Данные>` тип опций не выводится, и у задачи нет `retryLimit`. → Все три параметра: `work<Данные, void, { includeMetadata: true }>`. Последняя попытка — `retryCount >= retryLimit`. Перед `send` очередь должна существовать (`createQueue`) — это делает `PgBossJobs` при старте для каждой зарегистрированной задачи (2026-11-09, T-406).
 - **supertest: запрос создаётся до `await` в аргументах** — `agent.post(url).send({ id: await upload() })` создаёт запрос раньше, чем выполнится `upload()` с его собственным запросом; тот закрывает временный сервер, и первый падает с «Cannot read properties of null (reading 'address')». → Сначала `const id = await upload()`, потом запрос (2026-11-09, T-407).
 - **Старый `pnpm start` API держит порт 3001**: остановка через `Get-NetTCPConnection … | Stop-Process` из Git Bash (`powershell -Command`) молча не срабатывает, новый запуск падает с `EADDRINUSE`, а запросы уходят в старую сборку (404 на новых путях). → Останавливать инструментом PowerShell по PID (`netstat -ano | Select-String ":3001"`, `Stop-Process -Id`) (2026-11-09, T-407). Фильтр по слову `LISTENING` не годится — в русской Windows состояние пишется по-русски; PID процесса, который отвечает, виден и в логе API (`INFO (PID)`) (2026-11-09, T-408). Остановка фонового `pnpm start` у агента (`TaskStop`) гасит только обёртку `pnpm`, процесс node остаётся на порту — его тоже останавливать по PID; признак — `EADDRINUSE` в логе нового запуска и два разных PID в строках `INFO (…)` (2026-11-09).
+- **Помощник теста `async`, который возвращает запрос supertest**, отдаёт уже ответ: `await` внутри `async` разворачивает запрос, и `helper(...).expect(202)` — ошибка типов (`expect` нет у `Promise<Response>`). → Либо помощник не `async` и возвращает запрос, либо сам ждёт нужный код (`.expect(202)`) и возвращает ответ (2026-11-10, T-409).
+- **Строгий `@RateLimit` считает по IP, а в e2e все магазины с одного адреса**: 20 запросов в минуту на `createImport` — и половина тестов файла падала с 429. → Строгое ограничение ставить только там, где оно нужно по `api.md`; если запрос и так ограничен состоянием (один незаконченный импорт, лимит загрузок) — не ставить (2026-11-10, T-409).
+- **Массовый `update … from (values …)` в Drizzle**: `db.update(t).set({ col: sql`d.col` }).from(sql`(values …) as d(id, col)`).where(sql`${t.id} = d.id`)` работает, но у параметров в `values` нет типов — без приведения (`${id}::uuid`, `${n}::integer`, `${text}::text`) PostgreSQL отвечает ошибкой сравнения `uuid = text`. Строк в запросе — не больше ~1000: у запроса предел 65 535 параметров (2026-11-10, T-409).
+- **ExcelJS**: тип аргумента `workbook.xlsx.load` старше `Buffer` из Node 22 — нужно приведение `as unknown as ArrayBuffer`; число из ячейки приходит с хвостом двоичной дроби (18900.000000000004) — в текст через `toPrecision(15)`; порядок строк `returning` у массовой вставки не обещан — id новых строк сопоставлять по уникальному полю (`shortId`, артикул), а не по порядку (2026-11-10, T-409).
 
 ## Сверка с макетом (`design:compare`)
 

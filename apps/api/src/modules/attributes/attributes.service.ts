@@ -132,6 +132,23 @@ export class AttributesService {
   }
 
   /**
+   * Свойства по именам из файла импорта (без учёта регистра); недостающие создаются в конце списка и показываются
+   * в фильтрах (FR-A3). Возвращает id по имени в нижнем регистре. Внутри транзакции импорта.
+   */
+  async ensureByNames(shopId: string, names: string[], tx: DbOrTx): Promise<Map<string, string>> {
+    await attributesRepository.lock(tx, shopId);
+    const rows = await attributesRepository.list(tx, shopId);
+    const ids = new Map(rows.map((row) => [row.name.toLowerCase(), row.id]));
+    let position = rows.length;
+    for (const name of names) {
+      if (ids.has(name.toLowerCase())) continue;
+      const created = await attributesRepository.insert(tx, shopId, { name, inFilters: true, position: position++ });
+      ids.set(name.toLowerCase(), created.id);
+    }
+    return ids;
+  }
+
+  /**
    * Id значений по тексту для каждой строки (без учёта регистра); значения, которого нет («Свой размер»), создаётся
    * в конце свойства. Свойства должны существовать (`existing`). Внутри транзакции изменения товара.
    */

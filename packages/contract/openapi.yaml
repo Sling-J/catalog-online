@@ -1158,7 +1158,9 @@ paths:
               properties:
                 zeroMissing:
                   type: boolean
-                  description: Обнулить остаток артикулов, которых нет в файле
+                  description: |
+                    Обнулить остаток артикулов, которых нет в файле. Только у товаров, чьи варианты пришли
+                    импортом (importedFields содержит variants): заведённые руками импорт не трогает
       responses:
         '202':
           description: Применяется в фоне
@@ -1764,7 +1766,10 @@ components:
         isVisible: { type: boolean }
         importedFields:
           type: array
-          description: Поля, которые перезапишет следующий импорт — админка помечает их «из Excel»
+          description: |
+            Поля, которые перезапишет следующий импорт — админка помечает их «из Excel». Название или категория,
+            изменённые руками, пометку теряют (и импорт их больше не трогает); variants — цену, остаток и
+            свойства вариантов импорт обновляет по артикулу всегда
           items: { type: string, enum: [name, category, variants] }
         photos:
           type: array
@@ -1929,7 +1934,9 @@ components:
                 create: { type: integer }
                 update: { type: integer }
                 errors: { type: integer }
-                missingInFile: { type: integer, description: 'Артикулы магазина, которых нет в файле' }
+                missingInFile:
+                  type: integer
+                  description: Артикулы «из Excel» с остатком, которых нет в файле, — их обнулит zeroMissing
             - type: 'null'
         result:
           oneOf:
@@ -1942,7 +1949,11 @@ components:
                 skipped: { type: integer }
             - type: 'null'
         failureCode:
-          { type: [string, 'null'], description: 'Для failed: unreadable_file, too_many_rows, no_required_columns…' }
+          type: [string, 'null']
+          description: |
+            Для failed: unreadable_file (не таблица), too_many_rows (больше 20 000 строк), no_required_columns
+            (меньше четырёх колонок), no_rows (нет строк с данными), internal_error (сбой на нашей стороне).
+            Список может расти — неизвестный код показываем общим текстом.
         createdAt: { type: string, format: date-time }
         finishedAt: { type: [string, 'null'], format: date-time }
     ImportRowError:

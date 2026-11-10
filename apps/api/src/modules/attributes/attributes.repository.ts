@@ -122,8 +122,10 @@ export const attributesRepository = {
     shopId: string,
     rows: { attributeId: string; value: string; position: number }[],
   ): Promise<void> {
-    if (rows.length === 0) return;
-    await db.insert(attributeValues).values(rows.map((row) => ({ ...row, shopId })));
+    // пачками: импорт может принести тысячи новых значений, а параметров в запросе — не больше 65 535
+    for (let i = 0; i < rows.length; i += 1000) {
+      await db.insert(attributeValues).values(rows.slice(i, i + 1000).map((row) => ({ ...row, shopId })));
+    }
   },
 
   async updateValue(

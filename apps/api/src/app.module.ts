@@ -5,6 +5,7 @@ import { CoreModule } from './core/core.module.js';
 import { AttributesModule } from './modules/attributes/attributes.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CategoriesModule } from './modules/categories/categories.module.js';
+import { ImportsModule } from './modules/imports/imports.module.js';
 import { ProductsModule } from './modules/products/products.module.js';
 import { ShopModule } from './modules/shop/shop.module.js';
 import { UploadsModule } from './modules/uploads/uploads.module.js';
@@ -23,6 +24,7 @@ export class AppModule {
         CategoriesModule,
         AttributesModule,
         ProductsModule,
+        ImportsModule,
       ],
     };
   }

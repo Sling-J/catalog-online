@@ -23,6 +23,46 @@ export class CategoriesService {
     return (await categoriesRepository.find(tx ?? this.db, shopId, categoryId)) !== null;
   }
 
+  /**
+   * Категории по путям из файла импорта (`['Девочки', 'Куртки']`, не больше двух уровней): находит без учёта
+   * регистра, недостающие создаёт в конце своего уровня (FR-A3). Возвращает id по `categoryPathKey(путь)`.
+   * Внутри транзакции импорта.
+   */
+  async ensurePaths(shopId: string, paths: string[][], tx: DbOrTx): Promise<Map<string, string>> {
+    await categoriesRepository.lock(tx, shopId);
+    const all = await categoriesRepository.list(tx, shopId);
+    const siblingKey = (parentId: string | null, name: string) => `${parentId ?? ''}/${name.toLowerCase()}`;
+    const known = new Map(all.map((row) => [siblingKey(row.parentId, row.name), row]));
+    const nextPosition = new Map<string | null, number>();
+    for (const row of all) {
+      nextPosition.set(row.parentId, Math.max(nextPosition.get(row.parentId) ?? 0, row.position + 1));
+    }
+    const ensure = async (name: string, parent: CategoryRow | null): Promise<CategoryRow> => {
+      const parentId = parent?.id ?? null;
+      const found = known.get(siblingKey(parentId, name));
+      if (found) return found;
+      const position = nextPosition.get(parentId) ?? 0;
+      nextPosition.set(parentId, position + 1);
+      const created = await categoriesRepository.insert(tx, shopId, {
+        name,
+        parentId,
+        path: categoryPath(name, parent?.name ?? null),
+        position,
+      });
+      known.set(siblingKey(parentId, name), created);
+      return created;
+    };
+    const ids = new Map<string, string>();
+    for (const path of paths) {
+      const key = categoryPathKey(path);
+      const [rootName, childName] = path;
+      if (ids.has(key) || rootName === undefined) continue;
+      const root = await ensure(rootName, null);
+      ids.set(key, childName === undefined ? root.id : (await ensure(childName, root)).id);
+    }
+    return ids;
+  }
+
   async create(shopId: string, body: CreateCategoryData['body']): Promise<Category> {
     const name = requireName(body.name);
     const parentId = body.parentId ?? null;
@@ -139,6 +179,9 @@ export class CategoriesService {
     }
   }
 }
+
+/** Ключ пути категории из файла импорта — без учёта регистра. */
+export const categoryPathKey = (path: string[]): string => path.map((name) => name.toLowerCase()).join(' / ');
 
 function requireName(value: string): string {
   const name = value.trim();

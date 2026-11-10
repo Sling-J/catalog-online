@@ -121,7 +121,11 @@ export class ProductsService {
     );
   }
 
-  /** Только переданные поля; новое название — новый slug (старые ссылки ведут по `shortId`, DM3). */
+  /**
+   * Только переданные поля; новое название — новый slug (старые ссылки ведут по `shortId`, DM3). Название или
+   * категория, изменённые руками, теряют пометку «из Excel»: следующий импорт их не перезапишет (решение основателя
+   * 2026-11-10, T-409).
+   */
   async update(shopId: string, productId: string, body: ProductUpdate): Promise<Product> {
     const patch: Parameters<typeof productsRepository.update>[3] = {};
     if (body.name !== undefined) {
@@ -134,9 +138,15 @@ export class ProductsService {
       await this.checkCategory(this.db, shopId, body.categoryId);
       patch.categoryId = body.categoryId;
     }
-    const row = Object.keys(patch).length
-      ? await productsRepository.update(this.db, shopId, productId, patch)
-      : await productsRepository.find(this.db, shopId, productId);
+    const row = await this.db.transaction(async (tx) => {
+      const current = await productsRepository.findForUpdate(tx, shopId, productId);
+      if (!current || Object.keys(patch).length === 0) return current;
+      const edited = new Set<string>();
+      if (patch.name !== undefined && patch.name !== current.name) edited.add('name');
+      if (patch.categoryId !== undefined && patch.categoryId !== current.categoryId) edited.add('category');
+      if (edited.size) patch.importedFields = current.importedFields.filter((field) => !edited.has(field));
+      return productsRepository.update(tx, shopId, productId, patch);
+    });
     if (!row) throw new AppError('not_found', 404);
     return this.present(this.db, shopId, row);
   }

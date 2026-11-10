@@ -1,5 +1,11 @@
 import * as contract from '@catalog/contract/zod';
-import { Injectable, type CallHandler, type ExecutionContext, type NestInterceptor } from '@nestjs/common';
+import {
+  Injectable,
+  StreamableFile,
+  type CallHandler,
+  type ExecutionContext,
+  type NestInterceptor,
+} from '@nestjs/common';
 import { map, type Observable } from 'rxjs';
 import type { ZodType } from 'zod';
 
@@ -23,6 +29,8 @@ export class ResponseCheckInterceptor implements NestInterceptor {
 }
 
 export function checkResponse(operation: string, schema: ZodType, body: unknown): unknown {
+  // файл (шаблон импорта) отдаётся потоком — сверять со схемой JSON нечего
+  if (body instanceof StreamableFile) return body;
   const sent: unknown = body === undefined ? undefined : JSON.parse(JSON.stringify(body));
   const result = schema.safeParse(sent);
   if (!result.success) {

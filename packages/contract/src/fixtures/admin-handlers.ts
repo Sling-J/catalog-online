@@ -652,7 +652,18 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
       if (index < 0) return problem(404, 'not_found');
       const body = await request.json();
       const changes = Object.fromEntries(Object.entries(body).filter(([, value]) => value !== undefined));
-      products[index] = { ...products[index]!, ...changes, updatedAt: new Date().toISOString() };
+      const before = products[index]!;
+      // название или категория, изменённые руками, теряют пометку «из Excel» — импорт их больше не перезапишет (T-409)
+      const edited = [
+        ...(body.name !== undefined && body.name !== before.name ? ['name'] : []),
+        ...(body.categoryId !== undefined && body.categoryId !== before.categoryId ? ['category'] : []),
+      ];
+      products[index] = {
+        ...before,
+        ...changes,
+        importedFields: before.importedFields.filter((field) => !edited.includes(field)),
+        updatedAt: new Date().toISOString(),
+      };
       return HttpResponse.json(products[index]);
     }, options),
     handleCreateProduct(async ({ request }) => {
@@ -802,7 +813,14 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
         updated += 1;
         products[index] =
           action === 'set_category'
-            ? { ...product, categoryId: categoryId ?? null }
+            ? {
+                ...product,
+                categoryId: categoryId ?? null,
+                importedFields:
+                  product.categoryId === (categoryId ?? null)
+                    ? product.importedFields
+                    : product.importedFields.filter((field) => field !== 'category'),
+              }
             : { ...product, isVisible: action === 'show' };
       });
       return HttpResponse.json({ updated });
