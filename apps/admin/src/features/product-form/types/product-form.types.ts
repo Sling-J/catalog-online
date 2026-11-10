@@ -17,12 +17,17 @@ export type VariantRow = {
   barcode: string;
 };
 
+/** Поле карточки, которое может вести Excel (пометка «из Excel»). */
+export type ExcelField = 'name' | 'category';
+
 /** Карточка товара в редакторе, пока не сохранена. */
 export type ProductDraft = {
   name: string;
   description: string;
   categoryId: string | null;
   isVisible: boolean;
+  /** Какие из полей ведёт Excel; меняется ссылкой «брать из Excel» (у нового товара — пусто). */
+  excelFields: ExcelField[];
   /** Свойство таблицы размеров (рост, размер обуви); `null` — без размеров. */
   attributeId: string | null;
   /** Цена по умолчанию у нового товара: «Цена у всех размеров одна». */

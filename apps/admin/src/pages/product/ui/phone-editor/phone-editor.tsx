@@ -1,7 +1,7 @@
 import { Trans, useLingui } from '@lingui/react/macro';
 
 import { CategoryField } from '@/widgets/category-field';
-import { DeleteProduct, ExcelMark, VariantsCard, VisibilitySwitch } from '@/features/product-form';
+import { canTakeFromExcel, DeleteProduct, ExcelNote, VariantsCard, VisibilitySwitch } from '@/features/product-form';
 import { PhotoStrip } from '@/features/product-photos';
 import { StorefrontLink } from '@/entities/shop';
 import { BackBar, SaveBar } from '@/shared/ui';
@@ -20,6 +20,7 @@ export function PhoneEditor({
 }: ProductView) {
   const { t } = useLingui();
   const imported = (field: 'name' | 'category' | 'variants') => product.importedFields.includes(field);
+  const fromExcel = canTakeFromExcel(product);
   return (
     <form noValidate onSubmit={onSubmit}>
       <BackBar
@@ -37,13 +38,19 @@ export function PhoneEditor({
       <PhotoStrip photos={photos} size="edit" hint={t`Первое фото — обложка. Порядок меняется перетаскиванием.`} />
       <div className="flex flex-col gap-3 px-4 pt-3.5">
         <form.AppField name="name">
-          {(field) => <field.TextField label={t`Название`} note={imported('name') && <ExcelMark />} maxLength={200} />}
+          {(field) => (
+            <field.TextField
+              label={t`Название`}
+              note={<ExcelNote form={form} field="name" available={fromExcel} />}
+              maxLength={200}
+            />
+          )}
         </form.AppField>
         <form.Field name="categoryId">
           {(field) => (
             <CategoryField
               label={t`Категория`}
-              note={imported('category') && <ExcelMark />}
+              note={<ExcelNote form={form} field="category" available={fromExcel} />}
               value={field.state.value ?? null}
               onChange={field.handleChange}
             />

@@ -604,6 +604,40 @@ describe('импорт', () => {
     });
   });
 
+  it('«брать из Excel»: поле снова под импортом; новое свойство с множеством значений — не в фильтрах', async () => {
+    const s = await shop('take-from-excel@example.com');
+    const notes = Array.from({ length: 31 }, (_, i) => `N-${i};Товар ${i};100;1;;;Одежда;;;;заметка ${i}`);
+    await run(s, csv(`${TEMPLATE};Примечание`, 'A-1;Куртка;100;1;;;Одежда;;110;розовый;', ...notes));
+    const attributes = (await s.agent.get('/v1/admin/attributes').expect(200)).body;
+    expect(attributes.map((a: { name: string; inFilters: boolean }) => [a.name, a.inFilters])).toEqual([
+      ['Рост', true],
+      ['Цвет', true],
+      ['Примечание', false],
+    ]);
+
+    const jacket = (await catalog(s)).find((product) => product.variants[0]!.sku === 'A-1')!;
+    const patch = (body: object) => s.agent.patch(`/v1/admin/products/${jacket.id}`).set(XRW).send(body);
+    expect((await patch({ name: 'Куртка демисезонная' }).expect(200)).body.importedFields).toEqual([
+      'category',
+      'variants',
+    ]);
+    await patch({ importedFields: ['variants'] }).expect(422);
+    const back = await patch({ importedFields: ['name', 'category'] }).expect(200);
+    expect(back.body).toMatchObject({ name: 'Куртка демисезонная', importedFields: ['name', 'category', 'variants'] });
+
+    await run(s, csv(TEMPLATE, 'A-1;Куртка из файла;100;1;;;Одежда;;;'));
+    expect((await s.agent.get(`/v1/admin/products/${jacket.id}`).expect(200)).body.name).toBe('Куртка из файла');
+    // снять обе пометки разом — и импорт названия не тронет
+    await patch({ importedFields: [] }).expect(200);
+    await run(s, csv(TEMPLATE, 'A-1;Другое имя;100;1;;;Обувь;;;'));
+    const after = (await s.agent.get(`/v1/admin/products/${jacket.id}`).expect(200)).body;
+    expect(after).toMatchObject({
+      name: 'Куртка из файла',
+      categoryId: jacket.categoryId,
+      importedFields: ['variants'],
+    });
+  });
+
   it('большой файл: 3000 строк, 1000 товаров — одной транзакцией', async () => {
     const s = await shop('big@example.com');
     const lines = Array.from({ length: 3000 }, (_, i) => {

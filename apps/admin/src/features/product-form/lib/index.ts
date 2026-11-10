@@ -1,4 +1,5 @@
 export {
+  canTakeFromExcel,
   digitsOf,
   draftFromProduct,
   newRow,

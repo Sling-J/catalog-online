@@ -1804,6 +1804,13 @@ components:
         description: { type: [string, 'null'], maxLength: 5000 }
         categoryId: { type: [string, 'null'], format: uuid }
         isVisible: { type: boolean }
+        importedFields:
+          type: array
+          description: |
+            Какие из полей name и category ведёт Excel — «Брать из Excel» в карточке товара: перечисленные получают
+            пометку (следующий импорт их перезапишет), остальные из этих двух её теряют; variants не меняется.
+            Не передано — правка name или category сама снимает пометку с изменённого поля
+          items: { type: string, enum: [name, category] }
     Variant:
       type: object
       required: [id, sku, price, stock, values]

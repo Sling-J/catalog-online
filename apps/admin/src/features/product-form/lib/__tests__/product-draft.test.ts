@@ -2,6 +2,7 @@ import type { Attribute, Product } from '@catalog/contract';
 import { describe, expect, it } from 'vitest';
 
 import {
+  canTakeFromExcel,
   digitsOf,
   draftFromProduct,
   newProductDraft,
@@ -66,6 +67,21 @@ describe('черновик товара', () => {
     const draft = draftFromProduct(product);
     expect(productChanges(product, draft)).toEqual({});
     expect(variantsChanged(product, draft)).toBe(false);
+  });
+
+  it('«брать из Excel»: пометки отправляются, только если их поменяли', () => {
+    const edited: Product = { ...product, importedFields: ['category', 'variants'] };
+    const draft = draftFromProduct(edited);
+    expect(draft.excelFields).toEqual(['category']);
+    expect(canTakeFromExcel(edited)).toBe(true);
+    // правка названия без «брать из Excel» — пометки не шлём, сервер сам снимет пометку с изменённого поля
+    draft.name = 'Куртка';
+    expect(productChanges(edited, draft)).toEqual({ name: 'Куртка' });
+    draft.excelFields = ['category', 'name'];
+    expect(productChanges(edited, draft)).toEqual({ name: 'Куртка', importedFields: ['category', 'name'] });
+    // товар заведён руками — вернуть под Excel нечего
+    expect(canTakeFromExcel({ ...product, importedFields: [] })).toBe(false);
+    expect(newProductDraft([]).excelFields).toEqual([]);
   });
 
   it('правки карточки и остатка', () => {

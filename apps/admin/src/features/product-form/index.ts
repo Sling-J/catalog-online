@@ -6,13 +6,14 @@ export {
   useProductForm,
   useSaveProduct,
 } from './hooks';
-export { draftFromProduct, newProductDraft, validateDraft } from './lib';
+export { canTakeFromExcel, draftFromProduct, newProductDraft, validateDraft } from './lib';
 export type { ProductDraft } from './types';
 export {
   AmountInput,
   DeleteProduct,
   DraftErrorText,
   ExcelMark,
+  ExcelNote,
   ImportNote,
   PriceField,
   SelectField,

@@ -2,6 +2,7 @@ export { AmountInput } from './amount-input';
 export { DeleteProduct } from './delete-product';
 export { DraftErrorText } from './draft-error-text';
 export { ExcelMark } from './excel-mark';
+export { ExcelNote } from './excel-note';
 export { ImportNote } from './import-note';
 export { PriceField } from './price-field';
 export { SelectField, type SelectOption } from './select-field';

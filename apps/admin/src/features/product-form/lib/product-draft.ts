@@ -1,12 +1,22 @@
 import type { Attribute, Product, ProductUpdate, VariantInput } from '@catalog/contract';
 
-import type { DraftErrors, ProductDraft, VariantRow } from '../types';
+import type { DraftErrors, ExcelField, ProductDraft, VariantRow } from '../types';
 
 /** Только цифры: «8 200 ₸» → «8200». */
 export const digitsOf = (text: string): string => text.replace(/\D/g, '');
 
 /** Подпись строки: значения свойств через точку («104», «104 · синий»). */
 export const rowLabel = (row: VariantRow): string => row.values.map((value) => value.value).join(' · ');
+
+/** Поля карточки с пометкой «из Excel». */
+export const excelFieldsOf = (product: Product): ExcelField[] =>
+  product.importedFields.filter((field): field is ExcelField => field === 'name' || field === 'category');
+
+/**
+ * Можно ли вернуть поле под Excel («брать из Excel»): товар ведёт импорт (его варианты пришли из файла), а на поле
+ * пометки нет — её сняла ручная правка.
+ */
+export const canTakeFromExcel = (product: Product): boolean => product.importedFields.includes('variants');
 
 /** Редактор сохранённого товара: строки — варианты как есть, свойство — у первого варианта. */
 export function draftFromProduct(product: Product): ProductDraft {
@@ -15,6 +25,7 @@ export function draftFromProduct(product: Product): ProductDraft {
     description: product.description ?? '',
     categoryId: product.categoryId,
     isVisible: product.isVisible,
+    excelFields: excelFieldsOf(product),
     attributeId: product.variants[0]?.values[0]?.attributeId ?? null,
     price: '',
     stock: 0,
@@ -37,6 +48,7 @@ export function newProductDraft(attributes: Attribute[]): ProductDraft {
     description: '',
     categoryId: null,
     isVisible: true,
+    excelFields: [],
     attributeId: attributes[0]?.id ?? null,
     price: '',
     stock: 1,
@@ -97,6 +109,9 @@ export function productChanges(product: Product, draft: ProductDraft): ProductUp
   if (description !== (product.description ?? null)) changes.description = description;
   if (draft.categoryId !== product.categoryId) changes.categoryId = draft.categoryId;
   if (draft.isVisible !== product.isVisible) changes.isVisible = draft.isVisible;
+  // «брать из Excel» нажали — пометки отправляются явно; иначе ручная правка снимет пометку сама (на сервере)
+  const marked = [...draft.excelFields].sort().join();
+  if (marked !== excelFieldsOf(product).sort().join()) changes.importedFields = [...draft.excelFields];
   return changes;
 }
 

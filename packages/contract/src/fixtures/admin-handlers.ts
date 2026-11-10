@@ -653,15 +653,22 @@ export const demoAdminHandlers = ({ storage, assetBase, ...options }: DemoAdminH
       const body = await request.json();
       const changes = Object.fromEntries(Object.entries(body).filter(([, value]) => value !== undefined));
       const before = products[index]!;
-      // название или категория, изменённые руками, теряют пометку «из Excel» — импорт их больше не перезапишет (T-409)
-      const edited = [
-        ...(body.name !== undefined && body.name !== before.name ? ['name'] : []),
-        ...(body.categoryId !== undefined && body.categoryId !== before.categoryId ? ['category'] : []),
-      ];
+      // название или категория, изменённые руками, теряют пометку «из Excel» — импорт их больше не перезапишет;
+      // `importedFields` в запросе («Брать из Excel») ставит пометки на этих двух полях ровно как передано (T-409)
+      const fields = new Set(before.importedFields);
+      if (body.importedFields) {
+        for (const field of ['name', 'category'] as const) {
+          if (body.importedFields.includes(field)) fields.add(field);
+          else fields.delete(field);
+        }
+      } else {
+        if (body.name !== undefined && body.name !== before.name) fields.delete('name');
+        if (body.categoryId !== undefined && body.categoryId !== before.categoryId) fields.delete('category');
+      }
       products[index] = {
         ...before,
         ...changes,
-        importedFields: before.importedFields.filter((field) => !edited.includes(field)),
+        importedFields: (['name', 'category', 'variants'] as const).filter((field) => fields.has(field)),
         updatedAt: new Date().toISOString(),
       };
       return HttpResponse.json(products[index]);

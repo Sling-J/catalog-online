@@ -1,1 +1,9 @@
-export type { DraftError, DraftErrors, DraftField, ProductDraft, RowValue, VariantRow } from './product-form.types';
+export type {
+  DraftError,
+  DraftErrors,
+  DraftField,
+  ExcelField,
+  ProductDraft,
+  RowValue,
+  VariantRow,
+} from './product-form.types';

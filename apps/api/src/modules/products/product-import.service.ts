@@ -116,7 +116,7 @@ export class ProductImportService {
       ...plan.addedVariants.flatMap((added) => added.variants),
       ...plan.updatedVariants,
     ].map((variant) => variant.attributes);
-    const names = [...new Set(valuesOf.flat().map((item) => item.name))];
+    const names = newAttributes(valuesOf.flat());
     if (names.length) {
       const attributeIds = await this.attributes.ensureByNames(shopId, names, tx);
       const refs = valuesOf.map((items) =>
@@ -188,6 +188,27 @@ export class ProductImportService {
     );
     return paths.length ? this.categories.ensurePaths(shopId, paths, tx) : new Map<string, string>();
   }
+}
+
+/**
+ * Новое свойство из файла попадает в фильтры витрины, только если разных значений у него немного: колонка вроде
+ * «Примечание» или «Поставщик» с сотнями значений иначе превратится в бесполезный фильтр (решение основателя
+ * 2026-11-10). Включить фильтр магазин может сам в «Категориях и размерах».
+ */
+export const FILTER_VALUES_MAX = 30;
+
+function newAttributes(values: { name: string; value: string }[]): { name: string; inFilters: boolean }[] {
+  const distinct = new Map<string, { name: string; values: Set<string> }>();
+  for (const item of values) {
+    const key = item.name.toLowerCase();
+    const entry = distinct.get(key) ?? { name: item.name, values: new Set<string>() };
+    entry.values.add(item.value.toLowerCase());
+    distinct.set(key, entry);
+  }
+  return [...distinct.values()].map((entry) => ({
+    name: entry.name,
+    inFilters: entry.values.size <= FILTER_VALUES_MAX,
+  }));
 }
 
 /** Свободный в магазине код товара для адреса витрины (DM3); занятые — в `taken`, новый добавляется туда же. */
