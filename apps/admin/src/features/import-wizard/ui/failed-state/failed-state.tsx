@@ -10,6 +10,13 @@ function Reason({ code }: { code: string | null | undefined }) {
       return <Trans>В файле больше 20 000 строк — разделите его на части и загрузите по очереди.</Trans>;
     case 'no_required_columns':
       return <Trans>В файле не нашлось колонок с артикулом, названием, ценой и остатком.</Trans>;
+    case 'too_large':
+      return (
+        <Trans>
+          Файл слишком тяжёлый, чтобы его прочитать. Оставьте в нём один лист с товарами, уберите картинки и оформление
+          или разделите на части.
+        </Trans>
+      );
     case 'no_rows':
       return <Trans>В файле есть заголовки, но нет строк с товарами. Заполните его и загрузите ещё раз.</Trans>;
     case 'unreadable_file':

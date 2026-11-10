@@ -9,7 +9,7 @@ import {
   TEMPLATE_HEADERS,
   type CompleteMapping,
 } from './mapping.js';
-import { detectDelimiter, ImportFileError, MAX_ROWS, readTable } from './read-table.js';
+import { detectDelimiter, ImportFileError, MAX_ROWS, readTable, readTableIsolated } from './read-table.js';
 import { parseCategory, parsePrice, parseRows, parseStock } from './rows.js';
 import { buildTemplate } from './template.js';
 
@@ -118,6 +118,32 @@ describe('чтение файла', () => {
     expect(table.rows[0]!.cells.slice(0, 4)).toEqual(['KD-110', 'Куртка демисезонная', '18900', '3']);
   });
 });
+
+describe('чтение в отдельном потоке', () => {
+  const big = () =>
+    xlsx([
+      ['Артикул', 'Название', 'Цена', 'Остаток'],
+      ...Array.from({ length: 5000 }, (_, i) => [`A-${i}`, `Товар номер ${i}`, 1000 + i, i % 7]),
+    ]);
+
+  it('читает то же, что и без потока', async () => {
+    const file = await big();
+    expect(await readTableIsolated(file)).toEqual(await readTable(file));
+  });
+
+  it('ошибка файла приходит своим кодом', async () => {
+    await expect(readTableIsolated(csv('это не таблица'))).rejects.toMatchObject({ code: 'no_required_columns' });
+  });
+
+  it('упёрся в потолок памяти или времени — too_large, а процесс жив', async () => {
+    const file = await big();
+    await expect(readTableIsolated(file, { memoryMb: 8, timeoutMs: 60_000 })).rejects.toMatchObject({
+      code: 'too_large',
+    });
+    await expect(readTableIsolated(file, { memoryMb: 512, timeoutMs: 1 })).rejects.toMatchObject({ code: 'too_large' });
+    expect((await readTableIsolated(file)).rows).toHaveLength(5000);
+  });
+}, 60_000);
 
 describe('сопоставление колонок', () => {
   it('файл по шаблону: поля по именам, остальные колонки — свойства; шаг «Колонки» не нужен', () => {

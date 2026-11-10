@@ -1,3 +1,8 @@
+// Файл запускается и как код потока чтения (`readTableIsolated`): в тестах Node сам снимает с него типы, поэтому
+// здесь только стираемый TypeScript (без enum, namespace, свойств в параметрах конструктора) и без относительных
+// импортов.
+import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads';
+
 import { parse } from 'csv-parse/sync';
 import ExcelJS from 'exceljs';
 
@@ -8,12 +13,18 @@ export const MAX_COLUMNS = 60;
 /** Обязательных полей четыре (артикул, название, цена, остаток) — меньше колонок быть не может. */
 const MIN_COLUMNS = 4;
 
-/** Почему файл не подошёл — `Import.failureCode`, текст показывает админка. */
-export type ImportFailure = 'unreadable_file' | 'too_many_rows' | 'no_required_columns' | 'no_rows';
+/**
+ * Почему файл не подошёл — `Import.failureCode`, текст показывает админка. `too_large` — чтение упёрлось в потолок
+ * памяти или времени потока (огромная или «вредная» книга).
+ */
+export type ImportFailure = 'unreadable_file' | 'too_many_rows' | 'no_required_columns' | 'no_rows' | 'too_large';
 
 export class ImportFileError extends Error {
-  constructor(readonly code: ImportFailure) {
+  readonly code: ImportFailure;
+
+  constructor(code: ImportFailure) {
     super(code);
+    this.code = code;
   }
 }
 
@@ -72,11 +83,18 @@ function uniqueHeaders(headers: string[]): string[] {
 
 // ───────── xlsx ─────────
 
+/**
+ * Первый лист книги. Книга загружается в память целиком: потоковое чтение ExcelJS 4.4 ненадёжно (теряет строки и
+ * даты, если части архива лежат не в «экселевском» порядке, и ломается со второго файла в процессе —
+ * `06-process/pitfalls.md`). Память ограничивает поток, в котором идёт чтение (`readTableIsolated`).
+ */
 async function readXlsx(file: Buffer): Promise<RawRow[]> {
   const workbook = new ExcelJS.Workbook();
   try {
     // тип Buffer у ExcelJS старше, чем у Node 22
-    await workbook.xlsx.load(file as unknown as ArrayBuffer);
+    await workbook.xlsx.load(file as unknown as ArrayBuffer, {
+      ignoreNodes: ['dataValidations', 'conditionalFormatting'],
+    });
   } catch {
     throw new ImportFileError('unreadable_file');
   }
@@ -147,6 +165,71 @@ export function decodeText(file: Buffer): string {
   } catch {
     return new TextDecoder('windows-1251').decode(file);
   }
+}
+
+// ───────── отдельный поток ─────────
+
+/** Потолки потока чтения: 20 000 строк × 30 колонок читаются за ~2 с и укладываются в 256 МБ (замер 2026-11-10). */
+export type ReadLimits = { memoryMb: number; timeoutMs: number };
+export const READ_LIMITS: ReadLimits = { memoryMb: 512, timeoutMs: 60_000 };
+
+const WORKER_KIND = 'catalog:read-table';
+
+type WorkerReply = { ok: true; table: Table } | { ok: false; code: ImportFailure } | { ok: false; message: string };
+
+/**
+ * Прочитать файл в отдельном потоке Node (`worker_threads`) с потолком памяти и времени: огромная или «вредная»
+ * книга (zip, который распаковывается в гигабайты) убивает только этот поток — API продолжает отвечать витрине и
+ * админке, импорт получает `too_large` (решение основателя 2026-11-10). Поток запускает этот же файл: в сборке —
+ * `.js`, в тестах — `.ts`, с которого Node снимает типы сам.
+ */
+export function readTableIsolated(file: Buffer, limits: ReadLimits = READ_LIMITS): Promise<Table> {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(new URL(import.meta.url), {
+      workerData: { kind: WORKER_KIND, file },
+      resourceLimits: { maxOldGenerationSizeMb: limits.memoryMb, maxYoungGenerationSizeMb: 32 },
+      // вывод потока не нужен (предупреждения Node о снятии типов и т. п.)
+      stdout: true,
+      stderr: true,
+    });
+    let settled = false;
+    const finish = (run: () => void) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      run();
+      void worker.terminate();
+    };
+    const timer = setTimeout(() => finish(() => reject(new ImportFileError('too_large'))), limits.timeoutMs);
+    worker.once('message', (reply: WorkerReply) =>
+      finish(() => {
+        if (reply.ok) resolve(reply.table);
+        else if ('code' in reply) reject(new ImportFileError(reply.code));
+        else reject(new Error(`Поток чтения файла: ${reply.message}`));
+      }),
+    );
+    worker.once('error', (error: Error & { code?: string }) =>
+      finish(() => reject(error.code === 'ERR_WORKER_OUT_OF_MEMORY' ? new ImportFileError('too_large') : error)),
+    );
+    worker.once('exit', (code) =>
+      finish(() => reject(new Error(`Поток чтения файла завершился без ответа (код ${code})`))),
+    );
+  });
+}
+
+// код самого потока: запущен из `readTableIsolated` — читает файл и отвечает
+if (!isMainThread && (workerData as { kind?: unknown } | null)?.kind === WORKER_KIND) {
+  const data = workerData as { file: Uint8Array };
+  const file = Buffer.from(data.file.buffer, data.file.byteOffset, data.file.byteLength);
+  readTable(file).then(
+    (table) => parentPort!.postMessage({ ok: true, table } satisfies WorkerReply),
+    (error: unknown) =>
+      parentPort!.postMessage(
+        (error instanceof ImportFileError
+          ? { ok: false, code: error.code }
+          : { ok: false, message: String((error as Error)?.message ?? error) }) satisfies WorkerReply,
+      ),
+  );
 }
 
 /** Разделитель — кого больше в первой непустой строке вне кавычек; поровну или никого — `;` (так сохраняет Excel). */

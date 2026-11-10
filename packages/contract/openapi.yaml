@@ -1959,7 +1959,8 @@ components:
           type: [string, 'null']
           description: |
             Для failed: unreadable_file (не таблица), too_many_rows (больше 20 000 строк), no_required_columns
-            (меньше четырёх колонок), no_rows (нет строк с данными), internal_error (сбой на нашей стороне).
+            (меньше четырёх колонок), no_rows (нет строк с данными), too_large (чтение упёрлось в потолок памяти или
+            времени — огромная или повреждённая книга), internal_error (сбой на нашей стороне).
             Список может расти — неизвестный код показываем общим текстом.
         createdAt: { type: string, format: date-time }
         finishedAt: { type: [string, 'null'], format: date-time }

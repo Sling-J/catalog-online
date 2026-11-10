@@ -7,7 +7,7 @@ import { ProductImportService, type ImportRow } from '../products/product-import
 import { importsRepository, type ImportRecord, type ImportStatus } from './imports.repository.js';
 import { PREVIEW_IMPORT, SAMPLE_ROWS, type ImportJobData } from './lib/import-jobs.js';
 import { completeMapping, headersHash, mappingErrors, suggestMapping } from './lib/mapping.js';
-import { ImportFileError, readTable, type Table } from './lib/read-table.js';
+import { ImportFileError, readTableIsolated, type Table } from './lib/read-table.js';
 import { parseRows } from './lib/rows.js';
 
 /** Причина `failed`, когда дело не в файле: задача падала на всех попытках. */
@@ -156,7 +156,7 @@ export class ImportProcessingService {
   }
 
   private async read(record: ImportRecord): Promise<Table> {
-    return readTable(await this.storage.get('private', record.fileKey));
+    return readTableIsolated(await this.storage.get('private', record.fileKey));
   }
 
   private async fail(shopId: string, importId: string, from: ImportStatus, failureCode: string): Promise<void> {
