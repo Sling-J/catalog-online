@@ -74,6 +74,9 @@ $//' <файл>` (2026-11-08, T-311).
 - **Python на Windows пишет файлы с CRLF**: `open(p, 'w')` в текстовом режиме заменяет `
 ` на `
 `. Git при коммите приводит к LF (`eol=lf`), но в рабочей копии остаются CRLF, и `git ls-files --eol` показывает `w/crlf`. → Правки скриптом — `open(p, 'w', encoding='utf8', newline='')`; уже испорченное — `sed -i 's/$//'` (2026-11-10, T-410).
+- **e2e API при выключенном Docker падают невнятно**: «No test files found» и «Startup Error: TypeError: code.charCodeAt is not a function» — настоящая ошибка Testcontainers в глобальной подготовке теряется, пока Vitest печатает стек. → Сначала `docker info`; Docker Desktop не стартует сам после перезагрузки (2026-11-11, T-413).
+- **Vitest 5: хуки `beforeAll` / `afterAll` получают контекст фикстур первым аргументом**, а файл (`suite`, у него `filepath`) — вторым. Первый аргумент обязан быть деструктуризацией, иначе `FixtureParseError` («must use object destructuring pattern»): `afterAll(({}, suite) => …)` с `eslint-disable-next-line no-empty-pattern`. `expect.getState().testPath` в хуках файла пуст (2026-11-11, T-413).
+- **Модуль, который импортирует `vitest` (`inject`, `expect`), нельзя подключать в `globalSetup`** — падает на старте. Общие для подготовки и тестов функции держать в файле без импорта `vitest` (`test/helpers/contract.ts`) (2026-11-11, T-413).
 - **Поток `worker_threads` из TypeScript-исходника**: в тестах код идёт из `src/*.ts`, а `new Worker('./x.js')` такого файла не найдёт. → Поток запускает свой же модуль, `new Worker(new URL(import.meta.url))`: в сборке это `.js`, под Vitest — `.ts`, с которого Node 22.18+ снимает типы сам. В таком файле — только стираемый TypeScript (без `enum`, `namespace`, `constructor(readonly x)`) и без относительных импортов (`./y.js` рядом с `.ts` не найдётся). Нехватка памяти потока — событие `error` с `code: 'ERR_WORKER_OUT_OF_MEMORY'`, основной процесс жив (2026-11-10, T-409).
 
 ## Сверка с макетом (`design:compare`)

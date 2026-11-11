@@ -59,6 +59,7 @@ describe('суперадминка', () => {
     const agent = browser(t);
     expect((await login(agent, 'support@example.com', 'wrong-password').expect(401)).body.code).toBe('unauthorized');
     await login(agent, 'nobody@example.com').expect(401);
+    await agent.post('/v1/staff/login').set(XRW).send({ password: STAFF_PASSWORD }).expect(422);
     const { headers } = await login(agent, 'Support@Example.com').expect(204);
     const cookie = ([] as string[]).concat(headers['set-cookie'] ?? []).find((c) => c.startsWith('staff_sid='));
     expect(cookie).toMatch(/Max-Age=43200/);

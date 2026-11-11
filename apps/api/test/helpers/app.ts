@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import type { Provider, Type } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import type { Request, Response } from 'express';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
@@ -13,6 +14,7 @@ import { Mailer, type MailMessage } from '../../src/core/mail/index.js';
 import { Storage } from '../../src/core/storage/index.js';
 import { MemoryJobs } from './jobs.js';
 import { MemoryStorage } from './storage.js';
+import { ContractRecorder } from './contract-recorder.js';
 import { createTestDatabase } from './db.js';
 
 export const TEST_PUBLIC_URL = 'http://storage.test/catalog-public';
@@ -82,12 +84,21 @@ export async function createTestApp(
   const moduleRef = await builder.compile();
   const app = moduleRef.createNestApplication<NestExpressApplication>({ bufferLogs: true });
   configureApp(app, config);
+  // T-413: каждый ответ сверяется с кодами контракта; неожиданный код валит файл тестов при закрытии приложения
+  const recorder = new ContractRecorder();
+  app.use((req: Request, res: Response, next: () => void) => {
+    res.on('finish', () => recorder.record(req.method, req.route?.path, res.statusCode, req.originalUrl));
+    next();
+  });
   await app.init();
   return {
     app,
     config,
     http: () => request(app.getHttpServer()),
-    close: () => app.close(),
+    close: async () => {
+      await app.close();
+      recorder.finish();
+    },
     mails,
     storage,
     jobs,

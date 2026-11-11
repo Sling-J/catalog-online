@@ -68,6 +68,9 @@ describe('свойства', () => {
     const { body: after } = await agent.get(`/v1/admin/products/${item.id}`).expect(200);
     expect(after.variants[0].values).toMatchObject([{ attributeName: 'Рост ребёнка', value: '92' }]);
     await agent.patch(`/v1/admin/attributes/${NO_SUCH}`).set(XRW).send({ inFilters: true }).expect(404);
+    expect((await patch({ inFilters: 'да' }).expect(422)).body.errors).toEqual([
+      { field: 'inFilters', code: 'invalid_type' },
+    ]);
   });
 
   it('значения целиком: переименовать, переставить, добавить, удалить неиспользуемое; обмен значений', async () => {

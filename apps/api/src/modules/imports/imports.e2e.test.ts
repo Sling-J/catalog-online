@@ -470,6 +470,8 @@ describe('импорт', () => {
       // читается — применять рано
       expect((await apply(s, first.body.id).expect(409)).body.code).toBe('import_not_ready');
       await settle();
+      const noFlag = await s.agent.post(`/v1/admin/imports/${first.body.id}/apply`).set(XRW).send({}).expect(422);
+      expect(noFlag.body.errors).toEqual([{ field: 'zeroMissing', code: 'required' }]);
       await apply(s, first.body.id).expect(202);
       // применяется — второй раз не применить и не отменить
       expect((await apply(s, first.body.id).expect(409)).body.code).toBe('import_not_ready');
@@ -679,6 +681,7 @@ describe('импорт', () => {
     const tail = await errors({ limit: 2, cursor: page.body.nextCursor });
     expect(tail.body.items.map((item: { row: number }) => item.row)).toEqual([4]);
     expect(tail.body.nextCursor).toBeNull();
+    await s.agent.get(`/v1/admin/imports/${ids[0]}/errors`).query({ cursor: 'мусор' }).expect(422);
   });
 
   it('шаблон: файл .xlsx с заголовками, который сам проходит импорт', async () => {

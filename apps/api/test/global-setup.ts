@@ -1,4 +1,5 @@
-import { existsSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
@@ -6,6 +7,8 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 import type { TestProject } from 'vitest/node';
+
+import { contractCoverageError } from './contract-coverage.js';
 
 // То же имя — в helpers/db.ts
 const TEMPLATE_DB = 'catalog_template';
@@ -32,13 +35,21 @@ export default async function setup(project: TestProject) {
   admin.pathname = '/postgres';
   project.provide('pgAdminUrl', admin.toString());
 
+  // T-413: сюда тестовые приложения пишут пары «операция — код»; после прогона — сводка покрытия контракта
+  const coverageDir = mkdtempSync(resolve(tmpdir(), 'contract-coverage-'));
+  project.provide('contractCoverageDir', coverageDir);
+
   return async () => {
     await container.stop();
+    const error = contractCoverageError(coverageDir);
+    rmSync(coverageDir, { recursive: true, force: true });
+    if (error) throw new Error(error);
   };
 }
 
 declare module 'vitest' {
   export interface ProvidedContext {
     pgAdminUrl: string;
+    contractCoverageDir: string;
   }
 }

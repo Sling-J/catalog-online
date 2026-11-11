@@ -104,6 +104,7 @@ describe('категории', () => {
       Куртки: 'для девочек / Куртки',
     });
     await rename(NO_SUCH, 'X').expect(404);
+    expect((await rename(girls.id, '  ').expect(422)).body.errors).toEqual([{ field: 'name', code: 'required' }]);
   });
 
   it('порядок и вложенность целиком; обмен местами одноимённых категорий', async () => {

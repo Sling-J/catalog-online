@@ -398,6 +398,8 @@ describe('витрина', () => {
       // неизвестное значение (удалили, ссылка осталась) выборку не обнуляет
       expect((await list('sf-filter', `?values=${NO_SUCH}`)).items).toHaveLength(4);
       await get('sf-filter/products?values=not-a-uuid').expect(422);
+      await get('sf-filter/facets?values=not-a-uuid').expect(422);
+      await get('sf-nobody/facets').expect(404);
 
       const facets = (await get(`sf-filter/facets?categoryId=${girls}&values=${rost.value['110']}`).expect(200)).body;
       expect(facets).toEqual({

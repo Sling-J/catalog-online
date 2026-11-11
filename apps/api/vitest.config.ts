@@ -19,6 +19,7 @@ export default defineConfig({
           include: ['src/**/*.e2e.test.ts'],
           // Один контейнер PostgreSQL на прогон, у каждого файла тестов своя база из шаблона
           globalSetup: ['test/global-setup.ts'],
+          setupFiles: ['test/setup-e2e.ts'],
           testTimeout: 30_000,
           hookTimeout: 120_000,
         },
