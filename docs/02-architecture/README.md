@@ -9,6 +9,7 @@
 | [api.md](api.md) | Соглашения контракта API и какие запросы на каких экранах. Сам контракт — `packages/contract/openapi.yaml` |
 | [frontend-structure.md](frontend-structure.md) | Структура кода фронтов: Feature-Sliced Design ([ADR 0002](adr/0002-frontend-fsd.md)) |
 | [backend-structure.md](backend-structure.md) | Структура кода бэкенда: модули Nest, слои, изоляция магазинов, ошибки, транзакции, тесты ([ADR 0004](adr/0004-backend-structure.md)) |
+| [scaling.md](scaling.md) | Узкие места бэкенда и масштабирование: что сделано «пока так», признаки, когда чинить, когда нужны Redis и брокер |
 
 Отдельных документов нет, потому что тема уже описана в другом месте:
 - изоляция магазинов — [data-model.md](data-model.md) («Общие правила») и [backend-structure.md](backend-structure.md) (раздел 6);
