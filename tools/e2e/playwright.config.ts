@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-// Сценарии в браузере (ADR 0001; T-502). Пока бэкенда нет — админка на моках MSW: свой дев-сервер на 3022, чтобы не
+// Сценарии в браузере (ADR 0001; T-502). Админка на моках MSW (`--mode mocks`, T-501): свой дев-сервер на 3022, чтобы не
 // мешать открытому в работе на 3002. Браузер — установленный Google Chrome (канал chrome), как в design-compare:
 // браузеры Playwright не скачиваем.
 const PORT = 3022;
@@ -21,7 +21,7 @@ export default defineConfig({
     { name: 'desktop', use: { viewport: { width: 1440, height: 900 } } },
   ],
   webServer: {
-    command: `pnpm --filter @catalog/admin exec vite --port ${PORT} --strictPort`,
+    command: `pnpm --filter @catalog/admin exec vite --mode mocks --port ${PORT} --strictPort`,
     cwd: '../..',
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,

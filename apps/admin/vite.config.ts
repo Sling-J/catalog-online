@@ -22,10 +22,17 @@ const demoPhotos = (): Plugin => ({
   },
 });
 
+/**
+ * Запросы к API в разработке — через этот же сервер: `/v1` пересылается на API (решение основателя 2026-11-14, T-501).
+ * Админка (app.localhost) и API (localhost:3001) для браузера разные сайты — cookie сессии в запросы к API не уходил бы.
+ * Адрес API — API_PROXY_TARGET, по умолчанию http://localhost:3001.
+ */
+const apiProxy = { '/v1': { target: process.env.API_PROXY_TARGET ?? 'http://localhost:3001', changeOrigin: false } };
+
 // Админка — SPA без SSR (ADR 0001). В разработке открывается на app.localhost:3002, как app.<домен> в продакшене.
 export default defineConfig({
-  server: { port: 3002, strictPort: true },
-  preview: { port: 3002 },
+  server: { port: 3002, strictPort: true, proxy: apiProxy },
+  preview: { port: 3002, proxy: apiProxy },
   resolve: { tsconfigPaths: true },
   plugins: [
     // плагин роутера — до плагина React

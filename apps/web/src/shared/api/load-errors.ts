@@ -1,5 +1,7 @@
 import type { StorefrontShopGone } from '@catalog/contract';
 import { notFound } from '@tanstack/react-router';
+import { createIsomorphicFn } from '@tanstack/react-start';
+import { setResponseStatus } from '@tanstack/react-start/server';
 
 /** Что страница «не найдено» должна знать о причине: товара нет, а магазин на месте, или магазин скрыт. */
 export type NotFoundData = { reason: 'product' } | { reason: 'shop_gone'; shop: StorefrontShopGone['shop'] };
@@ -19,12 +21,24 @@ export const isNotFoundData = (data: unknown): data is NotFoundData =>
   typeof data === 'object' && data !== null && 'reason' in data;
 
 /**
+ * Страница скрытого или заблокированного магазина отвечает 410, как и API: поисковики убирают её из выдачи, а не ждут,
+ * как у 404 (open-questions, T-501). Роутер сам ставит 404 за `notFound`, статус из помощника Start применяется поверх.
+ * В браузере статуса нет — ничего не делаем.
+ */
+const markShopGone = createIsomorphicFn()
+  .server(() => setResponseStatus(410))
+  .client(() => {});
+
+/**
  * Превращает ошибки предзагрузки в «не найдено» маршрута. Причины смотрим все сразу: когда магазин скрыт
  * (410), остальные запросы отвечают 404, и важно показать заглушку магазина, а не «не найден».
  * `reason: 'product'` — нет только товара (для адреса товара).
  */
 export function throwLoadError(error: unknown, reason?: NotFoundData['reason']): never {
-  if (isGoneError(error)) throw notFound({ data: { reason: 'shop_gone', shop: error.shop } satisfies NotFoundData });
+  if (isGoneError(error)) {
+    markShopGone();
+    throw notFound({ data: { reason: 'shop_gone', shop: error.shop } satisfies NotFoundData });
+  }
   if (isNotFoundError(error)) {
     throw notFound(reason === 'product' ? { data: { reason: 'product' } satisfies NotFoundData } : undefined);
   }

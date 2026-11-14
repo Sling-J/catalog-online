@@ -59,9 +59,10 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - `pnpm format` / `pnpm format:check` — Prettier.
 - `pnpm i18n:extract` — строки Lingui в каталоги `.po`.
 - `docker compose up -d` — PostgreSQL и S3-хранилище для разработки (`.env.example`).
+- `pnpm dev` — API и оба фронта; фронты на настоящем API (нужны `docker compose up -d`, миграции, `db:seed`). Моки MSW — `vite --mode mocks` (конфигурации `admin-check` :3012 и `web-mocks` :3010 в `.claude/launch.json`).
 - `pnpm e2e` — сценарии в браузере (`tools/e2e`, Playwright на моках); после правок админки, в `pnpm check` не входит.
 - `pnpm --filter @catalog/api dev` — API на :3001 (корневой `.env`); `db:generate` / `db:migrate` — миграции drizzle-kit, `db:studio` — база в браузере (Drizzle Studio, https://local.drizzle.studio), `db:seed` — демо-магазины (вход как на моках), их фото и сотрудник суперадминки, `storage:setup` — хранилища разработки (один раз), `staff:create <почта>` — сотрудник суперадминки (пароль спросит). Тесты API (в `pnpm check`) — на Testcontainers, нужен запущенный Docker.
-- `pnpm design:compare --board <доска> --frame <экран> --url <адрес>` — сверка экрана с макетом (`tools/design-compare/README.md`); после вёрстки по макету — обязательно, вместо ручных замеров в браузере. Админку сверяем на http://localhost:3012 (`admin-check`).
+- `pnpm design:compare --board <доска> --frame <экран> --url <адрес>` — сверка экрана с макетом (`tools/design-compare/README.md`); после вёрстки по макету — обязательно, вместо ручных замеров в браузере. Сверяем на моках: админку — http://localhost:3012 (`admin-check`), витрину — http://aigerim-kids.localhost:3010 (`web-mocks`).
 
 ## Код
 - Контракт API правится только в `openapi.yaml`, затем `pnpm generate`; сгенерированное (`*.gen.ts`) руками не трогаем.

@@ -1,5 +1,9 @@
 import { isNotFound } from '@tanstack/react-router';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Статус ответа ставит помощник Start; в тесте запроса Start нет — подменяем и смотрим, что статус поставлен.
+const { setResponseStatus } = vi.hoisted(() => ({ setResponseStatus: vi.fn() }));
+vi.mock('@tanstack/react-start/server', () => ({ setResponseStatus }));
 
 import { isGoneError, isNotFoundData, isNotFoundError, throwFirstFailure } from '../load-errors';
 
@@ -34,6 +38,8 @@ describe('ошибки предзагрузки', () => {
     const error = caught(() => throwFirstFailure([rejected(missing), rejected(gone)]));
     expect(isNotFound(error)).toBe(true);
     expect(isNotFound(error) && error.data).toMatchObject({ reason: 'shop_gone', shop: { name: 'Айгерим Kids' } });
+    // страница скрытого магазина отвечает 410, как API (T-501)
+    expect(setResponseStatus).toHaveBeenCalledWith(410);
   });
 
   it('404 товара несёт причину product, обычный 404 — без данных', () => {

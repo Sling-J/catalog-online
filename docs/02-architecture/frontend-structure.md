@@ -37,7 +37,7 @@ app → pages → widgets → features → entities → shared
 ### Файлы маршрутов (TanStack Start / Router)
 Файловый роутер требует каталог маршрутов, поэтому `src/routes/` принадлежит слою `app`. Файл маршрута тонкий: путь, `validateSearch`, `loader` (предзагрузка Query), `head`/SEO и подключение компонента из `pages`. Разметки и бизнес-логики в нём нет. Серверная логика Start (request middleware, определение магазина по поддомену) — тоже в `app`.
 
-Точки входа Start лежат в `app` и подключены в `vite.config.ts`: `app/router.tsx` (роутер и QueryClient на каждый запрос), `app/client.tsx`, `app/server.ts`; маршруты — `app/routes`, дерево маршрутов `app/routeTree.gen.ts` генерирует Start и хранится в git. Моки API (MSW, только в разработке) — `app/mocks`. Определение магазина по `Host` (лендинг / витрина / чужой адрес) — `app/lib` (`getTenant`), результат лежит в контексте роутера как `tenant`.
+Точки входа Start лежат в `app` и подключены в `vite.config.ts`: `app/router.tsx` (роутер и QueryClient на каждый запрос), `app/client.tsx`, `app/server.ts`; маршруты — `app/routes`, дерево маршрутов `app/routeTree.gen.ts` генерирует Start и хранится в git. Моки API (MSW, только в разработке в режиме `--mode mocks`, T-501) — `app/mocks`. Определение магазина по `Host` (лендинг / витрина / чужой адрес) — `app/lib` (`getTenant`), результат лежит в контексте роутера как `tenant`.
 
 Локализация (Lingui, T-103): `app/i18n` создаёт свой экземпляр `i18n` на каждый запрос, роутер оборачивает приложение в `I18nProvider` (`Wrap` в `app/router.tsx`). Каталог витрины — `app/i18n/locales/{locale}.po`, строки `@catalog/ui` подгружаются из его каталога. Строки пишем макросами `Trans` / `useLingui` в `ui/` и `hooks/`.
 

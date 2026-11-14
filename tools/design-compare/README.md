@@ -4,7 +4,7 @@
 
 ## Запуск
 
-Дев-сервер должен работать: админка — конфигурация `admin-check` в `.claude/launch.json` (http://localhost:3012, моки там работают), витрина — `web` (http://aigerim-kids.localhost:3000).
+Дев-сервер должен работать на моках (`--mode mocks`, данные совпадают с макетами): админка — конфигурация `admin-check` в `.claude/launch.json` (http://localhost:3012), витрина — `web-mocks` (http://aigerim-kids.localhost:3010). Конфигурация `web` на :3000 ходит в настоящий API — данные там другие (T-501).
 
 ```bash
 pnpm design:compare --board AdminPhone --list
