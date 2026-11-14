@@ -1,4 +1,4 @@
-import { useLoadMore } from '@catalog/ui';
+import { useLoadMore, usePointerPauseOnScroll } from '@catalog/ui';
 import { Plural } from '@lingui/react/macro';
 import { hashKey, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
@@ -51,6 +51,8 @@ export function CatalogGrid({
   // Новая выборка: сетка на миг чуть приглушается и возвращается — видно, что список обновился.
   // Сетку не пересоздаём (иначе фото декодируются заново и плитки мигают пустыми); при первом показе — без анимации.
   const grid = useRef<HTMLUListElement>(null);
+  // при прокрутке плитки не грузят карточки по наведению зря (T-502)
+  usePointerPauseOnScroll(grid);
   const firstKey = useRef(queryKey);
   useEffect(() => {
     if (queryKey === firstKey.current) return;

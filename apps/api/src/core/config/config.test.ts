@@ -28,6 +28,8 @@ describe('parseConfig', () => {
       cookieDomain: undefined,
       smtpUrl: undefined,
       mailFrom: 'Каталог <no-reply@localhost>',
+      mailOutboxDir: undefined,
+      rateLimits: true,
       appSecret: 'x'.repeat(32),
       s3: {
         endpoint: 'http://localhost:8333',
@@ -43,6 +45,15 @@ describe('parseConfig', () => {
 
   it('строки окружения приводятся к числам', () => {
     expect(parseConfig({ ...base, API_PORT: '4000', TRUST_PROXY: '1' })).toMatchObject({ port: 4000, trustProxy: 1 });
+  });
+
+  it('папка писем и выключенные лимиты — только не в продакшене (e2e, T-502)', () => {
+    expect(parseConfig({ ...base, MAIL_OUTBOX_DIR: '.mail', RATE_LIMITS: 'off' })).toMatchObject({
+      mailOutboxDir: '.mail',
+      rateLimits: false,
+    });
+    expect(() => parseConfig({ ...base, NODE_ENV: 'production', MAIL_OUTBOX_DIR: '.mail' })).toThrow(/MAIL_OUTBOX_DIR/);
+    expect(() => parseConfig({ ...base, NODE_ENV: 'production', RATE_LIMITS: 'off' })).toThrow(/RATE_LIMITS/);
   });
 
   it('нет обязательных переменных — понятная ошибка со списком', () => {

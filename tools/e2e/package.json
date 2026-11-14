@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@catalog/tsconfig": "workspace:*",
-    "@playwright/test": "1.64.1"
+    "@playwright/test": "1.64.1",
+    "postgres": "3.4.9"
   }
 }

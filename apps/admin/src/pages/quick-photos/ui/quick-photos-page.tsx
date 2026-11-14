@@ -6,7 +6,7 @@ import { Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { QuickBoard, useProductPhotos } from '@/features/product-photos';
-import { invalidateProducts, productQueryOptions } from '@/entities/product';
+import { productQueryOptions } from '@/entities/product';
 import { ButtonLink } from '@/shared/ui';
 
 import { quickQueueQueryOptions } from '../api';
@@ -15,6 +15,8 @@ import { quickQueueQueryOptions } from '../api';
  * Быстрый режим «Добавить фото» (A3, макет AdminPhone, экран 4): очередь товаров без фото, по одному на экран —
  * снял, «Дальше →». Сверху «✕» (в «Товары»), «N из M», «Пропустить» и полоса прогресса. Очередь снимается
  * при входе и не меняется, пока снимают. Когда очередь кончилась (или её не было) — «Готово» (A25, макета нет).
+ * Списки и счётчики обновляет каждое добавленное фото (`useProductPhotos`); при выходе отдельно не перечитываем —
+ * иначе выход без фото гонял три лишних запроса (e2e T-502).
  */
 export function QuickPhotosPage() {
   const { data: queue } = useSuspenseQuery(quickQueueQueryOptions());
@@ -28,8 +30,6 @@ export function QuickPhotosPage() {
   useEffect(() => {
     if (next) void queryClient.prefetchQuery(productQueryOptions(next.id));
   }, [next, queryClient]);
-  // вышли из режима — счётчики и списки перечитать
-  useEffect(() => () => void invalidateProducts(queryClient), [queryClient]);
 
   if (!item) return <Finished done={done} />;
 

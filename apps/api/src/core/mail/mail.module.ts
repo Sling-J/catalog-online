@@ -1,3 +1,7 @@
+import { randomUUID } from 'node:crypto';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import { Global, Injectable, Logger, Module } from '@nestjs/common';
 import nodemailer, { type Transporter } from 'nodemailer';
 
@@ -27,6 +31,22 @@ export class LogMailer extends Mailer {
   }
 }
 
+/**
+ * Разработка и e2e (`MAIL_OUTBOX_DIR`): письмо — файл `<время>-<id>.json` (`to`, `subject`, `text`) в папке, e2e
+ * читает из него ссылку (T-502). Имя начинается со времени — по алфавиту файлы идут по порядку отправки.
+ */
+export class OutboxMailer extends Mailer {
+  constructor(private readonly dir: string) {
+    super();
+  }
+
+  async send(message: MailMessage): Promise<void> {
+    await mkdir(this.dir, { recursive: true });
+    const name = `${new Date().toISOString().replace(/[:.]/g, '-')}-${randomUUID()}.json`;
+    await writeFile(join(this.dir, name), JSON.stringify(message, null, 2));
+  }
+}
+
 /** Продакшен: SMTP из `SMTP_URL` (поставщик — открытый вопрос, open-questions.md). */
 export class SmtpMailer extends Mailer {
   private readonly transport: Transporter;
@@ -52,7 +72,9 @@ export class SmtpMailer extends Mailer {
       inject: [AppConfig],
       useFactory: (config: AppConfig): Mailer => {
         const smtpUrl = config.get('smtpUrl');
-        return smtpUrl ? new SmtpMailer(smtpUrl, config.get('mailFrom')) : new LogMailer();
+        if (smtpUrl) return new SmtpMailer(smtpUrl, config.get('mailFrom'));
+        const outbox = config.get('mailOutboxDir');
+        return outbox ? new OutboxMailer(outbox) : new LogMailer();
       },
     },
   ],

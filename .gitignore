@@ -42,3 +42,9 @@ Thumbs.db
 
 # Код, сгенерированный из контракта (pnpm generate), не храним в git
 packages/contract/src/gen/
+
+# Письма API в e2e (MAIL_OUTBOX_DIR)
+tools/e2e/.mail/
+
+# Сборка админки для e2e (tools/e2e/scripts/start-fronts.ts)
+apps/admin/dist-e2e/

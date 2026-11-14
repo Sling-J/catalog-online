@@ -29,11 +29,18 @@ export const productsQueryOptions = (params: ProductListParams) => {
   });
 };
 
-/** После правки товаров: перечитать списки, счётчики вкладок и меню, чек-лист магазина. */
-export function invalidateProducts(queryClient: QueryClient): Promise<void> {
+/**
+ * После правки товаров: перечитать списки и — если правка могла их изменить — счётчики вкладок и меню и чек-лист
+ * магазина (они зависят от видимости, остатков, фото и числа товаров). `counts: false` — правка только текста
+ * (название, описание, категория): без двух лишних запросов на каждое сохранение (e2e T-502).
+ */
+export function invalidateProducts(
+  queryClient: QueryClient,
+  { counts = true }: { counts?: boolean } = {},
+): Promise<void> {
   return Promise.all([
     queryClient.invalidateQueries({ queryKey: [{ _id: 'listProducts' }] }),
-    queryClient.invalidateQueries({ queryKey: productCountsQueryOptions().queryKey }),
-    queryClient.invalidateQueries({ queryKey: getShopQueryKey() }),
+    counts && queryClient.invalidateQueries({ queryKey: productCountsQueryOptions().queryKey }),
+    counts && queryClient.invalidateQueries({ queryKey: getShopQueryKey() }),
   ]).then(() => undefined);
 }

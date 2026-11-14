@@ -14,25 +14,30 @@ import { invalidateProducts } from '@/entities/product';
 /**
  * Правки категорий (FR-A6): создать, переименовать, перенести, удалить, порядок перетаскиванием. Каждая правка
  * сохраняется сразу. Порядок показывается до ответа сервера; не сохранился — возвращается прежний и `orderFailed`.
- * После правок перечитываются дерево и списки товаров (в строке товара — название категории).
+ * После правок перечитываются дерево и списки товаров (в строке товара — название категории); счётчики вкладок и
+ * чек-лист магазина от категорий не зависят — их не трогаем. Новая категория пуста — товары не перечитываем (e2e T-502).
  */
 export function useCategoryActions() {
   const queryClient = useQueryClient();
   const key = categoriesQueryOptions().queryKey;
   const [orderFailed, setOrderFailed] = useState(false);
   const refresh = () =>
-    Promise.all([queryClient.invalidateQueries({ queryKey: key }), invalidateProducts(queryClient)]).then(
-      () => undefined,
-    );
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: key }),
+      invalidateProducts(queryClient, { counts: false }),
+    ]).then(() => undefined);
 
-  const create = useMutation({ ...createCategoryMutation(), onSuccess: refresh });
+  const create = useMutation({
+    ...createCategoryMutation(),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: key }),
+  });
   const rename = useMutation({ ...renameCategoryMutation(), onSuccess: refresh });
   const remove = useMutation({ ...deleteCategoryMutation(), onSuccess: refresh });
   const reorder = useMutation({
     ...reorderCategoriesMutation(),
     onSuccess: (tree) => {
       queryClient.setQueryData(key, tree);
-      return invalidateProducts(queryClient);
+      return invalidateProducts(queryClient, { counts: false });
     },
   });
 

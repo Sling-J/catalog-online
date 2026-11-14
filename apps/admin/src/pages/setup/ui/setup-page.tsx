@@ -38,7 +38,10 @@ export function SetupPage({ requestedStep }: { requestedStep: number | undefined
     finish.mutate(
       { body: { setupCompleted: true } },
       {
-        onSuccess: (updated) => void applyShop(queryClient, updated).then(() => navigate({ to: '/', replace: true })),
+        onSuccess: (updated) => {
+          applyShop(queryClient, updated, { setupCompleted: true });
+          void navigate({ to: '/', replace: true });
+        },
       },
     );
 

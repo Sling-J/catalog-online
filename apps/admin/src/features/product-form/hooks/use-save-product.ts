@@ -14,17 +14,19 @@ export function useSaveProduct(product: Product) {
       const path = { productId: product.id };
       let saved = product;
       const changes = productChanges(product, draft);
+      const variants = variantsChanged(product, draft);
       if (Object.keys(changes).length > 0)
         saved = (await updateProduct({ path, body: changes, throwOnError: true })).data;
-      if (variantsChanged(product, draft)) {
+      if (variants) {
         const body = { variants: toVariantInputs(draft) };
         saved = (await replaceProductVariants({ path, body, throwOnError: true })).data;
       }
-      return saved;
+      // счётчики и чек-лист зависят от видимости и вариантов (остатки, их число), не от текста карточки
+      return { saved, counts: variants || 'isVisible' in changes };
     },
-    onSuccess: (saved) => {
+    onSuccess: ({ saved, counts }) => {
       applyProduct(queryClient, saved);
-      return invalidateProducts(queryClient);
+      return invalidateProducts(queryClient, { counts });
     },
   });
 }

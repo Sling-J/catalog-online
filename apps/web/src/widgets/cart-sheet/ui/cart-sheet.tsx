@@ -35,7 +35,6 @@ import { UndoLine } from './undo-line';
 export function CartSheet({ subdomain }: { subdomain: string }) {
   const { t } = useLingui();
   const desktop = useIsDesktop();
-  const { data: shop } = useQuery(shopQueryOptions(subdomain));
   const { open, items, payable, notices, checkState, total, comment, sentOrder, removed } = useUnit({
     open: $open,
     items: $items,
@@ -54,6 +53,9 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
     restore: itemRestored,
     setComment: commentChanged,
   });
+  // шторка смонтирована на всех страницах магазина, в том числе 404 / 410, где магазина в кеше нет: запрашиваем его,
+  // только когда корзину открыли (на каталоге и в карточке он уже в кеше) — иначе лишний запрос с ошибкой (T-502)
+  const { data: shop } = useQuery({ ...shopQueryOptions(subdomain), enabled: open });
   const hasChanges = Object.keys(notices).length > 0;
   const placement = !desktop ? 'bottom' : sentOrder ? 'center' : 'dropdown-right';
 

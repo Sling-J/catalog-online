@@ -11,4 +11,5 @@ export { cx } from './cx.js';
 export { Icon, type IconName, type IconProps } from './components/Icon.js';
 export { useIsDesktop } from './hooks/useIsDesktop.js';
 export { useLoadMore } from './hooks/useLoadMore.js';
+export { usePointerPauseOnScroll } from './hooks/usePointerPauseOnScroll.js';
 export { formatAmount, formatPrice } from './lib/format-price.js';

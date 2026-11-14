@@ -1,1 +1,1 @@
-export { LogMailer, Mailer, MailModule, SmtpMailer, type MailMessage } from './mail.module.js';
+export { LogMailer, Mailer, MailModule, OutboxMailer, SmtpMailer, type MailMessage } from './mail.module.js';

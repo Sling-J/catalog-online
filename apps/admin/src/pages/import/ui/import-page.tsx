@@ -18,6 +18,7 @@ import {
   WorkingState,
 } from '@/features/import-wizard';
 import {
+  applyImport,
   formatImportDate,
   importQueryOptions,
   importsQueryOptions,
@@ -77,8 +78,16 @@ function HistoryLink({ className }: { className?: string }) {
 
 /** Шаг «Файл»: выбрать файл. Если прошлый импорт не закончен — сразу к нему. */
 function NewImport({ onOpen }: { onOpen: OpenImport }) {
-  // список в кеше мог устареть (импорт только что отменили или применили) — решаем по свежему
-  const { data, isFetching } = useInfiniteQuery({ ...importsQueryOptions(), refetchOnMount: 'always' });
+  // старт, применение и отмена сами перечитывают список; устареть он может, только если последний импорт в кеше
+  // не закончен — фоновая задача могла его завершить. Тогда решаем по свежему, иначе — по кешу, пока свеж
+  // (раньше перечитывали всегда — лишний запрос сразу после главной, e2e T-502)
+  const { data, isFetching } = useInfiniteQuery({
+    ...importsQueryOptions(),
+    refetchOnMount: (query) => {
+      const cached = query.state.data?.pages[0]?.items[0];
+      return cached && isImportOpen(cached.status) ? 'always' : true;
+    },
+  });
   const latest = data?.pages[0]?.items[0];
   const open = !isFetching && latest && isImportOpen(latest.status) ? latest.id : undefined;
   useEffect(() => {
@@ -137,7 +146,12 @@ function OpenedImport({ importId, onOpen }: { importId: string; onOpen: OpenImpo
   const missing = statusOf(error) === 404;
   useEffect(() => {
     if (missing || status === 'cancelled') onOpen(undefined);
-    if (status === 'done') void invalidateProducts(queryClient);
+    if (status === 'done' && item) {
+      // готовый результат — в историю без запроса; товары, счётчики и чек-лист перечитать
+      applyImport(queryClient, item);
+      void invalidateProducts(queryClient);
+    }
+    // `item` в зависимостях не нужен: срабатываем на смену статуса, а не на каждый опрос
   }, [missing, status, onOpen, queryClient]);
 
   if (!item) {

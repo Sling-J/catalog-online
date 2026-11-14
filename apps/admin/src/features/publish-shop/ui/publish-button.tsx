@@ -69,7 +69,10 @@ export function PublishButton({
           publish.mutate(
             {},
             {
-              onSuccess: (shop) => void applyShop(queryClient, shop).then(() => onPublished(shop)),
+              onSuccess: (shop) => {
+                applyShop(queryClient, shop);
+                onPublished(shop);
+              },
               onError: () => setFailed(true),
             },
           );

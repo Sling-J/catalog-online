@@ -23,9 +23,10 @@ export function useAttributeActions() {
   const key = attributesQueryOptions().queryKey;
   const [failed, setFailed] = useState(false);
 
+  // подписи вариантов в списках и карточках меняются, счётчики и чек-лист магазина — нет (e2e T-502)
   const refreshProducts = () =>
     Promise.all([
-      invalidateProducts(queryClient),
+      invalidateProducts(queryClient, { counts: false }),
       queryClient.invalidateQueries({ queryKey: [{ _id: 'getProduct' }] }),
     ]).then(() => undefined);
   const put = (attribute: Attribute) =>

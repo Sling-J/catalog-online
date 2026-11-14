@@ -1,11 +1,17 @@
-import type { Import } from '@catalog/contract';
+import type { Import, ListImportsResponse } from '@catalog/contract';
 import {
   getImportOptions,
   getImportQueryKey,
   listImportErrorsOptions,
   listImportsInfiniteOptions,
 } from '@catalog/contract/query';
-import { infiniteQueryOptions, queryOptions, type QueryClient, type skipToken } from '@tanstack/react-query';
+import {
+  type InfiniteData,
+  infiniteQueryOptions,
+  queryOptions,
+  type QueryClient,
+  type skipToken,
+} from '@tanstack/react-query';
 
 import { isImportWorking } from '../lib';
 
@@ -22,9 +28,21 @@ export const importQueryOptions = (importId: string) =>
     refetchInterval: (query) => (query.state.data && isImportWorking(query.state.data.status) ? POLL_MS : false),
   });
 
-/** Ответ мутации (`createImport`, `setImportMapping`…) — сразу в кеш шага, без лишнего запроса. */
+/**
+ * Импорт из ответа API (`createImport`, `setImportMapping`, `applyImport`, готовый результат опроса) — сразу в кеш шага
+ * и в историю (заменить по id, новый — первым), без запросов. Раньше история перечитывалась после каждого действия,
+ * а запрос посреди смены шага отменялся и уходил снова (e2e T-502).
+ */
 export function applyImport(queryClient: QueryClient, item: Import): void {
   queryClient.setQueryData(getImportQueryKey({ path: { importId: item.id } }), item);
+  queryClient.setQueriesData<InfiniteData<ListImportsResponse>>({ queryKey: [{ _id: 'listImports' }] }, (data) => {
+    if (!data) return data;
+    const known = data.pages.some((page) => page.items.some((entry) => entry.id === item.id));
+    const pages = known
+      ? data.pages.map((page) => ({ ...page, items: page.items.map((entry) => (entry.id === item.id ? item : entry)) }))
+      : data.pages.map((page, index) => (index === 0 ? { ...page, items: [item, ...page.items] } : page));
+    return { ...data, pages };
+  });
 }
 
 /** Ошибки по строкам для проверки (первая страница). */
@@ -42,8 +60,3 @@ export const importsQueryOptions = () => {
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 };
-
-/** Список импортов изменился (новый, отменён, применён) — историю перечитать. */
-export function invalidateImports(queryClient: QueryClient): Promise<void> {
-  return queryClient.invalidateQueries({ queryKey: [{ _id: 'listImports' }] });
-}

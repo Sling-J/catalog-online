@@ -1,5 +1,7 @@
 node_modules
 dist
+dist-e2e
+tools/e2e/.mail
 coverage
 .turbo
 pnpm-lock.yaml

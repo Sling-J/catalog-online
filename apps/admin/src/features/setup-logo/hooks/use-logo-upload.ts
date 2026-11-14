@@ -30,7 +30,7 @@ export function useLogoUpload() {
     try {
       const uploadId = await uploadFile('logo', file);
       const { data: shop } = await setShopLogo({ body: { uploadId }, throwOnError: true });
-      await applyShop(queryClient, shop);
+      applyShop(queryClient, shop);
       setPreview(undefined);
     } catch {
       setPreview(undefined);

@@ -2,6 +2,7 @@ import { Injectable, Module, type ExecutionContext } from '@nestjs/common';
 import { SkipThrottle, Throttle, ThrottlerGuard, ThrottlerModule, type ThrottlerLimitDetail } from '@nestjs/throttler';
 import type { Response } from 'express';
 
+import { AppConfig } from '../config/index.js';
 import { AppError } from '../errors/index.js';
 
 /** Общий потолок на любой адрес с одного IP — защита от потока запросов. Строже — `@RateLimit()` на маршруте. */
@@ -32,9 +33,20 @@ export class RateLimitGuard extends ThrottlerGuard {
   }
 }
 
-/** Счётчики в памяти процесса: API — один процесс (ADR 0004). Несколько процессов — хранилище в PostgreSQL. */
+/**
+ * Счётчики в памяти процесса: API — один процесс (ADR 0004). Несколько процессов — хранилище в PostgreSQL
+ * (scaling.md, SC5). `RATE_LIMITS=off` (только разработка и e2e, T-502) — ограничения не действуют.
+ */
 @Module({
-  imports: [ThrottlerModule.forRoot({ throttlers: [{ name: 'default', ...DEFAULT_LIMIT }] })],
+  imports: [
+    ThrottlerModule.forRootAsync({
+      inject: [AppConfig],
+      useFactory: (config: AppConfig) => ({
+        throttlers: [{ name: 'default', ...DEFAULT_LIMIT }],
+        skipIf: () => !config.get('rateLimits'),
+      }),
+    }),
+  ],
   exports: [ThrottlerModule],
 })
 export class RateLimitModule {}

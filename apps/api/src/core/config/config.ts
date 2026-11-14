@@ -12,36 +12,48 @@ const csv = z.string().transform((value) =>
  * Переменные окружения API (backend-structure.md, раздел 10). Каждая новая — сюда,
  * в `.env.example` и в README.
  */
-const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  API_PORT: z.coerce.number().int().min(1).max(65535).default(3001),
-  DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
-  /** Адреса фронтов для CORS; `*` — любой поддомен: `http://*.localhost:3000`. */
-  CORS_ORIGINS: csv.pipe(z.array(z.string().min(1)).min(1)),
-  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
-  /** Сколько прокси перед API (Caddy — 1): от этого зависит IP клиента для ограничения частоты. */
-  TRUST_PROXY: z.coerce.number().int().min(0).default(0),
-  /** Адрес админки — для ссылок в письмах (api.md, «Ссылки из писем»). */
-  ADMIN_URL: z.url({ protocol: /^https?$/ }).transform((url) => url.replace(/\/+$/, '')),
-  /** Общий домен админки и API для cookie сессии (`.example.kz`); пусто — cookie только для адреса API. */
-  COOKIE_DOMAIN: z.string().min(1).optional(),
-  /** SMTP для писем (`smtp://user:pass@host:587`); пусто — письма пишутся в лог (разработка). */
-  SMTP_URL: z.url({ protocol: /^smtps?$/ }).optional(),
-  MAIL_FROM: z.string().min(3).default('Каталог <no-reply@localhost>'),
-  /** Секрет для подписи токенов (превью витрины); не короче 32 символов, в продакшене — свой. */
-  APP_SECRET: z.string().min(32),
-  /** S3-совместимое хранилище (в разработке — SeaweedFS из docker-compose.yml). */
-  S3_ENDPOINT: z.url({ protocol: /^https?$/ }),
-  S3_REGION: z.string().min(1).default('us-east-1'),
-  S3_ACCESS_KEY: z.string().min(1),
-  S3_SECRET_KEY: z.string().min(1),
-  /** Публичное: готовые фото и логотипы, их открывает кто угодно (решение основателя 2026-11-09, T-405). */
-  S3_PUBLIC_BUCKET: z.string().min(3),
-  /** Закрытое: исходники фото и файлы импорта — только для API. */
-  S3_PRIVATE_BUCKET: z.string().min(3),
-  /** Адрес, по которому покупатель открывает файлы публичного хранилища (без `/` в конце); позже — CDN. */
-  S3_PUBLIC_URL: z.url({ protocol: /^https?$/ }).transform((url) => url.replace(/\/+$/, '')),
-});
+const envSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    API_PORT: z.coerce.number().int().min(1).max(65535).default(3001),
+    DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+    /** Адреса фронтов для CORS; `*` — любой поддомен: `http://*.localhost:3000`. */
+    CORS_ORIGINS: csv.pipe(z.array(z.string().min(1)).min(1)),
+    LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
+    /** Сколько прокси перед API (Caddy — 1): от этого зависит IP клиента для ограничения частоты. */
+    TRUST_PROXY: z.coerce.number().int().min(0).default(0),
+    /** Адрес админки — для ссылок в письмах (api.md, «Ссылки из писем»). */
+    ADMIN_URL: z.url({ protocol: /^https?$/ }).transform((url) => url.replace(/\/+$/, '')),
+    /** Общий домен админки и API для cookie сессии (`.example.kz`); пусто — cookie только для адреса API. */
+    COOKIE_DOMAIN: z.string().min(1).optional(),
+    /** SMTP для писем (`smtp://user:pass@host:587`); пусто — письма пишутся в лог (разработка). */
+    SMTP_URL: z.url({ protocol: /^smtps?$/ }).optional(),
+    MAIL_FROM: z.string().min(3).default('Каталог <no-reply@localhost>'),
+    /** Разработка и e2e: каждое письмо — JSON-файл в этой папке (вместо лога); в продакшене запрещено (T-502). */
+    MAIL_OUTBOX_DIR: z.string().min(1).optional(),
+    /** `off` — без ограничений частоты: e2e регистрируют и входят чаще лимитов; в продакшене запрещено (T-502). */
+    RATE_LIMITS: z.enum(['on', 'off']).default('on'),
+    /** Секрет для подписи токенов (превью витрины); не короче 32 символов, в продакшене — свой. */
+    APP_SECRET: z.string().min(32),
+    /** S3-совместимое хранилище (в разработке — SeaweedFS из docker-compose.yml). */
+    S3_ENDPOINT: z.url({ protocol: /^https?$/ }),
+    S3_REGION: z.string().min(1).default('us-east-1'),
+    S3_ACCESS_KEY: z.string().min(1),
+    S3_SECRET_KEY: z.string().min(1),
+    /** Публичное: готовые фото и логотипы, их открывает кто угодно (решение основателя 2026-11-09, T-405). */
+    S3_PUBLIC_BUCKET: z.string().min(3),
+    /** Закрытое: исходники фото и файлы импорта — только для API. */
+    S3_PRIVATE_BUCKET: z.string().min(3),
+    /** Адрес, по которому покупатель открывает файлы публичного хранилища (без `/` в конце); позже — CDN. */
+    S3_PUBLIC_URL: z.url({ protocol: /^https?$/ }).transform((url) => url.replace(/\/+$/, '')),
+  })
+  .superRefine((env, ctx) => {
+    if (env.NODE_ENV !== 'production') return;
+    if (env.MAIL_OUTBOX_DIR)
+      ctx.addIssue({ code: 'custom', path: ['MAIL_OUTBOX_DIR'], message: 'только для разработки и тестов' });
+    if (env.RATE_LIMITS === 'off')
+      ctx.addIssue({ code: 'custom', path: ['RATE_LIMITS'], message: 'в продакшене ограничения частоты обязательны' });
+  });
 
 export type Config = {
   env: 'development' | 'test' | 'production';
@@ -54,6 +66,8 @@ export type Config = {
   cookieDomain: string | undefined;
   smtpUrl: string | undefined;
   mailFrom: string;
+  mailOutboxDir: string | undefined;
+  rateLimits: boolean;
   appSecret: string;
   s3: {
     endpoint: string;
@@ -85,6 +99,8 @@ export function parseConfig(env: Record<string, string | undefined>): Config {
     cookieDomain: e.COOKIE_DOMAIN,
     smtpUrl: e.SMTP_URL,
     mailFrom: e.MAIL_FROM,
+    mailOutboxDir: e.MAIL_OUTBOX_DIR,
+    rateLimits: e.RATE_LIMITS === 'on',
     appSecret: e.APP_SECRET,
     s3: {
       endpoint: e.S3_ENDPOINT,

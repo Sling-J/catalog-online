@@ -60,8 +60,12 @@ export function CategorySheet({
       const name = value.name.trim();
       const parentId = value.parent === TOP ? null : value.parent;
       try {
-        if (!category) onCreated?.(await actions.create(name, parentId));
-        else {
+        if (!category) {
+          // не `onCreated?.(await actions.create(…))`: без `onCreated` JavaScript не вычисляет и аргумент — категория
+          // не создавалась, а шторка закрывалась как после успеха (экран «Категории и свойства», e2e T-502)
+          const created = await actions.create(name, parentId);
+          onCreated?.(created);
+        } else {
           if (name !== category.name) await actions.rename(category.id, name);
           if (parentId !== category.parentId) await actions.move(moveToParent(tree, category.id, parentId));
         }

@@ -2,7 +2,7 @@ import { createImport, type Import, listImports } from '@catalog/contract';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import { applyImport, invalidateImports, isImportOpen } from '@/entities/import';
+import { applyImport, isImportOpen } from '@/entities/import';
 import { problemCode, uploadFile } from '@/shared/api';
 
 import { importContentType, type ImportFileProblem, importFileProblem } from '../lib';
@@ -25,8 +25,8 @@ export function useStartImport(onStarted: (item: Import) => void) {
       return data;
     },
     onSuccess: (item) => {
+      // импорт — в кеш шага и первым в историю, без перечитывания списка
       applyImport(queryClient, item);
-      void invalidateImports(queryClient);
       onStarted(item);
     },
     onError: async (failure) => {

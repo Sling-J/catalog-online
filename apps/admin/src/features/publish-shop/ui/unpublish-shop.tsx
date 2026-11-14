@@ -41,7 +41,8 @@ export function UnpublishShop({ className, onDone }: { className?: string; onDon
             {
               onSuccess: (shop) => {
                 setAsking(false);
-                void applyShop(queryClient, shop).then(onDone);
+                applyShop(queryClient, shop);
+                onDone();
               },
             },
           )
