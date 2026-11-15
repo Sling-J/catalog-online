@@ -1,0 +1,10 @@
+{
+  "extends": "@catalog/tsconfig/react.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "declaration": false,
+    "sourceMap": false,
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["src", "vite.config.ts", "lingui.config.ts"]
+}

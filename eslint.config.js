@@ -39,6 +39,7 @@ export default tseslint.config(
   },
   ...fsdBoundaries('apps/web'),
   ...fsdBoundaries('apps/admin'),
+  ...fsdBoundaries('apps/staff'),
   ...apiBoundaries(),
   prettier,
 );

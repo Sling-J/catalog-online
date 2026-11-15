@@ -7,7 +7,7 @@ import { connectTestDb } from '../../../test/helpers/db.js';
 import { browser, signUp, XRW, type Browser } from '../../../test/helpers/session.js';
 import { hashPassword } from '../../core/auth/index.js';
 import type { Db } from '../../core/db/index.js';
-import { accounts, auditLog, dailyStats, sessions, shops, staffUsers } from '../../core/db/schema/index.js';
+import { accounts, auditLog, authTokens, dailyStats, sessions, shops, staffUsers } from '../../core/db/schema/index.js';
 
 const STAFF_PASSWORD = 'staff-password-1';
 const NO_SUCH = '0192d000-0000-7000-8000-00000000ffff';
@@ -65,6 +65,16 @@ describe('суперадминка', () => {
     expect(cookie).toMatch(/Max-Age=43200/);
     expect(cookie).toMatch(/HttpOnly/);
     await agent.get('/v1/staff/shops').expect(200);
+    expect((await agent.get('/v1/staff/me').expect(200)).body).toEqual({ email: 'support@example.com' });
+  });
+
+  it('выход: сессия сотрудника закрыта, cookie стёрт; дальше — 401', async () => {
+    const agent = await staff();
+    const { headers } = await agent.post('/v1/staff/logout').set(XRW).expect(204);
+    const cookie = ([] as string[]).concat(headers['set-cookie'] ?? []).find((c) => c.startsWith('staff_sid='));
+    expect(cookie).toMatch(/Expires=Thu, 01 Jan 1970/);
+    await agent.get('/v1/staff/me').expect(401);
+    await request(t.app.getHttpServer()).get('/v1/staff/me').expect(401);
   });
 
   it('без сессии сотрудника — 401, сессия магазина не подходит; не UUID и несуществующий магазин — 404', async () => {
@@ -177,12 +187,26 @@ describe('суперадминка', () => {
       .expect(422);
   });
 
-  it('вход «от имени»: sid на 2 часа без продления, плашка в getMe, смена пароля и письмо — 403; журнал; и у заблокированного', async () => {
+  it('вход «от имени»: ссылка с токеном, обмен в админке — sid на 2 часа, смена пароля и письмо — 403; журнал; и у заблокированного', async () => {
     const owner = await shop('impersonate@example.com', { status: 'blocked' });
-    const agent = await staff();
-    const { headers } = await agent.post(`/v1/staff/shops/${owner.shopId}/impersonate`).set(XRW).expect(204);
+    const staffAgent = await staff();
+    const issued = await staffAgent.post(`/v1/staff/shops/${owner.shopId}/impersonate`).set(XRW).expect(200);
+    // сама суперадминка сессию магазина не получает: только ссылку в админку с токеном во фрагменте
+    expect(([] as string[]).concat(issued.headers['set-cookie'] ?? [])).toEqual([]);
+    const url = new URL(issued.body.url as string);
+    expect(`${url.origin}${url.pathname}`).toBe(`${t.config.adminUrl}/impersonate`);
+    const token = url.hash.slice(1);
+    expect(token.length).toBeGreaterThan(20);
+
+    // админка (другой браузерный контекст) обменивает токен на свою сессию
+    const agent = browser(t);
+    const { headers } = await agent.post('/v1/auth/impersonation').set(XRW).send({ token }).expect(204);
     const cookie = ([] as string[]).concat(headers['set-cookie'] ?? []).find((c) => c.startsWith('sid='));
     expect(cookie).toMatch(/Max-Age=7200/);
+    // токен одноразовый
+    expect((await browser(t).post('/v1/auth/impersonation').set(XRW).send({ token }).expect(410)).body.code).toBe(
+      'token_expired',
+    );
 
     const me = (await agent.get('/v1/auth/me').expect(200)).body;
     expect(me).toMatchObject({
@@ -217,6 +241,20 @@ describe('суперадминка', () => {
       .set(XRW)
       .send({ currentPassword: 'wrong-password', newPassword: 'new-password-1' })
       .expect(401);
+  });
+
+  it('токен входа «от имени»: просроченный и чужой — 410, без токена — 422', async () => {
+    const owner = await shop('impersonate-expired@example.com');
+    const agent = await staff();
+    const { body } = await agent.post(`/v1/staff/shops/${owner.shopId}/impersonate`).set(XRW).expect(200);
+    const token = new URL(body.url as string).hash.slice(1);
+    await db
+      .update(authTokens)
+      .set({ expiresAt: new Date(Date.now() - 1000) })
+      .where(eq(authTokens.purpose, 'impersonate'));
+    await browser(t).post('/v1/auth/impersonation').set(XRW).send({ token }).expect(410);
+    await browser(t).post('/v1/auth/impersonation').set(XRW).send({ token: 'net-takogo-tokena' }).expect(410);
+    await browser(t).post('/v1/auth/impersonation').set(XRW).send({}).expect(422);
   });
 
   it('вход: больше 10 в минуту с одного адреса — 429', async () => {

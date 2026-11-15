@@ -1,12 +1,12 @@
 ---
 status: accepted
 owner: founder
-updated: 2026-11-02
+updated: 2026-11-15
 ---
 
 # Структура кода фронтенда (FSD)
 
-Правила для `apps/web` и `apps/admin`. Основа — Feature-Sliced Design с поправками основателя; решение — [ADR 0002](adr/0002-frontend-fsd.md). Правила перенесены из другого проекта основателя и адаптированы: React DOM вместо React Native, TanStack Start / Router, TanStack Query, сгенерированный SDK. Что считать нарушением, ловит линтер (см. раздел 9).
+Правила для `apps/web`, `apps/admin` и `apps/staff` (суперадминка, [ADR 0005](adr/0005-staff-app.md)). Основа — Feature-Sliced Design с поправками основателя; решение — [ADR 0002](adr/0002-frontend-fsd.md). Правила перенесены из другого проекта основателя и адаптированы: React DOM вместо React Native, TanStack Start / Router, TanStack Query, сгенерированный SDK. Что считать нарушением, ловит линтер (см. раздел 9).
 
 ## 1. Слои
 
@@ -170,7 +170,7 @@ ui/
 
 ## 9. Проверка правил
 
-Линтер (`pnpm lint`) проверяет направление импортов между слоями, запрет импортов между срезами одного слоя, запрет глубоких путей (снаружи только `index.ts` среза и сегментов `shared`; `shared/constants` и `shared/types` — по файлу) и импорт среза через его же корневой `index.ts` по алиасу. Инструмент — `eslint-plugin-boundaries`, настройка — [`eslint.fsd.js`](../../eslint.fsd.js) (задача T-100), подключается к `apps/web` и `apps/admin`.
+Линтер (`pnpm lint`) проверяет направление импортов между слоями, запрет импортов между срезами одного слоя, запрет глубоких путей (снаружи только `index.ts` среза и сегментов `shared`; `shared/constants` и `shared/types` — по файлу) и импорт среза через его же корневой `index.ts` по алиасу. Инструмент — `eslint-plugin-boundaries`, настройка — [`eslint.fsd.js`](../../eslint.fsd.js) (задача T-100), подключается к `apps/web`, `apps/admin` и `apps/staff`.
 
 Не проверяется (остаётся на ревью): импорт своего корня через `..`, структура среза (модель только Effector, `api/`, `__tests__/`, `{name}.types.ts`, `index.ts` только с реэкспортами), именование.
 

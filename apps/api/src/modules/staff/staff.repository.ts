@@ -1,7 +1,7 @@
 import { and, desc, eq, ilike, or, sql, type SQL } from 'drizzle-orm';
 
 import type { DbOrTx } from '../../core/db/index.js';
-import { accounts, auditLog, shops, staffUsers } from '../../core/db/schema/index.js';
+import { accounts, auditLog, authTokens, shops, staffUsers } from '../../core/db/schema/index.js';
 import type { Cursor } from '../../core/pagination/index.js';
 
 export type ShopStatus = 'draft' | 'published' | 'blocked';
@@ -113,6 +113,19 @@ export const staffRepository = {
       .limit(1);
     const previous = row?.payload?.previousStatus;
     return previous === 'draft' || previous === 'published' ? previous : null;
+  },
+
+  async findStaffEmail(db: DbOrTx, staffUserId: string): Promise<string | null> {
+    const [row] = await db.select({ email: staffUsers.email }).from(staffUsers).where(eq(staffUsers.id, staffUserId));
+    return row?.email ?? null;
+  },
+
+  /** Одноразовый токен входа «от имени» (ADR 0005): в базе только хеш, гасит `authRepository.useImpersonationToken`. */
+  async createImpersonationToken(
+    db: DbOrTx,
+    row: { accountId: string; staffUserId: string; tokenHash: string; expiresAt: Date },
+  ): Promise<void> {
+    await db.insert(authTokens).values({ ...row, purpose: 'impersonate' });
   },
 
   async audit(

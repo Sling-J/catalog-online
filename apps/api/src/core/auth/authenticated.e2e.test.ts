@@ -11,6 +11,7 @@ const PUBLIC = new Set([
   'POST /v1/auth/register',
   'POST /v1/auth/login',
   'POST /v1/auth/email/verify',
+  'POST /v1/auth/impersonation',
   'POST /v1/auth/password/forgot',
   'POST /v1/auth/password/reset',
   'GET /v1/storefront/:subdomain',

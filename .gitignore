@@ -48,3 +48,4 @@ tools/e2e/.mail/
 
 # Сборка админки для e2e (tools/e2e/scripts/start-fronts.ts)
 apps/admin/dist-e2e/
+apps/staff/dist-e2e/

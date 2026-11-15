@@ -12,7 +12,7 @@ export const STAFF_SESSION_COOKIE = 'staff_sid';
 /** Рабочий день без продления: доступ ко всем магазинам (решение основателя 2026-11-10, T-412). */
 export const STAFF_SESSION_TTL_MS = 12 * 60 * 60_000;
 
-/** Сессии сотрудников: открыть (cookie `staff_sid`) и найти по cookie. В базе — только хеш токена. */
+/** Сессии сотрудников: открыть (cookie `staff_sid`), закрыть и найти по cookie. В базе — только хеш токена. */
 @Injectable()
 export class StaffSessionService {
   constructor(
@@ -34,6 +34,13 @@ export class StaffSessionService {
     this.ctx
       .response()
       .cookie(STAFF_SESSION_COOKIE, token, { ...sessionCookieOptions(this.config), maxAge: STAFF_SESSION_TTL_MS });
+  }
+
+  /** Выход: сессия текущего cookie удаляется, cookie стирается. */
+  async end(): Promise<void> {
+    const token = readCookie(this.ctx.request().headers.cookie, STAFF_SESSION_COOKIE);
+    if (token) await staffSessionsRepository.delete(this.db, hashToken(token));
+    this.ctx.response().clearCookie(STAFF_SESSION_COOKIE, sessionCookieOptions(this.config));
   }
 
   /** Сотрудник по cookie текущего запроса или `null`. */

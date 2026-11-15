@@ -21,10 +21,12 @@ function readRootEnv(): Record<string, string> {
 
 const dev = readRootEnv();
 
-export const PORTS = { web: 3100, api: 3101, admin: 3102 } as const;
+export const PORTS = { web: 3100, api: 3101, admin: 3102, staff: 3103 } as const;
 
 export const API_URL = `http://localhost:${PORTS.api}`;
 export const ADMIN_URL = `http://app.localhost:${PORTS.admin}`;
+/** Суперадминка (ADR 0005). */
+export const STAFF_URL = `http://staff.localhost:${PORTS.staff}`;
 export const LANDING_URL = `http://localhost:${PORTS.web}`;
 /** Витрина магазина: `<поддомен>.localhost:3100`. */
 export const shopUrl = (subdomain: string, path = '/'): string => `http://${subdomain}.localhost:${PORTS.web}${path}`;
@@ -75,6 +77,11 @@ export const adminEnv: Record<string, string> = {
   VITE_STOREFRONT_PORT: String(PORTS.web),
 };
 
+/** Суперадминка: как админка — запросы на свой адрес, Vite пересылает `/v1` на API e2e. */
+export const staffEnv: Record<string, string> = {
+  API_PROXY_TARGET: API_URL,
+};
+
 /** Витрина и лендинг: API e2e напрямую. */
 export const webEnv: Record<string, string> = {
   VITE_API_URL: API_URL,
@@ -88,3 +95,6 @@ export const DEMO = {
   email: 'aigerim.kids@example.com',
   password: 'demo-password',
 } as const;
+
+/** Сотрудник суперадминки из сида (`DEV_STAFF` в `apps/api/src/core/db/seed/seed.ts`). */
+export const STAFF = { email: 'staff@example.com', password: 'staff-password' } as const;

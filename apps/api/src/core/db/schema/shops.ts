@@ -103,9 +103,12 @@ export const sessions = pgTable(
   (t) => [index('sessions_account_idx').on(t.accountId)],
 );
 
-export const authTokenPurpose = pgEnum('auth_token_purpose', ['verify_email', 'reset_password']);
+export const authTokenPurpose = pgEnum('auth_token_purpose', ['verify_email', 'reset_password', 'impersonate']);
 
-/** Одноразовые ссылки из писем: подтверждение почты, сброс пароля. */
+/**
+ * Одноразовые ссылки: из писем — подтверждение почты, сброс пароля; из суперадминки — вход «от имени» (`impersonate`,
+ * `staffUserId` — кто выдал, ADR 0005).
+ */
 export const authTokens = pgTable(
   'auth_tokens',
   {
@@ -114,6 +117,7 @@ export const authTokens = pgTable(
       .notNull()
       .references(() => accounts.id, { onDelete: 'cascade' }),
     purpose: authTokenPurpose().notNull(),
+    staffUserId: uuid().references(() => staffUsers.id, { onDelete: 'cascade' }),
     tokenHash: text().notNull(),
     expiresAt: at().notNull(),
     usedAt: at(),

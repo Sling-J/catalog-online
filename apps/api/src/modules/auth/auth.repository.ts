@@ -109,6 +109,27 @@ export const authRepository = {
     return row?.accountId ?? null;
   },
 
+  /** Погасить токен входа «от имени» (ADR 0005), как `useToken`: аккаунт и сотрудник, выдавший ссылку, или `null`. */
+  async useImpersonationToken(
+    db: DbOrTx,
+    tokenHash: string,
+    now: Date,
+  ): Promise<{ accountId: string; staffUserId: string } | null> {
+    const [row] = await db
+      .update(authTokens)
+      .set({ usedAt: now })
+      .where(
+        and(
+          eq(authTokens.tokenHash, tokenHash),
+          eq(authTokens.purpose, 'impersonate'),
+          isNull(authTokens.usedAt),
+          gt(authTokens.expiresAt, now),
+        ),
+      )
+      .returning({ accountId: authTokens.accountId, staffUserId: authTokens.staffUserId });
+    return row?.staffUserId ? { accountId: row.accountId, staffUserId: row.staffUserId } : null;
+  },
+
   /** Погасить прежние ссылки того же назначения — действует только последнее письмо. */
   async revokeTokens(db: DbOrTx, accountId: string, purpose: TokenPurpose, now: Date): Promise<void> {
     await db

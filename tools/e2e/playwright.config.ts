@@ -3,7 +3,7 @@ import { defineConfig } from '@playwright/test';
 import { apiEnv, PORTS } from './e2e-env.ts';
 
 // Сценарии в браузере на настоящем API (ADR 0001; T-502, решения основателя 2026-11-14): своя база `catalog_e2e`,
-// API, админка и витрина на портах 3101 / 3102 / 3100 — не мешают разработке на 3000–3002; фронты — продакшен-сборки
+// API, админка, витрина и суперадминка на портах 3101 / 3102 / 3100 / 3103 — не мешают разработке на 3000–3002; фронты — продакшен-сборки
 // (`scripts/start-fronts.ts`). Каждый прогон начинается
 // с чистой базы (`scripts/start-api.ts`), поэтому уже запущенные серверы не переиспользуем. Нужен docker compose
 // (PostgreSQL и S3). Браузер — установленный Google Chrome (канал chrome), браузеры Playwright не скачиваем.
@@ -37,7 +37,7 @@ export default defineConfig({
       stdout: 'pipe',
     },
     {
-      // собирает и запускает обе (админку и витрину); ждём админку, витрину — следующая запись
+      // собирает и запускает админку, витрину и суперадминку; ждём админку, остальные — следующие записи
       name: 'fronts',
       command: 'node scripts/start-fronts.ts',
       url: `http://localhost:${PORTS.admin}`,
@@ -49,6 +49,14 @@ export default defineConfig({
       name: 'web',
       command: 'node scripts/wait-forever.ts',
       url: `http://localhost:${PORTS.web}`,
+      reuseExistingServer: true,
+      timeout: 300_000,
+    },
+    {
+      // суперадминку тоже поднял `start-fronts.ts`
+      name: 'staff',
+      command: 'node scripts/wait-forever.ts',
+      url: `http://localhost:${PORTS.staff}`,
       reuseExistingServer: true,
       timeout: 300_000,
     },

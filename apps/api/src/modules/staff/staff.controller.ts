@@ -1,9 +1,11 @@
 import type {
   StaffBlockShopData,
   StaffImpersonateShopData,
+  StaffImpersonateShopResponse,
   StaffListShopsData,
   StaffListShopsResponse,
   StaffLoginData,
+  StaffMeResponse,
   StaffUnblockShopData,
 } from '@catalog/contract';
 import type { StaffControllerMethods } from '@catalog/contract/nest';
@@ -33,6 +35,19 @@ export class StaffController implements StaffControllerMethods {
     return this.staff.login(body);
   }
 
+  @Post('logout')
+  @HttpCode(204)
+  @StaffAuthenticated()
+  staffLogout(): Promise<void> {
+    return this.staff.logout();
+  }
+
+  @Get('me')
+  @StaffAuthenticated()
+  staffMe(): Promise<StaffMeResponse> {
+    return this.staff.me(this.ctx.staffId());
+  }
+
   @Get('shops')
   @StaffAuthenticated()
   staffListShops(
@@ -60,9 +75,9 @@ export class StaffController implements StaffControllerMethods {
   }
 
   @Post('shops/:shopId/impersonate')
-  @HttpCode(204)
+  @HttpCode(200)
   @StaffAuthenticated()
-  staffImpersonateShop(@Param(PathIds) path: StaffImpersonateShopData['path']): Promise<void> {
+  staffImpersonateShop(@Param(PathIds) path: StaffImpersonateShopData['path']): Promise<StaffImpersonateShopResponse> {
     return this.staff.impersonate(this.ctx.staffId(), path.shopId);
   }
 }

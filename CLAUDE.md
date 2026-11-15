@@ -30,7 +30,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 | Дизайн-система | `DESIGN.md` (+ `.impeccable/design.json`, токены в коде — `packages/ui/src/tokens.css`) |
 | Экраны и решения по витрине и админке | `docs/04-design/storefront.md`, `admin.md`; макеты (вёрстка) — `design/canvas/` (копия холста, см. её README) |
 | Стек и архитектурные решения | `docs/02-architecture/adr/` |
-| Структура кода фронтов (FSD) | `docs/02-architecture/frontend-structure.md` (ADR 0002) |
+| Структура кода фронтов (FSD) | `docs/02-architecture/frontend-structure.md` (ADR 0002); суперадминка — отдельное приложение (ADR 0005) |
 | Структура кода бэкенда (модули Nest) | `docs/02-architecture/backend-structure.md` (ADR 0004) |
 | Модель данных, соглашения API | `docs/02-architecture/data-model.md`, `api.md`; контракт — `packages/contract/openapi.yaml` |
 | План и задачи | `docs/05-tasks/roadmap.md`, `backlog.md` |
@@ -59,7 +59,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - `pnpm format` / `pnpm format:check` — Prettier.
 - `pnpm i18n:extract` — строки Lingui в каталоги `.po`.
 - `docker compose up -d` — PostgreSQL и S3-хранилище для разработки (`.env.example`).
-- `pnpm dev` — API и оба фронта; фронты на настоящем API (нужны `docker compose up -d`, миграции, `db:seed`). Моки MSW — `vite --mode mocks` (конфигурации `admin-check` :3012 и `web-mocks` :3010 в `.claude/launch.json`).
+- `pnpm dev` — API, витрина, админка и суперадминка (`staff.localhost:3003`); фронты на настоящем API (нужны `docker compose up -d`, миграции, `db:seed`). Моки MSW — `vite --mode mocks` (конфигурации `admin-check` :3012 и `web-mocks` :3010 в `.claude/launch.json`).
 - `pnpm e2e` — сценарии в браузере на настоящем API (`tools/e2e`, своя база `catalog_e2e`, продакшен-сборки фронтов; нужны `docker compose up -d` и Chrome); после правок фронтов, в `pnpm check` не входит.
 - `pnpm --filter @catalog/api dev` — API на :3001 (корневой `.env`); `db:generate` / `db:migrate` — миграции drizzle-kit, `db:studio` — база в браузере (Drizzle Studio, https://local.drizzle.studio), `db:seed` — демо-магазины (вход как на моках), их фото и сотрудник суперадминки, `demo:publish` — демо для лендинга на продакшене (войти нельзя; в базе разработки не запускать), `storage:setup` — хранилища разработки (один раз), `staff:create <почта>` — сотрудник суперадминки (пароль спросит). Тесты API (в `pnpm check`) — на Testcontainers, нужен запущенный Docker.
 - `pnpm design:compare --board <доска> --frame <экран> --url <адрес>` — сверка экрана с макетом (`tools/design-compare/README.md`); после вёрстки по макету — обязательно, вместо ручных замеров в браузере. Сверяем на моках: админку — http://localhost:3012 (`admin-check`), витрину — http://aigerim-kids.localhost:3010 (`web-mocks`).
@@ -68,9 +68,10 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - Контракт API правится только в `openapi.yaml`, затем `pnpm generate`; сгенерированное (`*.gen.ts`) руками не трогаем.
 - Демо-данные «Айгерим Kids» для моков — `@catalog/contract/fixtures`, обработчики MSW — `@catalog/contract/msw`. В разработке приложения берут контракт из `src/` (условие `development` в `exports`), пересобирать после правок моков не нужно; `tsc` приложений по-прежнему смотрит на `dist` — его обновляет `pnpm check` / `pnpm build`.
 - Сообщения превью админка ↔ витрина (`postMessage`) — `@catalog/contract/preview` (Zod), не в `openapi.yaml`.
-- Код `apps/web` и `apps/admin` — по FSD (`docs/02-architecture/frontend-structure.md`): слои `app → pages → widgets → features → entities → shared`, без импортов между срезами одного слоя, снаружи среза только через его `index.ts`, алиас `@/*` → `src/*`. Границы проверяет `pnpm lint` (`eslint.fsd.js`).
+- Код `apps/web`, `apps/admin` и `apps/staff` — по FSD (`docs/02-architecture/frontend-structure.md`): слои `app → pages → widgets → features → entities → shared`, без импортов между срезами одного слоя, снаружи среза только через его `index.ts`, алиас `@/*` → `src/*`. Границы проверяет `pnpm lint` (`eslint.fsd.js`).
 - Токены дизайн-системы — `packages/ui/src/tokens.css` (Tailwind v4 `@theme`), источник — `DESIGN.md`.
 - Формы админки — TanStack Form через `useAppForm` из `@/shared/ui` (ADR 0003): проверка в `validators.onSubmit`, отправка `submitForm`, ошибки сервера `setServerError` / `setFormError`. Уход с несохранёнными правками — `useLeaveGuard` из `@/shared/hooks` и `LeaveConfirm` из `@/shared/ui`; общие поля форм (`TextAreaField`, `FieldLabel`, `FieldNote`, `SaveBar`) — там же.
+- Суперадминка (`apps/staff`, ADR 0005): строки без Lingui (плагин Lingui в сборке только для `@catalog/ui`), без моков и TanStack Form; вход «от имени» — ссылка с одноразовым токеном из `staffImpersonateShop`, админка меняет его на сессию на `/impersonate`.
 - Ссылка на витрину в админке — только `StorefrontLink` из `@/entities/shop`: до публикации он сам ведёт в превью (`?preview=<токен>`), обычный адрес черновика покупателю не отвечает (A32).
 - Файл в хранилище (API2) — `uploadFile` из `@/shared/api`; перетаскивание в админке — `@dnd-kit/react` (ADR 0001, пример — `features/product-photos/ui/sortable-photos`).
 - Выпадающий список — `Select` из `@catalog/ui` (панель на компьютере, шторка на телефоне, действия под чертой — `actions`), не системный `<select>`. Копирование с отметкой «Скопировано» — `useCopied` из `@/shared/hooks`.

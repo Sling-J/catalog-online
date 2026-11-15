@@ -15,6 +15,13 @@
       "when": 1794231915040,
       "tag": "0001_shop_logo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794728022426,
+      "tag": "0002_impersonation_token",
+      "breakpoints": true
     }
   ]
 }

@@ -20,4 +20,8 @@ export const staffSessionsRepository = {
       .where(and(eq(staffSessions.id, id), gt(staffSessions.expiresAt, now)));
     return row?.staffUserId ?? null;
   },
+
+  async delete(db: DbOrTx, id: string): Promise<void> {
+    await db.delete(staffSessions).where(eq(staffSessions.id, id));
+  },
 };

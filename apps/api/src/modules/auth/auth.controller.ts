@@ -5,6 +5,7 @@ import type {
   Me,
   RegisterData,
   ResetPasswordData,
+  StartImpersonationData,
   VerifyEmailData,
 } from '@catalog/contract';
 import type { AuthControllerMethods } from '@catalog/contract/nest';
@@ -14,6 +15,7 @@ import {
   zLoginBody,
   zRegisterBody,
   zResetPasswordBody,
+  zStartImpersonationBody,
   zVerifyEmailBody,
 } from '@catalog/contract/zod';
 import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
@@ -65,6 +67,13 @@ export class AuthController implements AuthControllerMethods {
   @RateLimit(20, 15 * MINUTE)
   verifyEmail(@Body({ schema: zVerifyEmailBody }) body: VerifyEmailData['body']): Promise<void> {
     return this.auth.verifyEmail(body.token);
+  }
+
+  @Post('impersonation')
+  @HttpCode(204)
+  @RateLimit(20, 15 * MINUTE)
+  startImpersonation(@Body({ schema: zStartImpersonationBody }) body: StartImpersonationData['body']): Promise<void> {
+    return this.auth.startImpersonation(body.token);
   }
 
   @Post('email/resend')

@@ -92,6 +92,15 @@ export class AuthService {
     await authRepository.markEmailVerified(this.db, accountId, now);
   }
 
+  /** Вход «от имени» по ссылке из суперадминки (FR-S3, ADR 0005): токен гаснет, cookie `sid` с отметкой сотрудника. */
+  async startImpersonation(token: string): Promise<void> {
+    await this.db.transaction(async (tx) => {
+      const used = await authRepository.useImpersonationToken(tx, hashToken(token), new Date());
+      if (!used) throw new AppError('token_expired', 410);
+      await this.sessions.startImpersonated(used.accountId, used.staffUserId, tx);
+    });
+  }
+
   /**
    * Новое письмо подтверждения; прежние ссылки гаснут. Почта уже подтверждена — ничего не делаем. Во входе
    * сотрудника «от имени» — 403: письма владельцу шлёт только он сам (решение основателя 2026-11-10, T-412).

@@ -1,7 +1,7 @@
 ---
 status: accepted
 owner: founder
-updated: 2026-11-10
+updated: 2026-11-15
 ---
 
 # Модель данных
@@ -25,7 +25,7 @@ updated: 2026-11-10
 erDiagram
   shops ||--|| accounts : "один логин (D10)"
   accounts ||--o{ sessions : ""
-  accounts ||--o{ auth_tokens : "почта, сброс пароля"
+  accounts ||--o{ auth_tokens : "почта, сброс пароля, вход «от имени»"
   shops ||--o{ categories : ""
   categories ||--o{ categories : "родитель (до 2 уровней)"
   shops ||--o{ attributes : "Рост, Размер обуви, Цвет"
@@ -79,7 +79,7 @@ erDiagram
 
 **sessions** — сессии входа (cookie). `id` (случайный токен, хранится хеш), `account_id`, `expires_at`, `created_at`, `user_agent`, `ip`. Для входа суперадмина «от имени» — `impersonated_by → staff_users` (FR-S3).
 
-**auth_tokens** — одноразовые ссылки: `id`, `account_id`, `purpose` (`verify_email` / `reset_password`), `token_hash`, `expires_at`, `used_at`.
+**auth_tokens** — одноразовые ссылки: `id`, `account_id`, `purpose` (`verify_email` / `reset_password` / `impersonate`), `staff_user_id` (кто выдал ссылку входа «от имени», ADR 0005), `token_hash`, `expires_at`, `used_at`.
 
 ### Каталог
 
