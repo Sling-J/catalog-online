@@ -20,7 +20,6 @@ export default tseslint.config(
       '**/public/mockServiceWorker.js',
       '**/src/locales/**/*.ts',
       'design-assets/**',
-      'design/canvas/**',
       'docs/**',
       '.claude/**',
       '.impeccable/**',

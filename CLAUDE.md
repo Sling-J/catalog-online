@@ -28,14 +28,14 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 | Продукт: объём MVP, решения D…, требования, сценарии | `docs/01-product/` |
 | Контекст продукта для дизайна | `PRODUCT.md` |
 | Дизайн-система | `DESIGN.md` (+ `.impeccable/design.json`, токены в коде — `packages/ui/src/tokens.css`) |
-| Экраны и решения по витрине и админке | `docs/04-design/storefront.md`, `admin.md`; макеты (вёрстка) — `design/canvas/` (копия холста, см. её README) |
+| Экраны и решения по витрине и админке | `docs/04-design/storefront.md`, `admin.md`; макеты — холст на claude.ai, референс стиля (ссылка и правила — `docs/04-design/README.md`) |
 | Стек и архитектурные решения | `docs/02-architecture/adr/` |
 | Структура кода фронтов (FSD) | `docs/02-architecture/frontend-structure.md` (ADR 0002); суперадминка — отдельное приложение (ADR 0005) |
 | Структура кода бэкенда (модули Nest) | `docs/02-architecture/backend-structure.md` (ADR 0004) |
 | Модель данных, соглашения API | `docs/02-architecture/data-model.md`, `api.md`; контракт — `packages/contract/openapi.yaml` |
 | План и задачи | `docs/05-tasks/roadmap.md`, `backlog.md` |
 | Нерешённое | `docs/open-questions.md` |
-| Идеи по интерфейсу, которых нет в макетах (сначала макет, потом код) | `docs/ideas.md` |
+| Идеи по интерфейсу, которых ещё нет в продукте | `docs/ideas.md` |
 | Устройство кода и команды | `README.md`, раздел «Команды» ниже |
 
 Правила (подробно — `docs/06-process/documentation-rules.md`):
@@ -47,7 +47,6 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - Задача закрыта → галочка в `backlog.md` (строка задачи не растёт), в `changelog.md` — что сделано, решения по ходу, что не сделано, как проверено; в `status.md` — «Последнее» и «Следующий шаг» (историю там не копим).
 - Появилась команда, пакет, переменная окружения, договорённость по коду → `README.md` и разделы «Команды» и «Код» ниже, `.env.example`.
 - Новый документ → строка в `README.md` своего раздела и, если раздел новый, в `docs/README.md`. В оглавлениях — только существующие файлы.
-- Изменился макет на холсте → обновить копию в `design/canvas/` (и наоборот), в том же коммите.
 - Перед коммитом: `pnpm check` проходит и документы не противоречат коду и друг другу.
 
 ## Команды
@@ -62,7 +61,6 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 - `pnpm dev` — API, витрина, админка и суперадминка (`staff.localhost:3003`); фронты на настоящем API (нужны `docker compose up -d`, миграции, `db:seed`). Моки MSW — `vite --mode mocks` (конфигурации `admin-check` :3012 и `web-mocks` :3010 в `.claude/launch.json`).
 - `pnpm e2e` — сценарии в браузере на настоящем API (`tools/e2e`, своя база `catalog_e2e`, продакшен-сборки фронтов; нужны `docker compose up -d` и Chrome); после правок фронтов, в `pnpm check` не входит.
 - `pnpm --filter @catalog/api dev` — API на :3001 и процесс фоновых задач `worker.ts` (корневой `.env`); `db:generate` / `db:migrate` — миграции drizzle-kit, `db:studio` — база в браузере (Drizzle Studio, https://local.drizzle.studio), `db:seed` — демо-магазины (вход как на моках), их фото и сотрудник суперадминки, `demo:publish` — демо для лендинга на продакшене (войти нельзя; в базе разработки не запускать), `storage:setup` — хранилища разработки (один раз), `staff:create <почта>` — сотрудник суперадминки (пароль спросит). Тесты API (в `pnpm check`) — на Testcontainers, нужен запущенный Docker.
-- `pnpm design:compare --board <доска> --frame <экран> --url <адрес>` — сверка экрана с макетом (`tools/design-compare/README.md`); после вёрстки по макету — обязательно, вместо ручных замеров в браузере. Сверяем на моках: админку — http://localhost:3012 (`admin-check`), витрину — http://aigerim-kids.localhost:3010 (`web-mocks`).
 
 ## Код
 - Контракт API правится только в `openapi.yaml`, затем `pnpm generate`; сгенерированное (`*.gen.ts`) руками не трогаем.

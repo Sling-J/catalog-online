@@ -8,7 +8,6 @@ pnpm-lock.yaml
 **/src/gen
 **/src/locales
 design-assets
-design/canvas
 .claude
 .impeccable
 docs
