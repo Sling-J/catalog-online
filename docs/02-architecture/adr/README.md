@@ -13,3 +13,4 @@
 | [0003](0003-forms-tanstack-form.md) | Формы админки: TanStack Form | accepted |
 | [0004](0004-backend-structure.md) | Структура кода бэкенда: модульный монолит на модулях NestJS | accepted |
 | [0005](0005-staff-app.md) | Суперадминка — отдельное приложение `apps/staff` | accepted |
+| [0006](0006-hosting.md) | Хостинг: ps.kz, один VPS в Казахстане | accepted |
