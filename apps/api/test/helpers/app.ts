@@ -50,7 +50,8 @@ class TestMailer extends Mailer {
  * Приложение целиком на своей базе (backend-structure.md, раздел 11) — тот же конвейер, что в `main.ts`.
  * `controllers` и `providers` — служебные части теста (например, чтобы проверить core без модулей); `realJobs` —
  * настоящая очередь pg-boss вместо очереди в памяти (только для проверки самой очереди); `jobsRole` — роль процесса
- * в очереди (`enqueue` — как API, `work` — как `worker.ts`), `databaseUrl` — общая база двух приложений теста.
+ * в очереди (`enqueue` — как API, `work` — как `worker.ts`), `databaseUrl` — общая база двух приложений теста,
+ * `env` — переменные окружения поверх тестовых (например, `TRUST_PROXY`).
  */
 export async function createTestApp(
   options: {
@@ -59,6 +60,7 @@ export async function createTestApp(
     realJobs?: boolean;
     jobsRole?: JobsRole;
     databaseUrl?: string;
+    env?: Record<string, string>;
   } = {},
 ): Promise<TestApp> {
   const mails: MailMessage[] = [];
@@ -75,6 +77,7 @@ export async function createTestApp(
     S3_PUBLIC_BUCKET: 'catalog-public',
     S3_PRIVATE_BUCKET: 'catalog-private',
     S3_PUBLIC_URL: TEST_PUBLIC_URL,
+    ...options.env,
   });
   // с настоящей очередью приложение по умолчанию и выполняет задачи (как API и процесс задач вместе)
   const config = { ...parsed, jobsRole: options.jobsRole ?? (options.realJobs ? 'work' : 'enqueue') };

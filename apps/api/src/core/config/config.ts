@@ -8,6 +8,9 @@ const csv = z.string().transform((value) =>
     .filter(Boolean),
 );
 
+/** Подсеть для `trust proxy`: имя из Express (`loopback`, `linklocal`, `uniquelocal`) или адрес / CIDR. */
+const PROXY = /^(loopback|linklocal|uniquelocal|[\d.]+(\/\d{1,2})?|[\da-f:]+(\/\d{1,3})?)$/i;
+
 /**
  * Переменные окружения API (backend-structure.md, раздел 10). Каждая новая — сюда,
  * в `.env.example` и в README.
@@ -25,8 +28,16 @@ const envSchema = z
     /** Адреса фронтов для CORS; `*` — любой поддомен: `http://*.localhost:3000`. */
     CORS_ORIGINS: csv.pipe(z.array(z.string().min(1)).min(1)),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
-    /** Сколько прокси перед API (Caddy — 1): от этого зависит IP клиента для ограничения частоты. */
-    TRUST_PROXY: z.coerce.number().int().min(0).default(0),
+    /**
+     * Каким прокси верить в `X-Forwarded-For` — от этого зависит IP клиента для ограничения частоты (Express
+     * `trust proxy`). Число — сколько прокси перед API; список подсетей через запятую (`loopback, uniquelocal`) —
+     * каким адресам верить. В продакшене — список: к API два пути разной длины (Caddy → api и Caddy → web → api,
+     * SSR витрины), число на одном из них верит подделанному заголовку (api.md, «Ограничение частоты»).
+     */
+    TRUST_PROXY: z
+      .string()
+      .default('0')
+      .pipe(z.union([z.string().regex(/^\d+$/).transform(Number), csv.pipe(z.array(z.string().regex(PROXY)).min(1))])),
     /** Адрес админки — для ссылок в письмах (api.md, «Ссылки из писем»). */
     ADMIN_URL: z.url({ protocol: /^https?$/ }).transform((url) => url.replace(/\/+$/, '')),
     /** Общий домен админки и API для cookie сессии (`.example.kz`); пусто — cookie только для адреса API. */
@@ -74,7 +85,8 @@ export type Config = {
   databasePoolMax: number;
   corsOrigins: string[];
   logLevel: z.infer<typeof envSchema>['LOG_LEVEL'];
-  trustProxy: number;
+  /** Число прокси или список доверенных подсетей — как `trust proxy` в Express. */
+  trustProxy: number | string[];
   adminUrl: string;
   cookieDomain: string | undefined;
   smtpUrl: string | undefined;

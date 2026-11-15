@@ -1,5 +1,6 @@
 import { client } from '@catalog/contract';
 
+import { getForwardedFor } from './forwarded-for';
 import { getPreviewToken, PREVIEW_PARAM } from './preview';
 
 const DEV_API_URL = 'http://localhost:3001';
@@ -16,6 +17,7 @@ let configured = false;
  * Клиент SDK один на процесс, поэтому настраиваем его один раз, а токен берём на каждый запрос.
  * `X-Requested-With` API требует у изменяющих запросов (корзина, события) — защита от CSRF (api.md, «Вход»). Ставим
  * его только им: у чтения нестандартный заголовок превращал бы каждый запрос витрины в два (T-501).
+ * На сервере (SSR) — `X-Forwarded-For` с IP покупателя (`forwarded-for.ts`); в браузере его нет.
  */
 export function configureApi(): void {
   if (configured) return;
@@ -24,6 +26,8 @@ export function configureApi(): void {
   if (baseUrl) client.setConfig({ baseUrl });
   client.interceptors.request.use(async (request) => {
     if (!READ_METHODS.has(request.method)) request.headers.set('X-Requested-With', 'XMLHttpRequest');
+    const forwardedFor = getForwardedFor();
+    if (forwardedFor) request.headers.set('X-Forwarded-For', forwardedFor);
     const token = getPreviewToken();
     const url = new URL(request.url);
     if (!token || !url.pathname.includes('/v1/storefront/')) return request;

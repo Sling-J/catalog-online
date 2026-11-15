@@ -50,6 +50,13 @@ describe('parseConfig', () => {
     expect(parseConfig({ ...base, API_PORT: '4000', TRUST_PROXY: '1' })).toMatchObject({ port: 4000, trustProxy: 1 });
   });
 
+  it('TRUST_PROXY списком подсетей — для двух путей к API (Caddy → api и Caddy → web → api)', () => {
+    expect(parseConfig({ ...base, TRUST_PROXY: 'loopback, uniquelocal, 10.1.0.0/16, fd00::/8' })).toMatchObject({
+      trustProxy: ['loopback', 'uniquelocal', '10.1.0.0/16', 'fd00::/8'],
+    });
+    expect(() => parseConfig({ ...base, TRUST_PROXY: 'caddy' })).toThrow(/TRUST_PROXY/);
+  });
+
   it('папка писем и выключенные лимиты — только не в продакшене (e2e, T-502)', () => {
     expect(parseConfig({ ...base, MAIL_OUTBOX_DIR: '.mail', RATE_LIMITS: 'off' })).toMatchObject({
       mailOutboxDir: '.mail',

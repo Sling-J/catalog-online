@@ -157,6 +157,36 @@ describe('core', () => {
     expect(Number(res.headers['retry-after'])).toBeGreaterThan(0);
   });
 
+  describe('ограничение частоты за прокси (TRUST_PROXY списком, api.md)', () => {
+    // Путь SSR: покупатель → Caddy (172.18.0.2) → web (здесь — loopback теста) → api.
+    // Caddy пишет в X-Forwarded-For адрес покупателя, web дописывает адрес Caddy.
+    let proxied: TestApp;
+    beforeAll(async () => {
+      proxied = await createTestApp({ controllers: [ProbeController], env: { TRUST_PROXY: 'loopback, uniquelocal' } });
+    });
+    afterAll(async () => {
+      await proxied?.close();
+    });
+
+    const send = (forwardedFor: string) =>
+      proxied
+        .http()
+        .post('/test/limited')
+        .set('X-Requested-With', 'XMLHttpRequest')
+        .set('X-Forwarded-For', forwardedFor);
+
+    it('счётчик — у каждого покупателя свой, а не один на сервер витрины', async () => {
+      await send('203.0.113.5, 172.18.0.2').expect(201);
+      await send('203.0.113.5, 172.18.0.2').expect(201);
+      await send('203.0.113.5, 172.18.0.2').expect(429);
+      await send('203.0.113.6, 172.18.0.2').expect(201);
+    });
+
+    it('подделанный адрес слева от настоящего не обходит лимит', async () => {
+      await send('198.51.100.1, 203.0.113.5, 172.18.0.2').expect(429);
+    });
+  });
+
   describe('CORS', () => {
     it('витрина на поддомене и админка разрешены, с cookie', async () => {
       for (const origin of ['http://aigerim-kids.localhost:3000', 'http://app.localhost:3002']) {
