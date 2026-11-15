@@ -1,0 +1,47 @@
+# Claude в issue и PR: отвечает на комментарии с @claude (docs/06-process/workflow.md, «Claude в GitHub»).
+# Только обсуждение: код читает, но не меняет. Отвечает лишь тем, у кого есть права записи в репозиторий.
+name: Claude
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+
+jobs:
+  claude:
+    # Машину поднимаем только когда Claude позвали.
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: claude-${{ github.event.issue.number || github.event.pull_request.number }}
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          # Токен подписки (claude setup-token), секрет репозитория.
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --model claude-sonnet-5-5
+            --max-turns 10
+            --append-system-prompt "Ты в issue на GitHub, отвечаешь участнице команды по продукту (не разработчику).
+            - Пиши по-русски, простым языком, без кода и названий файлов, если о них не спросили.
+            - Опирайся на docs/: объём MVP и решения (01-product), экраны (04-design), бэклог (05-tasks). Если идея противоречит принятому решению — скажи, какому, и почему оно было принято.
+            - Помогай продумать задачу: зачем она магазину и покупателю, сценарии, крайние случаи, что войдёт в первую версию, а что позже; задавай уточняющие вопросы.
+            - Если задача уже есть в бэклоге или макетах — скажи где.
+            - Ты только обсуждаешь: файлы не меняешь, реализацию не обещаешь. Правила из CLAUDE.md про обновление документов и коммиты здесь не действуют.
+            - В конце длинного обсуждения — короткий итог: что решили, что открыто. Решения принимает основатель и записывает в docs/."

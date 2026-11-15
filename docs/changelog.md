@@ -279,3 +279,4 @@ updated: 2026-11-15
 ## Документация и процесс
 
 - 2026-11-08: документация приведена к правилу «один факт — одно место» (`06-process/documentation-rules.md`, теперь `accepted`): бэклог — только список задач, подробности закрытых задач перенесены сюда; состояние проекта — только в `status.md`; оглавления разделов без несуществующих файлов и без статусов; README у `00-vision`; закрыты устаревшие вопросы (кабинет магазина, WhatsApp). Появилась проверка `pnpm docs:check` (`tools/docs-check`) — в `pnpm check` и CI.
+- 2026-11-15: Claude в issue и PR — workflow `.github/workflows/claude.yml` (`anthropics/claude-code-action`), отвечает на `@claude` авторам с правами записи; пока только обсуждение (код читает, не меняет), на подписке основателя, модель Sonnet, до 10 шагов. Правила — `06-process/workflow.md`, «Claude в GitHub». Проверено: `pnpm check`; живой ответ в issue — после установки приложения Claude и секрета `CLAUDE_CODE_OAUTH_TOKEN`.
