@@ -1,11 +1,13 @@
 import { eq } from 'drizzle-orm';
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createTestApp, TEST_ADMIN_URL, type TestApp } from '../../../test/helpers/app.js';
 import { connectTestDb } from '../../../test/helpers/db.js';
 import { signUp } from '../../../test/helpers/session.js';
 import { accounts, authTokens, shops } from '../../core/db/schema/index.js';
+import { Mailer } from '../../core/mail/index.js';
+import { AUTH_MAIL } from './lib/auth-mail-job.js';
 
 const PASSWORD = 'correct-horse-1';
 const XRW = { 'X-Requested-With': 'XMLHttpRequest' };
@@ -31,9 +33,15 @@ const register = (agent: ReturnType<typeof browser>, email: string, password = P
 const login = (agent: ReturnType<typeof browser>, email: string, password = PASSWORD) =>
   agent.post('/v1/auth/login').set(XRW).send({ email, password });
 
+/** Письма уходят задачей `auth.mail` (T-609): выполнить поставленное и вернуть все письма. */
+async function sentMails(t: TestApp) {
+  await t.jobs.drain();
+  return t.mails;
+}
+
 /** Токен из ссылки последнего письма. */
-function tokenFromLastMail(t: TestApp, path: string): string {
-  const mail = t.mails.at(-1);
+async function tokenFromLastMail(t: TestApp, path: string): Promise<string> {
+  const mail = (await sentMails(t)).at(-1);
   const match = mail?.text.match(new RegExp(`${TEST_ADMIN_URL}${path}\\?token=([\\w-]+)`));
   if (!match) throw new Error(`В письме нет ссылки ${path}`);
   return match[1]!;
@@ -53,7 +61,7 @@ describe('регистрация, вход, выход', () => {
     expect(cookie).toMatch(/^sid=[\w-]{43};/);
     expect(cookie).toMatch(/HttpOnly/i);
     expect(cookie).toMatch(/SameSite=Lax/i);
-    expect(app.t.mails.at(-1)).toMatchObject({ to: 'new.shop@example.com', subject: 'Подтвердите почту' });
+    expect((await sentMails(app.t)).at(-1)).toMatchObject({ to: 'new.shop@example.com', subject: 'Подтвердите почту' });
 
     const me = await agent.get('/v1/auth/me').expect(200);
     expect(me.body.account.id).toBe(res.body.account.id);
@@ -118,7 +126,7 @@ describe('подтверждение почты', () => {
   it('ссылка из письма подтверждает почту; повторно — 410 token_expired', async () => {
     const agent = browser(app.t);
     await register(agent, 'verify@example.com').expect(201);
-    const token = tokenFromLastMail(app.t, '/verify-email');
+    const token = await tokenFromLastMail(app.t, '/verify-email');
 
     // ссылку можно открыть в другом браузере — сессия не нужна
     await request(app.t.app.getHttpServer()).post('/v1/auth/email/verify').set(XRW).send({ token }).expect(204);
@@ -131,7 +139,7 @@ describe('подтверждение почты', () => {
   it('просроченная ссылка — 410', async () => {
     const agent = browser(app.t);
     const registered = await register(agent, 'expired@example.com').expect(201);
-    const token = tokenFromLastMail(app.t, '/verify-email');
+    const token = await tokenFromLastMail(app.t, '/verify-email');
     const { db, close } = connectTestDb(app.t.config.databaseUrl);
     await db
       .update(authTokens)
@@ -144,9 +152,9 @@ describe('подтверждение почты', () => {
   it('«Ещё раз» — новое письмо, прежняя ссылка гаснет', async () => {
     const agent = browser(app.t);
     await register(agent, 'resend@example.com').expect(201);
-    const first = tokenFromLastMail(app.t, '/verify-email');
+    const first = await tokenFromLastMail(app.t, '/verify-email');
     await agent.post('/v1/auth/email/resend').set(XRW).expect(204);
-    const second = tokenFromLastMail(app.t, '/verify-email');
+    const second = await tokenFromLastMail(app.t, '/verify-email');
     expect(second).not.toBe(first);
     await agent.post('/v1/auth/email/verify').set(XRW).send({ token: first }).expect(410);
     await agent.post('/v1/auth/email/verify').set(XRW).send({ token: second }).expect(204);
@@ -162,18 +170,18 @@ describe('пароль', () => {
 
   it('«Забыли пароль»: одинаковый ответ; письмо — только существующей почте', async () => {
     await register(browser(app.t), 'forgot@example.com').expect(201);
-    const before = app.t.mails.length;
+    const before = (await sentMails(app.t)).length;
     await browser(app.t).post('/v1/auth/password/forgot').set(XRW).send({ email: 'nobody@example.com' }).expect(204);
-    expect(app.t.mails.length).toBe(before);
+    expect((await sentMails(app.t)).length).toBe(before);
     await browser(app.t).post('/v1/auth/password/forgot').set(XRW).send({ email: 'Forgot@example.com' }).expect(204);
-    expect(app.t.mails.at(-1)).toMatchObject({ to: 'forgot@example.com', subject: 'Новый пароль' });
+    expect((await sentMails(app.t)).at(-1)).toMatchObject({ to: 'forgot@example.com', subject: 'Новый пароль' });
   });
 
   it('новый пароль по ссылке: все сессии закрыты, вход с новым паролем', async () => {
     const agent = browser(app.t);
     await register(agent, 'reset@example.com').expect(201);
     await browser(app.t).post('/v1/auth/password/forgot').set(XRW).send({ email: 'reset@example.com' }).expect(204);
-    const token = tokenFromLastMail(app.t, '/reset-password');
+    const token = await tokenFromLastMail(app.t, '/reset-password');
 
     await browser(app.t)
       .post('/v1/auth/password/reset')
@@ -279,7 +287,7 @@ describe('пароль: проверка нового', () => {
     const agent = browser(app.t);
     await register(agent, 'short@example.com').expect(201);
     await browser(app.t).post('/v1/auth/password/forgot').set(XRW).send({ email: 'short@example.com' }).expect(204);
-    const token = tokenFromLastMail(app.t, '/reset-password');
+    const token = await tokenFromLastMail(app.t, '/reset-password');
     const reset = await browser(app.t)
       .post('/v1/auth/password/reset')
       .set(XRW)
@@ -298,5 +306,50 @@ describe('пароль: проверка нового', () => {
       .set(XRW)
       .send({ token, password: 'long-enough-1' })
       .expect(204);
+  });
+});
+
+describe('письма через очередь (T-609)', () => {
+  const app = useApp();
+
+  it('запрос письма не ждёт; в задаче нет ссылки; SMTP упал — задача падает и на повторе шлёт новую ссылку', async () => {
+    await register(browser(app.t), 'queued@example.com').expect(201);
+    await app.t.jobs.drain();
+    const before = app.t.mails.length;
+    await browser(app.t).post('/v1/auth/password/forgot').set(XRW).send({ email: 'queued@example.com' }).expect(204);
+    expect(app.t.mails.length).toBe(before);
+    const job = app.t.jobs.sent.at(-1)!;
+    expect(job).toMatchObject({ name: 'auth.mail', data: { purpose: 'reset_password' } });
+    expect(Object.keys(job.data).sort()).toEqual(['accountId', 'purpose']);
+
+    const mailer = app.t.app.get(Mailer);
+    const send = vi.spyOn(mailer, 'send').mockRejectedValueOnce(new Error('SMTP недоступен'));
+    await expect(app.t.jobs.run(AUTH_MAIL, job.data as never)).rejects.toThrow('SMTP недоступен');
+    await app.t.jobs.run(AUTH_MAIL, job.data as never, { last: true });
+    send.mockRestore();
+    expect(app.t.mails.length).toBe(before + 1);
+    const token = await tokenFromLastMail(app.t, '/reset-password');
+    await browser(app.t)
+      .post('/v1/auth/password/reset')
+      .set(XRW)
+      .send({ token, password: 'after-retry-1' })
+      .expect(204);
+  });
+
+  it('почта уже подтверждена к моменту отправки — письма нет', async () => {
+    await register(browser(app.t), 'verified-before@example.com').expect(201);
+    const job = app.t.jobs.sent.splice(-1)[0]!;
+    const { db, close } = connectTestDb(app.t.config.databaseUrl);
+    try {
+      await db
+        .update(accounts)
+        .set({ emailVerifiedAt: new Date() })
+        .where(eq(accounts.email, 'verified-before@example.com'));
+    } finally {
+      await close();
+    }
+    const before = app.t.mails.length;
+    await app.t.jobs.run(AUTH_MAIL, job.data as never);
+    expect(app.t.mails.length).toBe(before);
   });
 });

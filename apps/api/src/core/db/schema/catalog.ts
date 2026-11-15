@@ -118,6 +118,8 @@ export const products = pgTable(
     index('products_shop_created_idx').on(t.shopId, t.createdAt),
     index('products_shop_group_key_idx').on(t.shopId, t.groupKey),
     index('products_category_idx').on(t.categoryId),
+    // поиск витрины `ilike '%слово%'` (T-611, scaling.md SC10): триграммы pg_trgm без учёта регистра
+    index('products_name_trgm_idx').using('gin', t.name.op('gin_trgm_ops')),
   ],
 );
 

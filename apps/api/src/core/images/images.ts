@@ -2,7 +2,7 @@ import type { Image } from '@catalog/contract';
 import { Global, Injectable, Logger, Module } from '@nestjs/common';
 
 import { Storage, type BucketKind } from '../storage/index.js';
-import { IMAGE_WIDTHS, renderImage, type ImageWidth } from './render.js';
+import { IMAGE_WIDTHS, renderImageIsolated, type ImageWidth } from './render.js';
 
 /** Готовая картинка в базе: стороны исходника и ключи размеров в публичном хранилище. */
 export type StoredImage = { width: number; height: number; sizes: Record<ImageWidth, string> };
@@ -17,9 +17,9 @@ export class Images {
 
   constructor(private readonly storage: Storage) {}
 
-  /** Сжать и выложить. Не открылось — `ImageUnreadableError`; ошибки хранилища — как есть (повторить можно). */
+  /** Сжать (в отдельном потоке, `renderImageIsolated`) и выложить. Не открылось — `ImageUnreadableError`; ошибки хранилища — как есть (повторить можно). */
   async publish(originalKey: string, prefix: string): Promise<StoredImage> {
-    const rendered = await renderImage(await this.storage.get('private', originalKey));
+    const rendered = await renderImageIsolated(await this.storage.get('private', originalKey));
     const sizes = {} as Record<ImageWidth, string>;
     for (const size of IMAGE_WIDTHS) {
       sizes[size] = `${prefix}/${size}.webp`;

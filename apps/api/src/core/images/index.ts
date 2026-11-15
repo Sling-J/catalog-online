@@ -3,7 +3,10 @@ export {
   IMAGE_WIDTHS,
   ImageUnreadableError,
   isHeic,
+  RENDER_LIMITS,
   renderImage,
+  renderImageIsolated,
   type ImageWidth,
   type RenderedImage,
+  type RenderLimits,
 } from './render.js';

@@ -4,16 +4,12 @@ import type { Me } from '@catalog/contract';
 import { AppConfig } from '../../core/config/index.js';
 import { InjectDb, isUniqueViolation, type Db, type DbOrTx } from '../../core/db/index.js';
 import { AppError } from '../../core/errors/index.js';
+import { Jobs, type JobAttempt } from '../../core/jobs/index.js';
 import { Mailer } from '../../core/mail/index.js';
 import { toMe } from './auth.mapper.js';
 import { authRepository, type TokenPurpose } from './auth.repository.js';
-import {
-  RESET_PASSWORD_TTL_HOURS,
-  resetPasswordMail,
-  VERIFY_EMAIL_TTL_HOURS,
-  verifyEmailMail,
-  type MailContent,
-} from './lib/mails.js';
+import { AUTH_MAIL } from './lib/auth-mail-job.js';
+import { RESET_PASSWORD_TTL_HOURS, resetPasswordMail, VERIFY_EMAIL_TTL_HOURS, verifyEmailMail } from './lib/mails.js';
 import {
   hashPassword,
   hashToken,
@@ -38,6 +34,7 @@ export class AuthService {
     @InjectDb() private readonly db: Db,
     private readonly sessions: SessionService,
     private readonly mailer: Mailer,
+    private readonly jobs: Jobs,
     private readonly config: AppConfig,
   ) {}
 
@@ -48,20 +45,18 @@ export class AuthService {
     const passwordHash = await hashPassword(input.password);
 
     let accountId: string;
-    let token: string;
     try {
-      ({ accountId, token } = await this.db.transaction(async (tx) => {
+      accountId = await this.db.transaction(async (tx) => {
         const created = await authRepository.createShopWithAccount(tx, { email, passwordHash });
-        const verifyToken = await this.issueToken(tx, created.accountId, 'verify_email', VERIFY_EMAIL_TTL_HOURS);
         await this.sessions.start(created.accountId, tx);
-        return { accountId: created.accountId, token: verifyToken };
-      }));
+        await this.jobs.send(AUTH_MAIL, { accountId: created.accountId, purpose: 'verify_email' }, tx);
+        return created.accountId;
+      });
     } catch (error) {
       // одновременная регистрация с той же почтой — уникальный индекс
       if (isUniqueViolation(error)) throw new AppError('email_taken', 409);
       throw error;
     }
-    await this.sendSafely(email, verifyEmailMail(this.config.get('adminUrl'), token));
     return this.me(accountId, false);
   }
 
@@ -102,7 +97,7 @@ export class AuthService {
   }
 
   /**
-   * Новое письмо подтверждения; прежние ссылки гаснут. Почта уже подтверждена — ничего не делаем. Во входе
+   * Новое письмо подтверждения (прежние ссылки гаснут при его отправке). Почта уже подтверждена — ничего не делаем. Во входе
    * сотрудника «от имени» — 403: письма владельцу шлёт только он сам (решение основателя 2026-11-10, T-412).
    */
   async resendVerificationEmail(session: { accountId: string; impersonated: boolean }): Promise<void> {
@@ -110,11 +105,7 @@ export class AuthService {
     const { accountId } = session;
     const me = await this.me(accountId, false);
     if (me.account.emailVerified) return;
-    const token = await this.db.transaction(async (tx) => {
-      await authRepository.revokeTokens(tx, accountId, 'verify_email', new Date());
-      return this.issueToken(tx, accountId, 'verify_email', VERIFY_EMAIL_TTL_HOURS);
-    });
-    await this.sendSafely(me.account.email, verifyEmailMail(this.config.get('adminUrl'), token));
+    await this.jobs.send(AUTH_MAIL, { accountId, purpose: 'verify_email' });
   }
 
   /** Ответ одинаковый, есть такая почта или нет: по нему нельзя проверить, кто зарегистрирован. */
@@ -122,11 +113,7 @@ export class AuthService {
     const email = normalizeEmail(input.email);
     const account = await authRepository.findByEmail(this.db, email);
     if (!account) return;
-    const token = await this.db.transaction(async (tx) => {
-      await authRepository.revokeTokens(tx, account.id, 'reset_password', new Date());
-      return this.issueToken(tx, account.id, 'reset_password', RESET_PASSWORD_TTL_HOURS);
-    });
-    await this.sendSafely(email, resetPasswordMail(this.config.get('adminUrl'), token));
+    await this.jobs.send(AUTH_MAIL, { accountId: account.id, purpose: 'reset_password' });
   }
 
   /** Новый пароль по ссылке из письма; все сессии закрываются. */
@@ -171,12 +158,26 @@ export class AuthService {
     return token;
   }
 
-  /** Письмо не ушло (SMTP недоступен) — регистрация и прочее не падают; ошибка — в лог, письмо можно запросить снова. */
-  private async sendSafely(to: string, mail: MailContent): Promise<void> {
+  /**
+   * Задача `auth.mail` (процесс задач): прежние ссылки того же назначения гаснут, выпускается новая, письмо уходит
+   * на текущую почту аккаунта. Подтверждение уже не нужно или аккаунта нет — ничего не делаем. SMTP не ответил —
+   * ошибка, задача повторится (на повторе ссылка снова новая: письмо с прежней не дошло).
+   */
+  async sendAuthMail(job: { accountId: string; purpose: TokenPurpose }, attempt: JobAttempt): Promise<void> {
+    const me = await authRepository.findMe(this.db, job.accountId);
+    if (!me || (job.purpose === 'verify_email' && me.emailVerifiedAt)) return;
+    const ttlHours = job.purpose === 'verify_email' ? VERIFY_EMAIL_TTL_HOURS : RESET_PASSWORD_TTL_HOURS;
+    const token = await this.db.transaction(async (tx) => {
+      await authRepository.revokeTokens(tx, job.accountId, job.purpose, new Date());
+      return this.issueToken(tx, job.accountId, job.purpose, ttlHours);
+    });
+    const adminUrl = this.config.get('adminUrl');
+    const mail = job.purpose === 'verify_email' ? verifyEmailMail(adminUrl, token) : resetPasswordMail(adminUrl, token);
     try {
-      await this.mailer.send({ to, ...mail });
+      await this.mailer.send({ to: me.email, ...mail });
     } catch (error) {
-      this.logger.error(error, `Письмо «${mail.subject}» не отправлено`);
+      if (attempt.last) this.logger.error(error, `Письмо «${mail.subject}» не отправлено, попытки кончились`);
+      throw error;
     }
   }
 }

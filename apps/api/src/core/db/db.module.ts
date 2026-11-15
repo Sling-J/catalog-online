@@ -29,7 +29,8 @@ class SqlClientCloser implements OnApplicationShutdown {
       provide: SQL_CLIENT,
       inject: [AppConfig],
       // postgres.js подключается лениво — при первом запросе, а не при старте
-      useFactory: (config: AppConfig) => postgres(config.get('databaseUrl'), { onnotice: () => {} }),
+      useFactory: (config: AppConfig) =>
+        postgres(config.get('databaseUrl'), { max: config.get('databasePoolMax'), onnotice: () => {} }),
     },
     {
       provide: DB,

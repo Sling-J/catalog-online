@@ -17,6 +17,11 @@ const envSchema = z
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     API_PORT: z.coerce.number().int().min(1).max(65535).default(3001),
     DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+    /**
+     * Подключений к базе у пула приложения на процесс (у pg-boss — свои: 2 у API, 4 у процесса задач). Сумма по
+     * всем процессам должна помещаться в `max_connections` PostgreSQL (по умолчанию 100) — scaling.md, SC12.
+     */
+    DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(100).default(10),
     /** Адреса фронтов для CORS; `*` — любой поддомен: `http://*.localhost:3000`. */
     CORS_ORIGINS: csv.pipe(z.array(z.string().min(1)).min(1)),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
@@ -66,6 +71,7 @@ export type Config = {
   jobsRole: JobsRole;
   port: number;
   databaseUrl: string;
+  databasePoolMax: number;
   corsOrigins: string[];
   logLevel: z.infer<typeof envSchema>['LOG_LEVEL'];
   trustProxy: number;
@@ -100,6 +106,7 @@ export function parseConfig(env: Record<string, string | undefined>): Config {
     jobsRole: 'enqueue',
     port: e.API_PORT,
     databaseUrl: e.DATABASE_URL,
+    databasePoolMax: e.DATABASE_POOL_MAX,
     corsOrigins: e.CORS_ORIGINS,
     logLevel: e.LOG_LEVEL,
     trustProxy: e.TRUST_PROXY,

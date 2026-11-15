@@ -7,6 +7,7 @@ import { createTestApp, type TestApp } from '../../../test/helpers/app.js';
 import { connectTestDb } from '../../../test/helpers/db.js';
 import { signUp, XRW, type Browser } from '../../../test/helpers/session.js';
 import { PREVIEW_TOKEN_TTL_MS, PreviewTokens } from '../../core/auth/index.js';
+import { NO_STORE, PUBLIC_CACHE } from '../../core/http/index.js';
 import type { Db } from '../../core/db/index.js';
 import { productPhotos, shops } from '../../core/db/schema/index.js';
 
@@ -179,6 +180,29 @@ describe('витрина', () => {
       expect((await get('sf-hidden').expect(410)).body.code).toBe('shop_blocked');
       expect((await get(`sf-hidden?preview=${token}`).expect(410)).body.code).toBe('shop_blocked');
       await get(`sf-hidden/products?preview=${token}`).expect(404);
+    });
+  });
+
+  describe('кеш (T-611)', () => {
+    it('чтение — public с коротким сроком; превью — no-store; ошибки и запись — без кеша', async () => {
+      const shop = await openShop('sf-cache');
+      const item = await product(shop, 'Платье', [{ price: 5000, stock: 1 }]);
+      for (const path of ['', '/categories', '/products', '/facets', `/products/${item.shortId}`]) {
+        const res = await get(`sf-cache${path}`).expect(200);
+        expect(res.headers['cache-control']).toBe(PUBLIC_CACHE);
+      }
+      const token = (await shop.agent.post('/v1/admin/preview-token').set(XRW).expect(201)).body.token as string;
+      for (const path of ['', '/products']) {
+        const res = await get(`sf-cache${path}?preview=${token}`).expect(200);
+        expect(res.headers['cache-control']).toBe(NO_STORE);
+      }
+      expect((await get('sf-cache/products/zzzzzzzz').expect(404)).headers['cache-control']).toBeUndefined();
+      const cart = await anon
+        .post('/v1/storefront/sf-cache/cart/check')
+        .set(XRW)
+        .send({ items: [{ variantId: item.variants[0]!.id, quantity: 1 }] })
+        .expect(200);
+      expect(cart.headers['cache-control']).toBeUndefined();
     });
   });
 

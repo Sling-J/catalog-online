@@ -1,3 +1,8 @@
+// Файл запускается и как код потока сжатия (`renderImageIsolated`): в тестах Node сам снимает с него типы, поэтому
+// здесь только стираемый TypeScript (без enum, namespace, свойств в параметрах конструктора) и без относительных
+// импортов.
+import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads';
+
 import decodeHeic from 'heic-decode';
 import sharp, { type Sharp } from 'sharp';
 
@@ -80,4 +85,89 @@ export async function renderImage(input: Buffer): Promise<RenderedImage> {
   } catch (error) {
     throw new ImageUnreadableError(error);
   }
+}
+
+// ───────── отдельный поток ─────────
+
+/**
+ * Потолки потока сжатия. HEIC 12 Мп декодируется в WebAssembly за ~0,4 с, пиксели RGBA — ~50 МБ (вне кучи JS,
+ * поэтому памяти куче много не нужно); время — с запасом на 48 Мп и медленный сервер.
+ */
+export type RenderLimits = { memoryMb: number; timeoutMs: number };
+export const RENDER_LIMITS: RenderLimits = { memoryMb: 256, timeoutMs: 60_000 };
+
+const WORKER_KIND = 'catalog:render-image';
+
+type WorkerReply =
+  | { ok: true; image: RenderedImage }
+  | { ok: false; unreadable: true; message: string }
+  | { ok: false; unreadable: false; message: string };
+
+/**
+ * `renderImage` в отдельном потоке Node (`worker_threads`) с потолком памяти и времени (T-608, scaling.md SC2):
+ * HEIC декодируется в WebAssembly синхронно и в основном потоке остановил бы все запросы процесса на время
+ * декодирования (логотип сжимается прямо в запросе `updateShop`, фото — в процессе задач). Поток запускает этот же
+ * файл, как `readTableIsolated`. Не уложилось в память или время — `ImageUnreadableError` (повтор не поможет);
+ * поток умер без ответа — обычная ошибка (задачу можно повторить).
+ */
+export function renderImageIsolated(input: Buffer, limits: RenderLimits = RENDER_LIMITS): Promise<RenderedImage> {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(new URL(import.meta.url), {
+      workerData: { kind: WORKER_KIND, input },
+      resourceLimits: { maxOldGenerationSizeMb: limits.memoryMb, maxYoungGenerationSizeMb: 32 },
+      // вывод потока не нужен (предупреждения Node о снятии типов и т. п.)
+      stdout: true,
+      stderr: true,
+    });
+    let settled = false;
+    const finish = (run: () => void) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      run();
+      void worker.terminate();
+    };
+    const timer = setTimeout(
+      () => finish(() => reject(new ImageUnreadableError(new Error('Сжатие не уложилось во время')))),
+      limits.timeoutMs,
+    );
+    worker.once('message', (reply: WorkerReply) =>
+      finish(() => {
+        if (reply.ok) resolve(fromTransfer(reply.image));
+        else if (reply.unreadable) reject(new ImageUnreadableError(new Error(reply.message)));
+        else reject(new Error(`Поток сжатия картинки: ${reply.message}`));
+      }),
+    );
+    worker.once('error', (error: Error & { code?: string }) =>
+      finish(() => reject(error.code === 'ERR_WORKER_OUT_OF_MEMORY' ? new ImageUnreadableError(error) : error)),
+    );
+    worker.once('exit', (code) =>
+      finish(() => reject(new Error(`Поток сжатия картинки завершился без ответа (код ${code})`))),
+    );
+  });
+}
+
+/** Между потоками `Buffer` приходит как `Uint8Array` — возвращаем `Buffer` без копирования. */
+function fromTransfer(image: RenderedImage): RenderedImage {
+  const variants = {} as Record<ImageWidth, Buffer>;
+  for (const size of IMAGE_WIDTHS) {
+    const part = image.variants[size] as Uint8Array;
+    variants[size] = Buffer.from(part.buffer, part.byteOffset, part.byteLength);
+  }
+  return { width: image.width, height: image.height, variants };
+}
+
+// код самого потока: запущен из `renderImageIsolated` — сжимает и отвечает
+if (!isMainThread && (workerData as { kind?: unknown } | null)?.kind === WORKER_KIND) {
+  const data = workerData as { input: Uint8Array };
+  const input = Buffer.from(data.input.buffer, data.input.byteOffset, data.input.byteLength);
+  renderImage(input).then(
+    (image) => parentPort!.postMessage({ ok: true, image } satisfies WorkerReply),
+    (error: unknown) =>
+      parentPort!.postMessage({
+        ok: false,
+        unreadable: error instanceof ImageUnreadableError,
+        message: String((error as Error)?.cause ?? (error as Error)?.message ?? error),
+      } satisfies WorkerReply),
+  );
 }

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 
-import { ImageUnreadableError, isHeic, renderImage } from './render.js';
+import { ImageUnreadableError, isHeic, renderImage, renderImageIsolated } from './render.js';
 
 // 400×300; HEIC сделан из того же JPEG (`heif-enc`, кодек HEVC — как у iPhone)
 const JPEG = readFileSync(new URL('../../../test/fixtures/photo.jpg', import.meta.url));
@@ -63,5 +63,22 @@ describe('renderImage', () => {
     await expect(renderImage(Buffer.from('not an image'))).rejects.toBeInstanceOf(ImageUnreadableError);
     await expect(renderImage(JPEG.subarray(0, 2000))).rejects.toBeInstanceOf(ImageUnreadableError);
     await expect(renderImage(HEIC.subarray(0, 2000))).rejects.toBeInstanceOf(ImageUnreadableError);
+  });
+});
+
+describe('renderImageIsolated', () => {
+  it('тот же результат, что в основном потоке, и HEIC тоже', async () => {
+    const image = await renderImageIsolated(HEIC);
+    expect(image).toMatchObject({ width: 400, height: 300 });
+    expect(Buffer.isBuffer(image.variants['320'])).toBe(true);
+    expect(await sizeOf(image.variants['320'])).toMatchObject({ format: 'webp', width: 320, height: 240 });
+    expect(await sizeOf((await renderImageIsolated(JPEG)).variants['1280'])).toMatchObject({ width: 400 });
+  });
+
+  it('не картинка, нехватка времени — ImageUnreadableError', async () => {
+    await expect(renderImageIsolated(Buffer.from('not an image'))).rejects.toBeInstanceOf(ImageUnreadableError);
+    await expect(renderImageIsolated(HEIC, { memoryMb: 256, timeoutMs: 1 })).rejects.toBeInstanceOf(
+      ImageUnreadableError,
+    );
   });
 });

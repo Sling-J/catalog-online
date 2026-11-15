@@ -23,6 +23,7 @@ describe('parseConfig', () => {
       jobsRole: 'enqueue',
       port: 3001,
       databaseUrl: base.DATABASE_URL,
+      databasePoolMax: 10,
       corsOrigins: ['http://app.localhost:3002', 'http://*.localhost:3000'],
       logLevel: 'info',
       trustProxy: 0,

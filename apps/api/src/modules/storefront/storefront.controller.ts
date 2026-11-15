@@ -27,6 +27,7 @@ import {
 import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
 
 import { RequestContext } from '../../core/context/index.js';
+import { PublicCache } from '../../core/http/index.js';
 import { RateLimit } from '../../core/rate-limit/index.js';
 import { StorefrontService } from './storefront.service.js';
 
@@ -34,7 +35,7 @@ const MINUTE = 60_000;
 
 /**
  * `/v1/storefront/{subdomain}/…` (контракт, тег storefront) — публично, без входа (API1). Поддомен и `shortId` без
- * схемы: неверный формат — такого магазина или товара нет, 404.
+ * схемы: неверный формат — такого магазина или товара нет, 404. Чтение кешируется браузером (`@PublicCache`, T-611).
  */
 @Controller('v1/storefront/:subdomain')
 export class StorefrontController implements StorefrontControllerMethods {
@@ -44,6 +45,7 @@ export class StorefrontController implements StorefrontControllerMethods {
   ) {}
 
   @Get()
+  @PublicCache()
   getStorefrontShop(
     @Param() path: GetStorefrontShopData['path'],
     @Query({ schema: zGetStorefrontShopQuery }) query?: GetStorefrontShopData['query'],
@@ -52,6 +54,7 @@ export class StorefrontController implements StorefrontControllerMethods {
   }
 
   @Get('categories')
+  @PublicCache()
   async listStorefrontCategories(
     @Param() path: ListStorefrontCategoriesData['path'],
     @Query({ schema: zListStorefrontCategoriesQuery }) query?: ListStorefrontCategoriesData['query'],
@@ -60,6 +63,7 @@ export class StorefrontController implements StorefrontControllerMethods {
   }
 
   @Get('products')
+  @PublicCache()
   async listStorefrontProducts(
     @Param() path: ListStorefrontProductsData['path'],
     @Query({ schema: zListStorefrontProductsQuery }) query?: ListStorefrontProductsData['query'],
@@ -68,6 +72,7 @@ export class StorefrontController implements StorefrontControllerMethods {
   }
 
   @Get('facets')
+  @PublicCache()
   async getStorefrontFacets(
     @Param() path: GetStorefrontFacetsData['path'],
     @Query({ schema: zGetStorefrontFacetsQuery }) query?: GetStorefrontFacetsData['query'],
@@ -76,6 +81,7 @@ export class StorefrontController implements StorefrontControllerMethods {
   }
 
   @Get('products/:shortId')
+  @PublicCache()
   async getStorefrontProduct(
     @Param() path: GetStorefrontProductData['path'],
     @Query({ schema: zGetStorefrontProductQuery }) query?: GetStorefrontProductData['query'],
