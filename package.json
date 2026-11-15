@@ -18,7 +18,6 @@
     "format:check": "prettier --check .",
     "check": "pnpm docs:check && pnpm format:check && turbo run lint typecheck test build",
     "docs:check": "node tools/docs-check/src/cli.ts",
-    "design:compare": "node tools/design-compare/src/cli.ts",
     "e2e": "pnpm --filter @catalog/e2e e2e"
   },
   "devDependencies": {

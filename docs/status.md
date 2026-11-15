@@ -6,6 +6,7 @@
 **Обновлено:** 2026-11-15 (T-608 – T-611)
 
 ## Последнее
+- Копия холста и `design:compare` убраны: холст на claude.ai — референс стиля, источник правды по интерфейсу — код и `04-design/` (подробно — `changelog.md`, «Документация и процесс»).
 - Claude в issue и PR: отвечает на `@claude`, пока только обсуждение (`06-process/workflow.md`, «Claude в GitHub»); заработает после установки приложения Claude и секрета `CLAUDE_CODE_OAUTH_TOKEN`.
 - T-608 – T-611 (код из аудита `scaling.md`): сжатие картинок в отдельном потоке, письма входа задачей `auth.mail`, уборка просроченных сессий и токенов, `DATABASE_POOL_MAX`, `UV_THREADPOOL_SIZE` в `pnpm dev`, `Cache-Control` на чтение витрины, индекс `pg_trgm` для поиска; `catalog_version` отложен (подробно — `changelog.md`, E6).
 - T-607: фоновые задачи — отдельный процесс `worker.ts`, API их только ставит; в `pnpm dev` и e2e процессов два (подробно — `changelog.md`, E6).
