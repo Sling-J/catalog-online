@@ -10,8 +10,10 @@ import { Jobs, type JobDefinition, type JobRegistration } from './jobs.js';
 export const JOBS_SCHEMA = 'pgboss';
 
 /**
- * Очередь pg-boss (ADR 0001) в том же процессе, что и API (раздел 9). Своё небольшое подключение `pg`: так
- * устроен pg-boss; задачи из транзакции ставятся через подключение Drizzle (`fromDrizzle`).
+ * Очередь pg-boss (ADR 0001, раздел 9). Обработчики регистрируют оба процесса, а выполняет задачи и запускает
+ * расписания только процесс задач (`worker.ts`, роль `work`); API (роль `enqueue`) задачи только ставит (T-607, SC1).
+ * Очереди создают оба — так API может ставить задачи, даже если процесс задач ещё не стартовал. Своё небольшое
+ * подключение `pg`: так устроен pg-boss; задачи из транзакции ставятся через подключение Drizzle (`fromDrizzle`).
  */
 @Injectable()
 export class PgBossJobs extends Jobs implements OnApplicationBootstrap, OnApplicationShutdown {
@@ -23,18 +25,27 @@ export class PgBossJobs extends Jobs implements OnApplicationBootstrap, OnApplic
   }
 
   async onApplicationBootstrap(): Promise<void> {
+    const working = this.config.get('jobsRole') === 'work';
     const boss = new PgBoss({
       connectionString: this.config.get('databaseUrl'),
       schema: JOBS_SCHEMA,
-      max: 4,
-      application_name: 'catalog-api-jobs',
+      max: working ? 4 : 2,
+      application_name: working ? 'catalog-worker' : 'catalog-api-jobs',
+      // API задачи не выполняет: без опроса расписаний и обслуживания очереди — это дело процесса задач
+      schedule: working,
+      supervise: working,
     });
     boss.on('error', (error) => this.logger.error(error));
     await boss.start();
-    for (const registration of this.handlers.values()) await this.startWorker(boss, registration);
-    for (const { job, cron } of this.schedules) {
-      await this.ensureQueue(boss, job);
-      await boss.schedule(job.name, cron);
+    for (const registration of this.handlers.values()) {
+      await this.ensureQueue(boss, registration.job);
+      if (working) await this.startWorker(boss, registration);
+    }
+    if (working) {
+      for (const { job, cron } of this.schedules) {
+        await this.ensureQueue(boss, job);
+        await boss.schedule(job.name, cron);
+      }
     }
     this.boss = boss;
   }
@@ -52,7 +63,6 @@ export class PgBossJobs extends Jobs implements OnApplicationBootstrap, OnApplic
   }
 
   private async startWorker(boss: PgBoss, { job, handler }: JobRegistration): Promise<void> {
-    await this.ensureQueue(boss, job);
     await boss.work<object, void, { includeMetadata: true }>(job.name, { includeMetadata: true }, async ([item]) => {
       if (!item) return;
       const last = item.retryCount >= item.retryLimit;

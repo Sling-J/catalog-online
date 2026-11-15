@@ -7,7 +7,7 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
 import { AppModule } from '../../src/app.module.js';
-import { parseConfig, type Config } from '../../src/core/config/index.js';
+import { parseConfig, type Config, type JobsRole } from '../../src/core/config/index.js';
 import { configureApp } from '../../src/core/http/index.js';
 import { Jobs } from '../../src/core/jobs/index.js';
 import { Mailer, type MailMessage } from '../../src/core/mail/index.js';
@@ -49,15 +49,22 @@ class TestMailer extends Mailer {
 /**
  * Приложение целиком на своей базе (backend-structure.md, раздел 11) — тот же конвейер, что в `main.ts`.
  * `controllers` и `providers` — служебные части теста (например, чтобы проверить core без модулей); `realJobs` —
- * настоящая очередь pg-boss вместо очереди в памяти (только для проверки самой очереди).
+ * настоящая очередь pg-boss вместо очереди в памяти (только для проверки самой очереди); `jobsRole` — роль процесса
+ * в очереди (`enqueue` — как API, `work` — как `worker.ts`), `databaseUrl` — общая база двух приложений теста.
  */
 export async function createTestApp(
-  options: { controllers?: Type[]; providers?: Provider[]; realJobs?: boolean } = {},
+  options: {
+    controllers?: Type[];
+    providers?: Provider[];
+    realJobs?: boolean;
+    jobsRole?: JobsRole;
+    databaseUrl?: string;
+  } = {},
 ): Promise<TestApp> {
   const mails: MailMessage[] = [];
-  const config = parseConfig({
+  const parsed = parseConfig({
     NODE_ENV: 'test',
-    DATABASE_URL: await createTestDatabase(),
+    DATABASE_URL: options.databaseUrl ?? (await createTestDatabase()),
     CORS_ORIGINS: TEST_CORS_ORIGINS,
     LOG_LEVEL: 'silent',
     ADMIN_URL: TEST_ADMIN_URL,
@@ -69,6 +76,8 @@ export async function createTestApp(
     S3_PRIVATE_BUCKET: 'catalog-private',
     S3_PUBLIC_URL: TEST_PUBLIC_URL,
   });
+  // с настоящей очередью приложение по умолчанию и выполняет задачи (как API и процесс задач вместе)
+  const config = { ...parsed, jobsRole: options.jobsRole ?? (options.realJobs ? 'work' : 'enqueue') };
   const storage = new MemoryStorage(config.s3);
   const jobs = new MemoryJobs();
   let builder = Test.createTestingModule({

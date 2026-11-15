@@ -3,7 +3,7 @@ import { sql } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { createTestApp, type TestApp } from '../../../test/helpers/app.js';
-import { connectTestDb } from '../../../test/helpers/db.js';
+import { connectTestDb, createTestDatabase } from '../../../test/helpers/db.js';
 import type { Db } from '../db/index.js';
 import { defineJob, Jobs, JOBS_SCHEMA } from './index.js';
 
@@ -85,5 +85,31 @@ describe('фоновые задачи (pg-boss)', () => {
       sql`select name, cron from ${sql.identifier(JOBS_SCHEMA)}.schedule`,
     );
     expect(rows.map((row) => [row.name, row.cron])).toContainEqual(['uploads.cleanup', '30 21 * * *']);
+  });
+
+  it('API задачи только ставит и расписаний не пишет; выполняет процесс задач (T-607)', async () => {
+    const databaseUrl = await createTestDatabase();
+    const api = await createTestApp({ providers: [EchoWorker], realJobs: true, jobsRole: 'enqueue', databaseUrl });
+    const { db: apiDb, close: closeApiDb } = connectTestDb(databaseUrl);
+    try {
+      await api.app.get(Jobs).send(ECHO, { n: 'from-api' });
+      // pg-boss опрашивает очередь раз в 2 секунды: обработчик в API за это время задачу взял бы
+      await new Promise((resolve) => setTimeout(resolve, 3_000));
+      expect(has('from-api')).toBe(false);
+      const schedules = await apiDb.execute<{ count: number }>(
+        sql`select count(*)::int as count from ${sql.identifier(JOBS_SCHEMA)}.schedule`,
+      );
+      expect(schedules[0]?.count).toBe(0);
+
+      const worker = await createTestApp({ providers: [EchoWorker], realJobs: true, jobsRole: 'work', databaseUrl });
+      try {
+        await waitFor(() => has('from-api'));
+      } finally {
+        await worker.close();
+      }
+    } finally {
+      await closeApiDb();
+      await api.close();
+    }
   });
 });

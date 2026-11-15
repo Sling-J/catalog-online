@@ -19,6 +19,8 @@ describe('parseConfig', () => {
   it('умолчания и разбор списка адресов', () => {
     expect(parseConfig(base)).toEqual({
       env: 'development',
+      // роль в очереди задаёт точка входа: из окружения — всегда API
+      jobsRole: 'enqueue',
       port: 3001,
       databaseUrl: base.DATABASE_URL,
       corsOrigins: ['http://app.localhost:3002', 'http://*.localhost:3000'],

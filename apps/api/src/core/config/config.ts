@@ -55,8 +55,15 @@ const envSchema = z
       ctx.addIssue({ code: 'custom', path: ['RATE_LIMITS'], message: 'в продакшене ограничения частоты обязательны' });
   });
 
+/**
+ * Роль процесса в очереди (T-607, scaling.md SC1): API (`main.ts`) задачи только ставит, процесс задач
+ * (`worker.ts`) выполняет их и запускает расписания. Задаётся точкой входа, не переменной окружения.
+ */
+export type JobsRole = 'enqueue' | 'work';
+
 export type Config = {
   env: 'development' | 'test' | 'production';
+  jobsRole: JobsRole;
   port: number;
   databaseUrl: string;
   corsOrigins: string[];
@@ -90,6 +97,7 @@ export function parseConfig(env: Record<string, string | undefined>): Config {
   const e = result.data;
   return {
     env: e.NODE_ENV,
+    jobsRole: 'enqueue',
     port: e.API_PORT,
     databaseUrl: e.DATABASE_URL,
     corsOrigins: e.CORS_ORIGINS,

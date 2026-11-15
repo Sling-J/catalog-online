@@ -1,4 +1,5 @@
-// Разработка API: `tsc --watch` пересобирает dist, `node --watch` перезапускает сервер.
+// Разработка API: `tsc --watch` пересобирает dist, `node --watch` перезапускает сервер и процесс задач — их два,
+// как в продакшене (T-607): API задачи только ставит, `worker.js` выполняет.
 // Не tsx/esbuild: они не выдают метаданные декораторов, без них DI в Nest не работает (pitfalls.md).
 import { spawn, spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
@@ -12,6 +13,7 @@ if (first.status !== 0) process.exit(first.status ?? 1);
 const children = [
   spawn(process.execPath, [tsc, ...project, '--watch', '--preserveWatchOutput'], { stdio: 'inherit' }),
   spawn(process.execPath, ['--env-file-if-exists=../../.env', '--watch', 'dist/main.js'], { stdio: 'inherit' }),
+  spawn(process.execPath, ['--env-file-if-exists=../../.env', '--watch', 'dist/worker.js'], { stdio: 'inherit' }),
 ];
 
 const stop = () => {
