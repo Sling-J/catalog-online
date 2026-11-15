@@ -54,7 +54,7 @@ SaaS: онлайн-каталог (товары, размеры, остатки,
 Монорепо pnpm + Turborepo, Node ≥ 22.19 (`docs/02-architecture/adr/0001-stack.md`).
 - `pnpm install` — зависимости.
 - `pnpm generate` — код из `packages/contract/openapi.yaml` (Hey API) в `packages/contract/src/gen` (в git не хранится, turbo запускает сам перед проверками).
-- `pnpm check` — проверка документов + lint + typecheck + test + build по всем пакетам; перед коммитом должен проходить.
+- `pnpm check` — проверка документов + Prettier (`format:check`) + lint + typecheck + test + build по всем пакетам; перед коммитом должен проходить.
 - `pnpm docs:check` — ссылки, front matter и оглавления в документах (`tools/docs-check`).
 - `pnpm format` / `pnpm format:check` — Prettier.
 - `pnpm i18n:extract` — строки Lingui в каталоги `.po`.
