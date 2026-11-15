@@ -1,2 +1,2 @@
-export { $sentOrder } from './model';
-export { OrderButton, OrderSent } from './ui';
+export { $demoOrder, $sentOrder, demoOrderClosed } from './model';
+export { DemoOrder, OrderButton, OrderSent } from './ui';

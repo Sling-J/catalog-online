@@ -21,7 +21,15 @@ import {
   quantityChanged,
 } from '@/entities/cart';
 import { shopQueryOptions } from '@/entities/shop';
-import { $sentOrder, OrderButton, OrderSent } from '@/features/order-via-whatsapp';
+import {
+  $demoOrder,
+  $sentOrder,
+  demoOrderClosed,
+  DemoOrder,
+  OrderButton,
+  OrderSent,
+} from '@/features/order-via-whatsapp';
+import { getSiteOrigin, isDemoShop, serviceUrls } from '@/shared/lib';
 
 import { CartLine } from './cart-line';
 import { UndoLine } from './undo-line';
@@ -30,12 +38,12 @@ import { UndoLine } from './undo-line';
  * Корзина шторкой снизу на телефоне, выпадающей панелью под кнопкой корзины на компьютере. При открытии цены
  * и наличие перепроверяются: общая плашка «магазин кое-что обновил» и плашка у каждой изменённой строки
  * (FR-V7, S3, S10). После «Заказать через WhatsApp» вместо корзины — «Отправлено ✓» (FR-V8), на компьютере
- * окном по центру.
+ * окном по центру. В демо-магазине (S14) вместо WhatsApp — текст заявки и регистрация.
  */
 export function CartSheet({ subdomain }: { subdomain: string }) {
   const { t } = useLingui();
   const desktop = useIsDesktop();
-  const { open, items, payable, notices, checkState, total, comment, sentOrder, removed } = useUnit({
+  const { open, items, payable, notices, checkState, total, comment, sentOrder, demoOrder, removed } = useUnit({
     open: $open,
     items: $items,
     payable: $payable,
@@ -44,19 +52,22 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
     total: $total,
     comment: $comment,
     sentOrder: $sentOrder,
+    demoOrder: $demoOrder,
     removed: $removed,
   });
-  const { close, setQuantity, remove, restore, setComment } = useUnit({
+  const { close, setQuantity, remove, restore, setComment, closeDemoOrder } = useUnit({
     close: cartClosed,
     setQuantity: quantityChanged,
     remove: itemRemoved,
     restore: itemRestored,
     setComment: commentChanged,
+    closeDemoOrder: demoOrderClosed,
   });
   // шторка смонтирована на всех страницах магазина, в том числе 404 / 410, где магазина в кеше нет: запрашиваем его,
   // только когда корзину открыли (на каталоге и в карточке он уже в кеше) — иначе лишний запрос с ошибкой (T-502)
   const { data: shop } = useQuery({ ...shopQueryOptions(subdomain), enabled: open });
   const hasChanges = Object.keys(notices).length > 0;
+  const demo = isDemoShop(subdomain);
   const placement = !desktop ? 'bottom' : sentOrder ? 'center' : 'dropdown-right';
 
   return (
@@ -65,10 +76,12 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
       onClose={close}
       placement={placement}
       hideTitle={!!sentOrder}
-      title={sentOrder ? t`Заказ отправлен` : t`Корзина`}
+      title={sentOrder ? t`Заказ отправлен` : demoOrder ? t`Это пример` : t`Корзина`}
     >
       {sentOrder ? (
         <OrderSent order={sentOrder} onClose={close} />
+      ) : demoOrder ? (
+        <DemoOrder text={demoOrder} registerUrl={serviceUrls(getSiteOrigin()).register} onBack={closeDemoOrder} />
       ) : (
         <>
           {hasChanges && (
@@ -132,9 +145,14 @@ export function CartSheet({ subdomain }: { subdomain: string }) {
                       total={total}
                       comment={comment}
                       disabled={!shop || checkState === 'loading'}
+                      demo={demo}
                     />
                     <p className="mt-2.5 text-center text-[12px] text-ink-muted lg:hidden">
-                      <Trans>Откроется WhatsApp с готовым сообщением для магазина</Trans>
+                      {demo ? (
+                        <Trans>Это пример: покажем сообщение, которое получил бы магазин</Trans>
+                      ) : (
+                        <Trans>Откроется WhatsApp с готовым сообщением для магазина</Trans>
+                      )}
                     </p>
                   </div>
                 </>

@@ -5,7 +5,7 @@ import { useUnit } from 'effector-react';
 import type { CartItem } from '@/entities/cart';
 import { whatsappLink } from '@/entities/shop';
 import { buildOrderText } from '@/features/order-via-whatsapp/lib';
-import { orderSent } from '@/features/order-via-whatsapp/model';
+import { demoOrderShown, orderSent } from '@/features/order-via-whatsapp/model';
 
 /**
  * Мятная «Заказать через WhatsApp»: обычная ссылка на `wa.me` с готовым текстом — так браузер не блокирует
@@ -18,6 +18,7 @@ export function OrderButton({
   total,
   comment,
   disabled,
+  demo,
 }: {
   subdomain: string;
   shop: { name: string; whatsapp: string };
@@ -27,9 +28,11 @@ export function OrderButton({
   comment: string;
   /** Например, пока идёт перепроверка цен: заказывать по устаревшим не нужно. */
   disabled: boolean;
+  /** Демо-магазин (S14): по нажатию — текст заявки на экране, без перехода в WhatsApp. */
+  demo?: boolean;
 }) {
   const { t } = useLingui();
-  const sent = useUnit(orderSent);
+  const { sent, showDemo } = useUnit({ sent: orderSent, showDemo: demoOrderShown });
 
   const text = buildOrderText({
     greeting: t`Здравствуйте! Заказ с сайта ${shop.name}:`,
@@ -41,6 +44,20 @@ export function OrderButton({
   });
   const url = whatsappLink(shop.whatsapp, text);
   const inactive = disabled || items.length === 0;
+  const className = cx(
+    'inline-flex h-14 w-full items-center justify-center rounded-pill text-[16px] font-bold lg:h-[52px] lg:text-[15px]',
+    'press focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris',
+    inactive
+      ? 'bg-chip-haze text-ink-quiet'
+      : 'bg-mint text-mint-ink shadow-[0_5px_0_var(--color-mint-underside)] hover:bg-mint-hover lg:shadow-press-mint',
+  );
+
+  if (demo)
+    return (
+      <button type="button" disabled={inactive} onClick={() => showDemo(text)} className={className}>
+        <Trans>Заказать через WhatsApp</Trans>
+      </button>
+    );
 
   return (
     <a
@@ -59,13 +76,7 @@ export function OrderButton({
           photos: items.map((entry) => entry.photo),
         });
       }}
-      className={cx(
-        'inline-flex h-14 w-full items-center justify-center rounded-pill text-[16px] font-bold lg:h-[52px] lg:text-[15px]',
-        'press focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-iris',
-        inactive
-          ? 'bg-chip-haze text-ink-quiet'
-          : 'bg-mint text-mint-ink shadow-[0_5px_0_var(--color-mint-underside)] hover:bg-mint-hover lg:shadow-press-mint',
-      )}
+      className={className}
     >
       <Trans>Заказать через WhatsApp</Trans>
     </a>

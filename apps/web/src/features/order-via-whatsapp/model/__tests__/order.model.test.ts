@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { $items, cartClosed, variantAdded, type CartItem } from '@/entities/cart';
 
-import { $sentOrder, orderSent, trackOrderClickFx } from '../order.model';
+import { $demoOrder, $sentOrder, demoOrderClosed, demoOrderShown, orderSent, trackOrderClickFx } from '../order.model';
 
 const item: CartItem = {
   variantId: 'v1',
@@ -44,5 +44,22 @@ describe('заказ через WhatsApp', () => {
     await allSettled(orderSent, { scope, params: order });
     await allSettled(cartClosed, { scope });
     expect(scope.getState($sentOrder)).toBeNull();
+  });
+
+  it('демо-магазин: показывает текст заявки, корзина остаётся, событие не отправляется', async () => {
+    const track = vi.fn(async () => {});
+    const scope = fork({ handlers: [[trackOrderClickFx, track]] });
+    await allSettled(variantAdded, { scope, params: item });
+
+    await allSettled(demoOrderShown, { scope, params: 'текст заявки' });
+    expect(scope.getState($demoOrder)).toBe('текст заявки');
+    expect(scope.getState($items)).toHaveLength(1);
+    expect(track).not.toHaveBeenCalled();
+
+    await allSettled(demoOrderClosed, { scope });
+    expect(scope.getState($demoOrder)).toBeNull();
+    await allSettled(demoOrderShown, { scope, params: 'ещё раз' });
+    await allSettled(cartClosed, { scope });
+    expect(scope.getState($demoOrder)).toBeNull();
   });
 });

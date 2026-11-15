@@ -1,1 +1,1 @@
-export { $sentOrder, orderSent } from './order.model';
+export { $demoOrder, $sentOrder, demoOrderClosed, demoOrderShown, orderSent } from './order.model';

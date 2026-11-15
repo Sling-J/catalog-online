@@ -4,6 +4,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import type { ReactNode } from 'react';
 
 import { OpenStatus, ShopAvatar, whatsappLink } from '@/entities/shop';
+import { getSiteOrigin, isDemoShop, serviceUrls } from '@/shared/lib';
 
 /**
  * Шапка магазина, закреплена при прокрутке. Нажатие на название открывает «О магазине».
@@ -38,6 +39,18 @@ export function ShopHeader({
             <Trans>Черновик</Trans>
           </span>
           <Trans>так витрину увидят покупатели</Trans>
+        </p>
+      )}
+      {/* демо-магазин для лендинга (S14): гость с «Посмотреть пример» должен понять, что это образец, и где сделать свой */}
+      {!shop.isPreview && isDemoShop(shop.subdomain) && (
+        <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 bg-ink-night px-4 py-2 text-center text-[13px] font-semibold text-white">
+          <Trans>Это пример витрины</Trans>
+          <a
+            href={serviceUrls(getSiteOrigin()).register}
+            className="rounded-pill bg-sun px-2.5 py-0.5 text-[12px] font-bold text-ink-night hover:bg-sun-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun"
+          >
+            <Trans>Создайте свой каталог →</Trans>
+          </a>
         </p>
       )}
       <div className="lg:border-b lg:border-[#eceaf5] lg:bg-white">

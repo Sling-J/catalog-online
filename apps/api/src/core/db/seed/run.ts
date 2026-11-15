@@ -9,10 +9,8 @@ import postgres from 'postgres';
 import { loadConfig } from '../../config/index.js';
 import { S3Storage } from '../../storage/index.js';
 import * as schema from '../schema/index.js';
+import { DEMO_PHOTOS_DIR } from './photos.js';
 import { DEV_STAFF, seedDemo } from './seed.js';
-
-/** Фото демо-магазина — те же, что у моков: design-assets/storefront в корне репозитория. */
-const DEMO_PHOTOS_DIR = resolve(import.meta.dirname, '../../../../../../design-assets/storefront');
 
 const config = loadConfig();
 const sql = postgres(config.databaseUrl, { max: 1, onnotice: () => {} });

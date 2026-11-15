@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { serviceUrls } from '../service-urls';
+import { isDemoShop, serviceUrls } from '../service-urls';
 
 describe('адреса сервиса', () => {
   afterEach(() => vi.unstubAllEnvs());
@@ -34,5 +34,14 @@ describe('адреса сервиса', () => {
       register: 'http://localhost:5173/register',
       demoShop: 'http://demo.localhost:3000',
     });
+  });
+
+  it('демо-магазин узнаётся по поддомену, на моках — нет', () => {
+    vi.stubEnv('VITE_DEMO_SHOP', '');
+    vi.stubEnv('MODE', 'production');
+    expect(isDemoShop('aigerim-kids')).toBe(true);
+    expect(isDemoShop('drugoj')).toBe(false);
+    vi.stubEnv('MODE', 'mocks');
+    expect(isDemoShop('aigerim-kids')).toBe(false);
   });
 });
